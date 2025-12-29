@@ -16,10 +16,15 @@
 
 #### ⬜ タスク 1: リポジトリと基本設定
 
-- [ ] Cloudflare ディレクトリ作成: `pose-est-infra/cloudflare/`
-- [ ] 基本ファイル作成: README.md, .gitignore, SECURITY.md
-- [ ] Terraform バージョン固定: `versions.tf` 作成
-- [ ] Terraform バックエンド設定: 適切な状態管理方法の決定
+- [ ] Cloudflare ディレクトリ作成 (確認): `pose-est-infra/cloudflare/`
+- [ ] ディレクトリ構造作成: `terraform/`, `terraform/modules/`, `terraform/environments/`
+- [ ] 基本ファイル作成: `README.md`, `.gitignore`, `SECURITY.md`, `.terraform-version`
+- [ ] 開発用ツール作成: `Makefile` (terraform コマンドのラッパー)
+- [ ] Terraform バージョン固定: `terraform/versions.tf` 作成
+- [ ] Terraform バックエンド設計と初期化:
+  - [ ] バックエンドに R2 (S3 互換) を採用決定
+  - [ ] 状態管理バケット作成手順の策定 (ブートストラップ)
+  - [ ] `terraform/backend.tf` (または `backend` block in `versions.tf`) の設定
 
 #### ⬜ タスク 2: Cloudflare 認証設定
 
