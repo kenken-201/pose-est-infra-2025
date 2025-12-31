@@ -16,6 +16,8 @@
 
 terraform {
   backend "s3" {
+    # NOTE: This bucket must be created manually or via bootstrap script BEFORE initializing backend.
+    # See scripts/init-backend.sh
     bucket                      = "pose-est-terraform-state"
     key                         = "cloudflare/terraform.tfstate"
     region                      = "auto"

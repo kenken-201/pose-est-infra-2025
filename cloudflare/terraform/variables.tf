@@ -9,6 +9,11 @@ variable "cloudflare_account_id" {
   description = "Cloudflare Account ID"
   type        = string
   sensitive   = true
+
+  validation {
+    condition     = can(regex("^[a-f0-9]{32}$", var.cloudflare_account_id))
+    error_message = "Cloudflare Account ID must be a 32-character hexadecimal string."
+  }
 }
 
 variable "cloudflare_zone_id" {
