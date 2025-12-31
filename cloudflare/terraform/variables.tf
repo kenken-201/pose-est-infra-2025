@@ -1,40 +1,40 @@
-# -----------------------------------------------------------------------------
-# Input Variables
-# -----------------------------------------------------------------------------
-# Define input variables for the Cloudflare infrastructure module.
-# These variables allow customization of the infrastructure deployment.
-# -----------------------------------------------------------------------------
+/*
+  入力変数
+  -----------------------------------------------------------------------------
+  Cloudflare インフラストラクチャモジュールの入力変数を定義します。
+  これらの変数により、インフラストラクチャのデプロイをカスタマイズできます。
+*/
 
 variable "cloudflare_account_id" {
-  description = "Cloudflare Account ID"
+  description = "Cloudflare アカウント ID"
   type        = string
   sensitive   = true
 
   validation {
     condition     = can(regex("^[a-f0-9]{32}$", var.cloudflare_account_id))
-    error_message = "Cloudflare Account ID must be a 32-character hexadecimal string."
+    error_message = "Cloudflare アカウント ID は 32 文字の 16 進数文字列である必要があります。"
   }
 }
 
 variable "cloudflare_zone_id" {
-  description = "Cloudflare Zone ID for kenken-pose-est.online"
+  description = "kenken-pose-est.online の Cloudflare ゾーン ID"
   type        = string
   default     = ""
 }
 
 variable "environment" {
-  description = "Environment name (dev, production)"
+  description = "環境名 (dev, production)"
   type        = string
   default     = "dev"
 
   validation {
     condition     = contains(["dev", "production"], var.environment)
-    error_message = "Environment must be 'dev' or 'production'."
+    error_message = "環境名は 'dev' または 'production' である必要があります。"
   }
 }
 
 variable "domain_name" {
-  description = "Primary domain name"
+  description = "プライマリドメイン名"
   type        = string
   default     = "kenken-pose-est.online"
 }

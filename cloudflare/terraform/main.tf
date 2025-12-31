@@ -1,20 +1,20 @@
-# -----------------------------------------------------------------------------
-# Main Terraform Configuration
-# -----------------------------------------------------------------------------
-# This file orchestrates all Cloudflare infrastructure modules.
-# Modules will be added in subsequent phases:
-#   - Phase 2: R2 Storage
-#   - Phase 3: DNS
-#   - Phase 4: Cloudflare Pages
-#   - Phase 5: Security (WAF, Rate Limiting)
-# -----------------------------------------------------------------------------
+/*
+  メイン Terraform 設定
+  -----------------------------------------------------------------------------
+  このファイルはすべての Cloudflare インフラストラクチャモジュールを統合管理します。
+  モジュールは以降のフェーズで追加されます:
+    - Phase 2: R2 ストレージ
+    - Phase 3: DNS
+    - Phase 4: Cloudflare Pages
+    - Phase 5: セキュリティ (WAF, レート制限)
+*/
 
-# Provider configuration
+# プロバイダー設定
 provider "cloudflare" {
-  # API token is provided via CLOUDFLARE_API_TOKEN environment variable
+  # API トークンは CLOUDFLARE_API_TOKEN 環境変数経由で提供されます
 }
 
-# Local values for common configurations
+# 共通設定のためのローカル値
 locals {
   project_name = "pose-est"
 

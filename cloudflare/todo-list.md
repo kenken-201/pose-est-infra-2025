@@ -52,17 +52,17 @@
 
 ### 🗄️ **フェーズ 2: R2 ストレージ層設定**
 
-#### ⬜ タスク 4: R2 Terraform モジュール作成
+#### ✅ タスク 4: R2 Terraform モジュール作成
 
-- [ ] Terraform モジュールディレクトリ作成: `modules/r2`
-- [ ] R2 リソース定義 (`main.tf`):
-  - [ ] `cloudflare_r2_bucket`: バケット作成
-  - [ ] `cloudflare_r2_bucket_lifecycle_rule`: 7 日自動削除設定
-  - [ ] `cloudflare_r2_bucket_cors`: フロントエンドからのアクセス許可
-- [ ] 変数定義 (`variables.tf`):
-  - [ ] `account_id`, `bucket_name`, `location`, `cors_origins`
-- [ ] 出力定義 (`outputs.tf`):
-  - [ ] `bucket_name`, `bucket_domain`
+- [x] Terraform モジュールディレクトリ作成: `modules/r2`
+- [x] R2 リソース定義 (`main.tf`):
+  - [x] `cloudflare_r2_bucket`: バケット作成
+  - [x] `cloudflare_r2_bucket_lifecycle_rule`: 7 日自動削除設定
+  - [x] `cloudflare_r2_bucket_cors`: フロントエンドからのアクセス許可
+- [x] 変数定義 (`variables.tf`):
+  - [x] `account_id`, `bucket_name`, `location`, `cors_origins`
+- [x] 出力定義 (`outputs.tf`):
+  - [x] `bucket_name`, `bucket_domain`
 
 #### ⬜ タスク 5: R2 バケット初期設定
 
