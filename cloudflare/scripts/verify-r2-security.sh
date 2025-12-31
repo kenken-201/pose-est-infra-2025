@@ -52,9 +52,14 @@ echo "🔑 [Test 2] 署名付き URL 機能テスト..."
 # テスト用ファイル作成
 echo "This is a security test file via Presigned URL." > "$TEST_FILE"
 
+# 終了時に必ずクリーンアップする
+trap 'rm -f "$TEST_FILE"' EXIT
+
 # Python スクリプトで PUT URL 生成
 echo "   Generating PUT URL..."
-PUT_URL=$(python3 "$SCRIPT_DIR/generate-presigned-url.py" "$TEST_KEY" "PUT" 300 | tail -n 3 | head -n 1)
+# 新しい argparse 形式: python3 generate.py <key> <method> [--expires <sec>]
+# 出力は URL のみ (標準出力)
+PUT_URL=$(python3 "$SCRIPT_DIR/generate-presigned-url.py" "$TEST_KEY" "PUT" --expires 300)
 
 if [ -z "$PUT_URL" ]; then
     echo "❌ 署名付き URL の生成に失敗しました。"
@@ -68,7 +73,7 @@ echo "   Upload complete."
 
 # Python スクリプトで GET URL 生成
 echo "   Generating GET URL..."
-GET_URL=$(python3 "$SCRIPT_DIR/generate-presigned-url.py" "$TEST_KEY" "GET" 300 | tail -n 3 | head -n 1)
+GET_URL=$(python3 "$SCRIPT_DIR/generate-presigned-url.py" "$TEST_KEY" "GET" --expires 300)
 
 # ダウンロード確認
 echo "   Downloading file..."
@@ -82,9 +87,6 @@ else
     echo "Got: $DOWNLOADED_CONTENT"
     exit 1
 fi
-
-# クリーンアップ (今回は上書き前提なので残しても良いがマナーとして)
-rm -f "$TEST_FILE"
 
 echo ""
 echo "✅ すべてのセキュリティ検証テストを通過しました。"
