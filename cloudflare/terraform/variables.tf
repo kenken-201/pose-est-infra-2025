@@ -38,3 +38,9 @@ variable "domain_name" {
   type        = string
   default     = "kenken-pose-est.online"
 }
+
+variable "cors_origins" {
+  description = "CORS 許可オリジンリスト"
+  type        = list(string)
+  default     = ["*"]
+}

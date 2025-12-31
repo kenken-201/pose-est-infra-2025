@@ -86,15 +86,15 @@
   - [x] `scripts/register-gh-secrets.sh`: GitHub Secrets への登録
 - [x] キーローテーション運用ルールの策定 (ドキュメント化: `docs/setup-auth.md`)
 
-#### ⬜ タスク 7: R2 セキュリティ設定
+#### ✅ タスク 7: R2 セキュリティ設定
 
-- [ ] CORS 設定の厳格化: `["*"]` から具体的なオリジン (`localhost`, 本番ドメイン) へ変更
-- [ ] 署名付き URL (Presigned URL) 生成スクリプトの実装:
-  - [ ] `scripts/generate-presigned-url.py`: PUT(アップロード) / GET(ダウンロード) 用
-- [ ] アクセス制御 (ACL) 検証テスト:
-  - [ ] `scripts/verify-r2-security.sh`: 匿名アクセスの拒否 (403/401) を確認
-  - [ ] 公開バケット設定 (Public Access) が無効であることを確認
-- [ ] (Optional) 監査ログ設定調査 (プラン依存のため確認のみ)
+- [x] CORS 設定の厳格化: `["*"]` から具体的なオリジン (`localhost`, 本番ドメイン) へ変更
+- [x] 署名付き URL (Presigned URL) 生成スクリプトの実装:
+  - [x] `scripts/generate-presigned-url.py`: PUT(アップロード) / GET(ダウンロード) 用
+- [x] アクセス制御 (ACL) 検証テスト:
+  - [x] `scripts/verify-r2-security.sh`: 匿名アクセスの拒否 (403/401/400) を確認
+  - [x] 公開バケット設定 (Public Access) が無効であることを確認
+- [x] (Optional) 監査ログ設定調査 (プラン依存のため確認のみ/今回はスキップ)
 
 ### 🛡️ **フェーズ 3: DNS とドメイン設定**
 

@@ -39,6 +39,6 @@ module "r2_bucket" {
   location    = "apac"
 
   # 開発環境はすべてのオリジンを許可、本番環境は特定ドメインのみに制限可能
-  # 現在は開発・本番ともに広めに許可し、必要に応じて制限します
-  cors_origins = ["*"]
+  # tfvars 経由で環境ごとに異なる値を注入します
+  cors_origins = var.cors_origins
 }
