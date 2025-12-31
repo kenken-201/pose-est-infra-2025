@@ -54,10 +54,15 @@
 
 #### ⬜ タスク 4: R2 Terraform モジュール作成
 
-- [ ] Terraform モジュール: `modules/r2`
-- [ ] R2 バケットリソース定義: 環境別バケット作成
-- [ ] ライフサイクルポリシー: 7 日自動削除設定
-- [ ] バケット設定出力: バケット名、リージョンなど
+- [ ] Terraform モジュールディレクトリ作成: `modules/r2`
+- [ ] R2 リソース定義 (`main.tf`):
+  - [ ] `cloudflare_r2_bucket`: バケット作成
+  - [ ] `cloudflare_r2_bucket_lifecycle_rule`: 7 日自動削除設定
+  - [ ] `cloudflare_r2_bucket_cors`: フロントエンドからのアクセス許可
+- [ ] 変数定義 (`variables.tf`):
+  - [ ] `account_id`, `bucket_name`, `location`, `cors_origins`
+- [ ] 出力定義 (`outputs.tf`):
+  - [ ] `bucket_name`, `bucket_domain`
 
 #### ⬜ タスク 5: R2 バケット初期設定
 
