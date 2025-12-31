@@ -9,18 +9,31 @@ resource "cloudflare_r2_bucket" "this" {
   -----------------------------------------------------------------------------
   コスト最適化のため、7日間の有効期限ポリシーを設定します。
 */
-resource "cloudflare_r2_bucket_lifecycle_rule" "retention" {
+resource "cloudflare_r2_bucket_lifecycle" "retention" {
   account_id  = var.account_id
   bucket_name = cloudflare_r2_bucket.this.name
 
-  rule {
-    id     = "7-day-retention"
-    status = "enabled"
+  rules = [
+    {
+      id      = "7-day-retention"
+      enabled = true
 
-    expiration {
-      days = 7
+      conditions = {
+        prefix = "" # 全てのオブジェクトに適用
+      }
+
+      delete_objects_transition = {
+        condition = {
+          type    = "Age"
+          max_age = 604800 # 7日間 (秒)
+        }
+      }
+
+      # Optional attributes must be omitted or handled if required by object structure
+      abort_multipart_uploads_transition = null
+      storage_class_transitions          = []
     }
-  }
+  ]
 }
 
 # CORS 設定 (フロントエンドからのアクセス用)
@@ -28,11 +41,15 @@ resource "cloudflare_r2_bucket_cors" "this" {
   account_id  = var.account_id
   bucket_name = cloudflare_r2_bucket.this.name
 
-  rule {
-    allowed_methods = ["GET", "PUT", "HEAD", "POST"]
-    allowed_origins = var.cors_origins
-    allowed_headers = ["*"]
-    expose_headers  = ["ETag"]
-    max_age_seconds = 3600
-  }
+  rules = [
+    {
+      allowed = {
+        methods = ["GET", "PUT", "HEAD", "POST"]
+        origins = var.cors_origins
+        headers = ["*"]
+      }
+      expose_headers  = ["ETag"]
+      max_age_seconds = 3600
+    }
+  ]
 }

@@ -24,3 +24,21 @@ locals {
     managed_by  = "terraform"
   }
 }
+
+/*
+  R2 バケットモジュール (動画保存用)
+  -----------------------------------------------------------------------------
+  環境ごとの R2 バケットを作成します。
+  バケット名は `pose-est-videos-<env>` の形式になります。
+*/
+module "r2_bucket" {
+  source = "./modules/r2"
+
+  account_id  = var.cloudflare_account_id
+  bucket_name = "pose-est-videos-${var.environment}"
+  location    = "apac"
+
+  # 開発環境はすべてのオリジンを許可、本番環境は特定ドメインのみに制限可能
+  # 現在は開発・本番ともに広めに許可し、必要に応じて制限します
+  cors_origins = ["*"]
+}

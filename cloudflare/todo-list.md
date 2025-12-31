@@ -64,18 +64,18 @@
 - [x] 出力定義 (`outputs.tf`):
   - [x] `bucket_name`, `bucket_domain`
 
-#### ⬜ タスク 5: R2 バケット要件定義と実装
+#### ✅ タスク 5: R2 バケット要件定義と実装
 
-- [ ] `terraform/main.tf` に `modules/r2` 呼び出しを追加
-- [ ] 環境別変数ファイル作成:
-  - [ ] `terraform/environments/dev/terraform.tfvars`
-  - [ ] `terraform/environments/production/terraform.tfvars`
-- [ ] 適用と検証 (`dev`):
-  - [ ] `terraform plan -var-file=environments/dev/terraform.tfvars`
-  - [ ] `terraform apply` (Dev)
-  - [ ] バケット作成確認 (`aws s3 ls` 互換コマンド等)
-- [ ] テスト:
-  - [ ] CORS 検証 (curl)
+- [x] `terraform/main.tf` に `modules/r2` 呼び出しを追加
+- [x] 環境別変数ファイル作成:
+  - [x] `terraform/environments/dev/terraform.tfvars`
+  - [x] `terraform/environments/production/terraform.tfvars`
+- [x] 適用と検証 (`dev`):
+  - [x] `terraform plan -var-file=environments/dev/terraform.tfvars`
+  - [x] `terraform apply` (Dev)
+  - [x] バケット作成確認 (Python script + curl)
+- [x] テスト:
+  - [x] CORS 検証 (curl / boto3)
 
 #### ⬜ タスク 6: R2 アクセスキー管理
 
