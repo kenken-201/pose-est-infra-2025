@@ -26,24 +26,29 @@
   - [x] 状態管理バケット作成手順の策定 (ブートストラップ)
   - [x] `terraform/backend.tf` (または `backend` block in `versions.tf`) の設定
 
-#### ⬜ タスク 2: Cloudflare 認証設定
+#### ✅ タスク 2: Cloudflare 認証設定
 
 - [x] Cloudflare API トークン作成ガイド作成: `docs/setup-auth.md`
-- [ ] API トークン発行と検証:
-  - 必要な権限: Zone Read/Write, DNS Edit, Page Write, R2 Read/Write
+- [x] API トークン発行と検証:
+  - [x] 必要な権限: Zone Read/Write, DNS Edit, Page Write, R2 Read/Write, etc.
   - [x] 検証スクリプト作成: `scripts/verify-auth.sh`
-  - 動作確認: `make verify-auth` (またはスクリプト直接実行)
+  - [x] 動作確認: `make verify-auth` (またはスクリプト直接実行)
 - [x] 環境変数テンプレート作成: `.env.example`
-- [ ] ローカル環境変数設定: `.env` (gitignored)
-- [ ] GitHub Secrets 設定
+- [x] ローカル環境変数設定: `.env` (gitignored)
+- [x] GitHub Secrets 設定
   - `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`
   - `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`
 
 #### ⬜ タスク 3: CI/CD 基本パイプライン作成
 
-- [ ] GitHub Actions 基本ワークフロー作成
-- [ ] Terraform Plan ワークフロー作成（PR 時自動実行）
-- [ ] セキュリティスキャンワークフロー作成
+- [ ] GitHub Actions 共通設定:
+  - [ ] ワークフローのパスフィルタリング設定 (`pose-est-infra/cloudflare/**`)
+- [ ] Terraform CI ワークフロー作成: `.github/workflows/cloudflare-terraform-ci.yml`
+  - [ ] `fmt`, `validate`
+  - [ ] `tflint` (リンター)
+  - [ ] `plan` (PR への結果コメントなど)
+- [ ] セキュリティスキャンワークフロー作成: `.github/workflows/cloudflare-security.yml`
+  - [ ] `checkov` による静的解析
 
 ### 🗄️ **フェーズ 2: R2 ストレージ層設定**
 
