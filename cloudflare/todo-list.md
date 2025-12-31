@@ -79,10 +79,12 @@
 
 #### ⬜ タスク 6: R2 アクセスキー管理
 
-- [ ] R2 アクセスキー作成 (Terraform または手動)
-- [ ] キーの GitHub Secrets 登録
-- [ ] キーの Secret Manager 登録 (GCP 連携用)
-- [ ] キーローテーションポリシー策定
+- [ ] アプリケーション用 R2 アクセスキー発行 (Cloudflare Dashboard 経由 - 手動)
+  - [ ] 権限: `Object Read/Write` (バケット単位の制限推奨)
+- [ ] シークレット管理スクリプト作成:
+  - [ ] `scripts/setup-secrets.sh`: ローカル `.env` への追加ヘルパー
+  - [ ] `scripts/register-gh-secrets.sh`: GitHub Secrets への登録
+- [ ] キーローテーション運用ルールの策定 (ドキュメント化)
 
 #### ⬜ タスク 7: R2 セキュリティ設定
 
