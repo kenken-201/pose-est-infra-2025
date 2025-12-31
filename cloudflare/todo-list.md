@@ -39,16 +39,16 @@
   - `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`
   - `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`
 
-#### ⬜ タスク 3: CI/CD 基本パイプライン作成
+#### ✅ タスク 3: CI/CD 基本パイプライン作成
 
-- [ ] GitHub Actions 共通設定:
-  - [ ] ワークフローのパスフィルタリング設定 (`pose-est-infra/cloudflare/**`)
-- [ ] Terraform CI ワークフロー作成: `.github/workflows/cloudflare-terraform-ci.yml`
-  - [ ] `fmt`, `validate`
-  - [ ] `tflint` (リンター)
-  - [ ] `plan` (PR への結果コメントなど)
-- [ ] セキュリティスキャンワークフロー作成: `.github/workflows/cloudflare-security.yml`
-  - [ ] `checkov` による静的解析
+- [x] GitHub Actions 共通設定:
+  - [x] ワークフローのパスフィルタリング設定 (`pose-est-infra/cloudflare/**`)
+- [x] Terraform CI ワークフロー作成: `.github/workflows/cloudflare-terraform-ci.yml`
+  - [x] `fmt`, `validate`
+  - [x] `tflint` (リンター)
+  - [x] `plan` (PR への結果コメントなど)
+- [x] セキュリティスキャンワークフロー作成: `.github/workflows/cloudflare-security.yml`
+  - [x] `checkov` による静的解析
 
 ### 🗄️ **フェーズ 2: R2 ストレージ層設定**
 
