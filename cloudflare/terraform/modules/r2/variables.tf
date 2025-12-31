@@ -35,4 +35,20 @@ variable "cors_origins" {
   description = "許可された CORS オリジンのリスト"
   type        = list(string)
   default     = []
+
+  validation {
+    condition     = length(var.cors_origins) > 0
+    error_message = "cors_origins には少なくとも 1 つのオリジンを指定する必要があります。"
+  }
+}
+
+variable "retention_days" {
+  description = "オブジェクトの保持日数 (ライフサイクル自動削除)"
+  type        = number
+  default     = 7
+
+  validation {
+    condition     = var.retention_days >= 1 && var.retention_days <= 365
+    error_message = "retention_days は 1 ~ 365 日の範囲で指定する必要があります。"
+  }
 }

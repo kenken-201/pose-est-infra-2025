@@ -7,7 +7,8 @@ resource "cloudflare_r2_bucket" "this" {
 /*
   ライフサイクルポリシー設定
   -----------------------------------------------------------------------------
-  コスト最適化のため、7日間の有効期限ポリシーを設定します。
+  コスト最適化のため、指定日数後にオブジェクトを自動削除します。
+  retention_days 変数で保持期間を制御します。
 */
 resource "cloudflare_r2_bucket_lifecycle" "retention" {
   account_id  = var.account_id
@@ -15,7 +16,7 @@ resource "cloudflare_r2_bucket_lifecycle" "retention" {
 
   rules = [
     {
-      id      = "7-day-retention"
+      id      = "${var.retention_days}-day-retention"
       enabled = true
 
       conditions = {
@@ -25,7 +26,7 @@ resource "cloudflare_r2_bucket_lifecycle" "retention" {
       delete_objects_transition = {
         condition = {
           type    = "Age"
-          max_age = 604800 # 7日間 (秒)
+          max_age = var.retention_days * 86400 # 日数を秒に変換
         }
       }
 

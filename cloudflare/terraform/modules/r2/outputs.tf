@@ -8,3 +8,8 @@ output "bucket_domain" {
   value       = "https://${var.account_id}.r2.cloudflarestorage.com/${cloudflare_r2_bucket.this.name}"
   sensitive   = true
 }
+
+output "retention_days" {
+  description = "設定されたオブジェクト保持期間 (日)"
+  value       = var.retention_days
+}
