@@ -64,13 +64,18 @@
 - [x] 出力定義 (`outputs.tf`):
   - [x] `bucket_name`, `bucket_domain`
 
-#### ⬜ タスク 5: R2 バケット初期設定
+#### ⬜ タスク 5: R2 バケット要件定義と実装
 
-- [ ] 開発環境 R2 バケット作成: `pose-est-videos-dev`
-- [ ] 本番環境 R2 バケット作成: `pose-est-videos-prod`
-- [ ] バケットポリシー設定: 最小限の公開アクセス
-- [ ] CORS 設定: フロントエンドドメインからのアクセス許可
-- [ ] テストファイルアップロード/ダウンロード検証
+- [ ] `terraform/main.tf` に `modules/r2` 呼び出しを追加
+- [ ] 環境別変数ファイル作成:
+  - [ ] `terraform/environments/dev/terraform.tfvars`
+  - [ ] `terraform/environments/production/terraform.tfvars`
+- [ ] 適用と検証 (`dev`):
+  - [ ] `terraform plan -var-file=environments/dev/terraform.tfvars`
+  - [ ] `terraform apply` (Dev)
+  - [ ] バケット作成確認 (`aws s3 ls` 互換コマンド等)
+- [ ] テスト:
+  - [ ] CORS 検証 (curl)
 
 #### ⬜ タスク 6: R2 アクセスキー管理
 
