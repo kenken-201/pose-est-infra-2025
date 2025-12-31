@@ -160,7 +160,7 @@
 - [ ] プライベートエンドポイント設定（VPC 接続）
 - [ ] Cloud Armor 設定（DDoS 保護）
 - [ ] SSL 証明書管理（マネージド SSL）
-- [ ] カスタムドメイン準備: `api.kenken-pose-est.com`（Cloudflare 連携用）
+- [ ] カスタムドメイン準備: `api.kenken-pose-est.online`（Cloudflare 連携用）
 - [ ] CORS 設定: Cloudflare ドメインのみ許可
 - [ ] R2 署名 URL 生成エンドポイントの保護
 

@@ -22,7 +22,7 @@
 │                                                                    │
 │  DNS管理:                                                          │
 │  ┌────────────────────────────────────────────┐                   │
-│  │  kenken-pose-est.com                       │                   │
+│  │  kenken-pose-est.online                       │                   │
 │  │  • @ → Cloudflare Pages IP                │                   │
 │  │  • api → GCP Cloud Run CNAME              │                   │
 │  │  • www → Cloudflare Pages CNAME           │                   │
@@ -56,7 +56,7 @@
 ┌─────────────────▼───────────────────────────────────────────────┐
 │              Google Cloud Platform (GCP)                       │
 │                  (連携先 - 別リポジトリ)                        │
-│  API: api.kenken-pose-est.com → Cloud Run                     │
+│  API: api.kenken-pose-est.online → Cloud Run                     │
 │  R2連携: 署名URL生成 → 直接R2アクセス                         │
 └────────────────────────────────────────────────────────────────┘
 ```
@@ -268,11 +268,11 @@ pose-est-infra/cloudflare/
 
 ### 7.2 環境戦略
 
-| 環境           | ドメイン                       | R2 バケット            | 自動デプロイ           | 目的                 |
-| -------------- | ------------------------------ | ---------------------- | ---------------------- | -------------------- |
-| **開発**       | `dev.kenken-pose-est.com`      | `pose-est-videos-dev`  | プルリクエストマージ時 | 機能開発・結合テスト |
-| **プレビュー** | `{branch}.kenken-pose-est.com` | 使用しない             | PR 作成時              | 機能プレビュー       |
-| **本番**       | `kenken-pose-est.com`          | `pose-est-videos-prod` | 手動承認後             | 本番サービス提供     |
+| 環境           | ドメイン                          | R2 バケット            | 自動デプロイ           | 目的                 |
+| -------------- | --------------------------------- | ---------------------- | ---------------------- | -------------------- |
+| **開発**       | `dev.kenken-pose-est.online`      | `pose-est-videos-dev`  | プルリクエストマージ時 | 機能開発・結合テスト |
+| **プレビュー** | `{branch}.kenken-pose-est.online` | 使用しない             | PR 作成時              | 機能プレビュー       |
+| **本番**       | `kenken-pose-est.online`          | `pose-est-videos-prod` | 手動承認後             | 本番サービス提供     |
 
 ## 8. GCP 連携ポイント (R2 署名 URL 生成追加)
 

@@ -14,26 +14,30 @@
 
 ## 🏗️ **フェーズ 1: 基本プロジェクト設定と認証**
 
-#### ⬜ タスク 1: リポジトリと基本設定
+#### ✅ タスク 1: リポジトリと基本設定
 
-- [ ] Cloudflare ディレクトリ作成 (確認): `pose-est-infra/cloudflare/`
-- [ ] ディレクトリ構造作成: `terraform/`, `terraform/modules/`, `terraform/environments/`
-- [ ] 基本ファイル作成: `README.md`, `.gitignore`, `SECURITY.md`, `.terraform-version`
-- [ ] 開発用ツール作成: `Makefile` (terraform コマンドのラッパー)
-- [ ] Terraform バージョン固定: `terraform/versions.tf` 作成
-- [ ] Terraform バックエンド設計と初期化:
-  - [ ] バックエンドに R2 (S3 互換) を採用決定
-  - [ ] 状態管理バケット作成手順の策定 (ブートストラップ)
-  - [ ] `terraform/backend.tf` (または `backend` block in `versions.tf`) の設定
+- [x] Cloudflare ディレクトリ作成 (確認): `pose-est-infra/cloudflare/`
+- [x] ディレクトリ構造作成: `terraform/`, `terraform/modules/`, `terraform/environments/`
+- [x] 基本ファイル作成: `README.md`, `.gitignore`, `SECURITY.md`, `.terraform-version`
+- [x] 開発用ツール作成: `Makefile` (terraform コマンドのラッパー)
+- [x] Terraform バージョン固定: `terraform/versions.tf` 作成
+- [x] Terraform バックエンド設計と初期化:
+  - [x] バックエンドに R2 (S3 互換) を採用決定
+  - [x] 状態管理バケット作成手順の策定 (ブートストラップ)
+  - [x] `terraform/backend.tf` (または `backend` block in `versions.tf`) の設定
 
 #### ⬜ タスク 2: Cloudflare 認証設定
 
-- [ ] Cloudflare API トークン作成
-  - 必要な権限: Zone Read/Write, DNS Edit, Page Write, **R2 Read/Write**
+- [ ] Cloudflare API トークン作成ガイド作成: `docs/setup-auth.md`
+- [ ] API トークン発行と検証:
+  - 必要な権限: Zone Read/Write, DNS Edit, Page Write, R2 Read/Write
+  - 検証スクリプト作成: `scripts/verify-auth.sh`
+  - 動作確認: `make verify-auth` (またはスクリプト直接実行)
+- [ ] 環境変数テンプレート作成: `.env.example`
+- [ ] ローカル環境変数設定: `.env` (gitignored)
 - [ ] GitHub Secrets 設定
   - `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`
-  - `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY` (開発用)
-- [ ] 環境変数設定: ローカル開発環境用
+  - `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`
 
 #### ⬜ タスク 3: CI/CD 基本パイプライン作成
 
@@ -77,7 +81,7 @@
 #### ⬜ タスク 8: ゾーンとドメイン設定
 
 - [ ] Terraform モジュール: `modules/dns`
-- [ ] Cloudflare ゾーン追加: `kenken-pose-est.com`
+- [ ] Cloudflare ゾーン追加: `kenken-pose-est.online`
 - [ ] DNS レコード基本設定:
   - A レコード: `@` → Cloudflare Pages IP
   - CNAME レコード: `www` → Cloudflare Pages
@@ -86,7 +90,7 @@
 
 #### ⬜ タスク 9: 環境別 DNS 設定
 
-- [ ] 開発環境 DNS: `dev.kenken-pose-est.com`
+- [ ] 開発環境 DNS: `dev.kenken-pose-est.online`
 - [ ] プレビュー環境 DNS: ブランチ名ベースの自動生成
 - [ ] API サブドメイン: `api` → GCP Cloud Run（変数で管理）
 
@@ -105,8 +109,8 @@
 
 #### ⬜ タスク 11: カスタムドメイン設定
 
-- [ ] プライマリドメイン: `kenken-pose-est.com`
-- [ ] エイリアスドメイン: `www.kenken-pose-est.com`
+- [ ] プライマリドメイン: `kenken-pose-est.online`
+- [ ] エイリアスドメイン: `www.kenken-pose-est.online`
 - [ ] HTTPS 強制: 自動的に HTTPS へリダイレクト
 - [ ] 証明書管理: 自動 SSL 証明書発行
 
@@ -140,7 +144,7 @@
 #### ⬜ タスク 15: レート制限設定
 
 - [ ] API エンドポイントのレート制限:
-  - `api.kenken-pose-est.com/*` への制限
+  - `api.kenken-pose-est.online/*` への制限
   - IP ベースの制限設定
   - 異常トラフィックのブロック
 - [ ] ブルートフォース対策: ログイン試行回数制限
