@@ -52,34 +52,49 @@
 
 ### 🗄️ **フェーズ 2: R2 ストレージ層設定**
 
-#### ⬜ タスク 4: R2 Terraform モジュール作成
+#### ✅ タスク 4: R2 Terraform モジュール作成
 
-- [ ] Terraform モジュール: `modules/r2`
-- [ ] R2 バケットリソース定義: 環境別バケット作成
-- [ ] ライフサイクルポリシー: 7 日自動削除設定
-- [ ] バケット設定出力: バケット名、リージョンなど
+- [x] Terraform モジュールディレクトリ作成: `modules/r2`
+- [x] R2 リソース定義 (`main.tf`):
+  - [x] `cloudflare_r2_bucket`: バケット作成
+  - [x] `cloudflare_r2_bucket_lifecycle_rule`: 7 日自動削除設定
+  - [x] `cloudflare_r2_bucket_cors`: フロントエンドからのアクセス許可
+- [x] 変数定義 (`variables.tf`):
+  - [x] `account_id`, `bucket_name`, `location`, `cors_origins`
+- [x] 出力定義 (`outputs.tf`):
+  - [x] `bucket_name`, `bucket_domain`
 
-#### ⬜ タスク 5: R2 バケット初期設定
+#### ✅ タスク 5: R2 バケット要件定義と実装
 
-- [ ] 開発環境 R2 バケット作成: `pose-est-videos-dev`
-- [ ] 本番環境 R2 バケット作成: `pose-est-videos-prod`
-- [ ] バケットポリシー設定: 最小限の公開アクセス
-- [ ] CORS 設定: フロントエンドドメインからのアクセス許可
-- [ ] テストファイルアップロード/ダウンロード検証
+- [x] `terraform/main.tf` に `modules/r2` 呼び出しを追加
+- [x] 環境別変数ファイル作成:
+  - [x] `terraform/environments/dev/terraform.tfvars`
+  - [x] `terraform/environments/production/terraform.tfvars`
+- [x] 適用と検証 (`dev`):
+  - [x] `terraform plan -var-file=environments/dev/terraform.tfvars`
+  - [x] `terraform apply` (Dev)
+  - [x] バケット作成確認 (Python script + curl)
+- [x] テスト:
+  - [x] CORS 検証 (curl / boto3)
 
-#### ⬜ タスク 6: R2 アクセスキー管理
+#### ✅ タスク 6: R2 アクセスキー管理
 
-- [ ] R2 アクセスキー作成 (Terraform または手動)
-- [ ] キーの GitHub Secrets 登録
-- [ ] キーの Secret Manager 登録 (GCP 連携用)
-- [ ] キーローテーションポリシー策定
+- [x] アプリケーション用 R2 アクセスキー発行 (Cloudflare Dashboard 経由 - 手動)
+  - [x] 権限: `Object Read/Write` (バケット単位の制限推奨)
+- [x] シークレット管理スクリプト作成:
+  - [x] `scripts/setup-secrets.sh`: ローカル `.env` への追加ヘルパー
+  - [x] `scripts/register-gh-secrets.sh`: GitHub Secrets への登録
+- [x] キーローテーション運用ルールの策定 (ドキュメント化: `docs/setup-auth.md`)
 
-#### ⬜ タスク 7: R2 セキュリティ設定
+#### ✅ タスク 7: R2 セキュリティ設定
 
-- [ ] バケット公開アクセス制限
-- [ ] 署名 URL 生成テスト用スクリプト作成
-- [ ] IP 制限ポリシー検討 (必要に応じて)
-- [ ] 監査ログ有効化
+- [x] CORS 設定の厳格化: `["*"]` から具体的なオリジン (`localhost`, 本番ドメイン) へ変更
+- [x] 署名付き URL (Presigned URL) 生成スクリプトの実装:
+  - [x] `scripts/generate-presigned-url.py`: PUT(アップロード) / GET(ダウンロード) 用
+- [x] アクセス制御 (ACL) 検証テスト:
+  - [x] `scripts/verify-r2-security.sh`: 匿名アクセスの拒否 (403/401/400) を確認
+  - [x] 公開バケット設定 (Public Access) が無効であることを確認
+- [x] (Optional) 監査ログ設定調査 (プラン依存のため確認のみ/今回はスキップ)
 
 ### 🛡️ **フェーズ 3: DNS とドメイン設定**
 
