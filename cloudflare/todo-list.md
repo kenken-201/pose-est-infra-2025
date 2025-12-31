@@ -28,12 +28,12 @@
 
 #### ⬜ タスク 2: Cloudflare 認証設定
 
-- [ ] Cloudflare API トークン作成ガイド作成: `docs/setup-auth.md`
+- [x] Cloudflare API トークン作成ガイド作成: `docs/setup-auth.md`
 - [ ] API トークン発行と検証:
   - 必要な権限: Zone Read/Write, DNS Edit, Page Write, R2 Read/Write
-  - 検証スクリプト作成: `scripts/verify-auth.sh`
+  - [x] 検証スクリプト作成: `scripts/verify-auth.sh`
   - 動作確認: `make verify-auth` (またはスクリプト直接実行)
-- [ ] 環境変数テンプレート作成: `.env.example`
+- [x] 環境変数テンプレート作成: `.env.example`
 - [ ] ローカル環境変数設定: `.env` (gitignored)
 - [ ] GitHub Secrets 設定
   - `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`

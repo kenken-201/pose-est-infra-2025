@@ -1,8 +1,11 @@
 .PHONY: init plan apply fmt validate lint
 
 TERRAFORM_DIR := terraform
+SCRIPTS_DIR := scripts
 
-init:
+verify-auth:
+	./$(SCRIPTS_DIR)/verify-auth.sh
+
 	cd $(TERRAFORM_DIR) && terraform init
 
 plan:
