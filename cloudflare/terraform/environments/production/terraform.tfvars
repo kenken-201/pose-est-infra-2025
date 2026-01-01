@@ -4,5 +4,3 @@ cors_origins = [
   "https://kenken-pose-est.online",
   "https://www.kenken-pose-est.online"
 ]
-  "https://www.kenken-pose-est.online"
-]

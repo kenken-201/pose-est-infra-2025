@@ -1,5 +1,9 @@
+# ==============================================================================
+# DNS Module Variables
+# ==============================================================================
+
 variable "zone_id" {
-  description = "Cloudflare Zone ID"
+  description = "Cloudflare Zone ID (32文字の16進数)"
   type        = string
 
   validation {
@@ -9,6 +13,11 @@ variable "zone_id" {
 }
 
 variable "domain_name" {
-  description = "ドメイン名 (e.g. example.com)"
+  description = "管理対象のドメイン名 (e.g. example.com)"
   type        = string
+
+  validation {
+    condition     = can(regex("^[a-z0-9][a-z0-9.-]*\\.[a-z]{2,}$", var.domain_name))
+    error_message = "有効なドメイン名を指定してください (例: example.com)。"
+  }
 }
