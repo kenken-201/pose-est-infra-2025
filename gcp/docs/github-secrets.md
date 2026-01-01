@@ -50,8 +50,25 @@ jobs:
             -backend-config="endpoint=https://${{ secrets.CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com"
 ```
 
-## セキュリティに関する注意
+## セキュリティに関する詳細とベストプラクティス
 
-- **Workload Identity Federation** を使用しているため、サービスアカウントキー（JSON）は不要です
-- Secrets は暗号化されて保存され、ログには表示されません
-- `id-token: write` パーミッションが必要です
+### 1. Workload Identity Federation (WIF)
+
+- **キーレス認証**: 従来の長期間有効なサービスアカウントキー（JSON）を使用せず、一時的なトークンを使用するため、漏洩リスクが大幅に低減されます。
+- **属性条件**: Workload Identity Pool Provider の設定で `attribute.repository_owner` 等の条件を設定することで、特定のリポジトリからのリクエストのみを許可しています（推奨）。
+
+### 2. GitHub Actions のバージョン固定
+
+本番環境のワークフローでは、サプライチェーン攻撃を防ぐため、Action のバージョンを SHA ハッシュで固定することを強く推奨します。
+
+```yaml
+# 推奨設定例（バージョンは適宜最新を確認してください）
+uses: google-github-actions/auth@6fc4af4b145ae7821d527454aa9bd537d1f2dc5f # v2
+uses: hashicorp/setup-terraform@a1502cd9e758c50496cc9ac5308c48ae4db1d30d # v3
+```
+
+### 3. Secrets の安全性
+
+- GitHub Secrets は暗号化されて保存されます。
+- ログ出力時は自動的にマスク（`***`）されますが、デバッグ出力などで誤って値を表示しないよう注意してください。
+- Terraform のバックエンド設定（`terraform init`）で Secret を使用する際も、コマンドライン引数として渡すことで、コード内にハードコーディングすることを防いでいます。
