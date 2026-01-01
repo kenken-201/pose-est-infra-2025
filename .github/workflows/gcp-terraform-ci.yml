@@ -58,6 +58,7 @@ jobs:
           tflint_version: v0.50.3
 
       # フォーマットチェック
+      # エラーがあっても処理を継続し、後続のステップでまとめて報告する
       - name: Terraform Format Check
         id: fmt
         run: terraform fmt -check -recursive
@@ -121,11 +122,11 @@ jobs:
 
             | Step | Status |
             |------|--------|
-            | 🖌 Format | ${{ steps.fmt.outcome }} |
-            | ⚙️ Init | ${{ steps.init.outcome }} |
-            | 🔍 Validate | ${{ steps.validate.outcome }} |
-            | 🧹 TFLint | ${{ steps.tflint.outcome }} |
-            | 📋 Plan | ${{ steps.plan.outcome }} |
+            | 🖌 Format | \`${{ steps.fmt.outcome }}\` |
+            | ⚙️ Init | \`${{ steps.init.outcome }}\` |
+            | 🔍 Validate | \`${{ steps.validate.outcome }}\` |
+            | 🧹 TFLint | \`${{ steps.tflint.outcome }}\` |
+            | 📋 Plan | \`${{ steps.plan.outcome }}\` |
 
             <details><summary>Show Plan Output</summary>
 
@@ -135,7 +136,7 @@ jobs:
 
             </details>
 
-            *Pushed by: @${{ github.actor }}, Action: ${{ github.event_name }}*`;
+            *Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
 
             if (botComment) {
               await github.rest.issues.updateComment({
