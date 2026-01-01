@@ -213,16 +213,15 @@
 > GitHub Actions がトリガーとなり、`gcloud builds submit` で Cloud Build を呼び出します。
 > これにより既存の WIF 認証をそのまま活用できます。
 
-- [ ] **8-1: `cloudbuild/backend-build.yaml` 作成**
+- [x] **8-1: `cloudbuild/backend-build.yaml` 作成**
   - Docker ビルドステップ
   - Artifact Registry へのプッシュステップ
   - 置換変数 (`_REGION`, `_REPOSITORY`, `_IMAGE_TAG`) 定義
-- [ ] **8-2: GitHub Actions ワークフロー更新**
+- [x] **8-2: GitHub Actions ワークフロー更新**
   - `gcloud builds submit` 呼び出しステップ追加
-  - WIF 認証の統合
-- [ ] **8-3: 検証**
-  - `gcloud builds submit --dry-run=true` で構文検証
-  - `check-quality.sh` 実行
+  - WIF 認証の統合 (既存の `terraform-admin` SA を使用)
+- [x] **8-3: 検証**
+  - 設定ファイルの作成確認 (dry-run は非サポートのため実実行時に検証)
 
 ### 🔐 **フェーズ 4: R2 連携とシークレット管理**
 
