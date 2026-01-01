@@ -82,6 +82,9 @@ module "artifact_registry" {
   cloud_build_sa_member = module.iam.cloud_build_sa_member
   cloud_run_sa_member   = module.iam.cloud_run_sa_member
 
+  # 開発環境ではタグの上書きを許可 (latest タグの更新など)
+  immutable_tags = false
+
   depends_on = [
     module.gcp_project, # API 有効化後
     module.iam          # SA 作成後

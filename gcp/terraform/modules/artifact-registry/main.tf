@@ -31,6 +31,11 @@ resource "google_artifact_registry_repository" "repo" {
   description   = "Docker repository for Pose Estimation Backend (${var.environment})"
   format        = "DOCKER"
 
+  # Docker タグの不変性設定 (本番環境では true 推奨)
+  docker_config {
+    immutable_tags = var.immutable_tags
+  }
+
   # -----------------------------------------------------------------------------
   # クリーンアップポリシー (コスト最適化)
   # -----------------------------------------------------------------------------

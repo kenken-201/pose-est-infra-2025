@@ -33,3 +33,9 @@ variable "cloud_run_sa_member" {
   description = "Cloud Run サービスアカウントの IAM メンバー形式 (serviceAccount:...)"
   type        = string
 }
+
+variable "immutable_tags" {
+  description = "Docker タグの不変性を有効にするか (true: 上書き禁止, false: 上書き許可)"
+  type        = bool
+  default     = false # 開発環境の柔軟性のためデフォルトは false
+}
