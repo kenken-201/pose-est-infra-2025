@@ -14,27 +14,116 @@
 
 ## 🏗️ **フェーズ 1: 基本プロジェクト設定と認証**
 
-#### ⬜ タスク 1: リポジトリと基本設定
+#### ✅ タスク 1: リポジトリと基本設定
 
-- [ ] GCP ディレクトリ作成: `pose-est-infra/gcp/`
-- [ ] 基本ファイル作成: README.md, .gitignore, SECURITY.md
-- [ ] Terraform バージョン固定: `versions.tf` 作成
-- [ ] Terraform バックエンド設定: Cloud Storage バケット準備（状態管理用）
+> [!NOTE]
+> Cloudflare 側の既存実装 (`pose-est-infra/cloudflare/`) から流用可能なファイルを活用し、効率的に構築します。
+> tfstate 管理先は **Cloudflare R2** (`pose-est-terraform-state` バケット) を使用します。
 
-#### ⬜ タスク 2: GCP 認証設定
+- [x] **1-1: ディレクトリ構造作成**
+  - [x] `pose-est-infra/gcp/terraform/` ディレクトリ作成
+  - [x] `pose-est-infra/gcp/terraform/modules/` ディレクトリ作成
+  - [x] `pose-est-infra/gcp/terraform/environments/` ディレクトリ作成
+  - [x] `pose-est-infra/gcp/docs/` ディレクトリ作成
+  - [x] `pose-est-infra/gcp/scripts/` ディレクトリ作成
+- [x] **1-2: `.gitignore` 作成**
+  - [x] Cloudflare 版 (`cloudflare/.gitignore`) をそのまま流用
+- [x] **1-3: `README.md` 作成**
+  - [x] Cloudflare 版を参考に GCP 向けに調整
+- [x] **1-4: `SECURITY.md` 作成**
+  - [x] Cloudflare 版をそのまま流用
+- [x] **1-5: `terraform/versions.tf` 作成**
+  - [x] Terraform バージョン固定: `>= 1.14.3`
+  - [x] Google プロバイダー設定
+  - [x] Google Beta プロバイダー設定（オプション）
+- [x] **1-6: `terraform/backend.tf` 作成**
+  - [x] Cloudflare R2 をバックエンドとして設定
+  - [x] バケット: `pose-est-terraform-state`
+  - [x] キー: `gcp/terraform.tfstate`
+  - [x] Cloudflare 版 (`cloudflare/terraform/backend.tf`) を参考に作成
+- [x] **1-7: R2 バックエンド初期化テスト**
+  - [x] `terraform init` の実行確認
+  - [x] `terraform plan` の実行確認
+  - [x] tfstate ファイルが R2 に作成されることを確認
+- [x] **1-8: 環境変数設定 (.env)**
+  - [x] `.env.example` 作成と `.env` 設定手順の整備
+  - [x] `scripts/init-backend.sh` の作成と動作確認
 
-- [ ] GCP サービスアカウント作成と権限設定
-  - 必要な権限: Project Owner, Cloud Run Admin, Secret Manager Admin
-- [ ] GitHub Secrets 設定
-  - `GCP_SA_KEY`, `GCP_PROJECT_ID`, `GCP_REGION`
-  - `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`（開発用）
-- [ ] ローカル認証設定: `gcloud auth` と環境変数設定
+#### ✅ タスク 2: GCP 認証設定
 
-#### ⬜ タスク 3: CI/CD 基本パイプライン作成
+> [!NOTE]
+> GCP プロジェクト `kenken-pose-est` に対する認証設定を行います。
+> ローカル開発用と CI/CD（GitHub Actions）用の両方を整備します。
 
-- [ ] GitHub Actions 基本ワークフロー作成
-- [ ] Terraform Plan ワークフロー作成（PR 時自動実行）
-- [ ] セキュリティスキャンワークフロー作成
+- [x] **2-1: ローカル認証設定（gcloud CLI）**
+  - [x] `gcloud auth login` でユーザー認証
+  - [x] `gcloud config set project kenken-pose-est` でプロジェクト設定
+  - [x] `gcloud auth application-default login` で ADC（Application Default Credentials）設定
+  - [x] `.env` に `GCP_PROJECT_ID` と `GCP_REGION` を追加（タスク 1 で設定済み）
+- [x] **2-2: サービスアカウント作成（Terraform 用）**
+  - [x] サービスアカウント名: `terraform-admin`
+  - [x] 必要な権限（最小権限の原則）:
+    - `roles/editor` または以下の個別ロール:
+      - [x] `roles/run.admin` (Cloud Run)
+      - [x] `roles/secretmanager.admin` (Secret Manager)
+      - [x] `roles/artifactregistry.admin` (Artifact Registry)
+      - [x] `roles/iam.serviceAccountUser` (サービスアカウント使用)
+      - [x] `roles/storage.admin` (Cloud Storage - 一時ファイル用)
+  - [x] キーファイル（JSON）のエクスポートは **非推奨**（Workload Identity Federation 推奨）
+- [x] **2-3: Workload Identity Federation 設定（GitHub Actions 用）**
+  - [x] Workload Identity Pool の作成
+  - [x] GitHub プロバイダーの設定
+  - [x] サービスアカウントへの IAM バインディング
+  - 参考: [GitHub Actions OIDC with GCP](https://cloud.google.com/iam/docs/workload-identity-federation-with-deployment-pipelines)
+- [x] **2-4: 認証検証スクリプト作成**
+  - [x] `scripts/verify-auth.sh` の作成
+  - [x] 検証項目:
+    - [x] `gcloud` CLI 認証状態
+    - [x] プロジェクトアクセス確認
+    - [x] R2 クレデンシャル存在確認（タスク 1 の継続）
+- [x] **2-5: GitHub Secrets 設定（ドキュメント化）**
+  - [x] 必要な Secrets 一覧:
+    - `GCP_PROJECT_ID`: `kenken-pose-est`
+    - `GCP_REGION`: `asia-northeast1`
+    - `GCP_WORKLOAD_IDENTITY_PROVIDER`: Workload Identity Pool プロバイダー
+    - `GCP_SERVICE_ACCOUNT`: Terraform サービスアカウントメール
+    - `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`: タスク 1 で設定済み
+  - [x] 設定手順のドキュメント作成 (`docs/github-secrets.md`)
+
+#### ✅ タスク 3: CI/CD 基本パイプライン作成
+
+> [!NOTE]
+> Cloudflare 側の CI/CD 実装 (`cloudflare-terraform-ci.yml`, `cloudflare-security.yml`) を参考に、
+> GCP 向けのワークフローを作成します。Workload Identity Federation を使用したキーレス認証を採用。
+
+- [x] **3-1: Terraform CI ワークフロー作成**
+  - [x] ファイル: `.github/workflows/gcp-terraform-ci.yml`
+  - トリガー: `pull_request` (main ブランチへの PR 時、`pose-est-infra/gcp/**` パス変更時)
+  - ステップ:
+    - Checkout
+    - Workload Identity Federation 認証 (`google-github-actions/auth`)
+    - Terraform Setup
+    - TFLint Setup
+    - Format Check, Init, Validate, TFLint, Plan
+    - PR へのコメント（Plan 結果サマリー）
+- [x] **3-2: セキュリティスキャンワークフロー作成**
+  - [x] ファイル: `.github/workflows/gcp-security.yml`
+  - トリガー: `pull_request` (main ブランチへの PR 時)
+  - ステップ:
+    - Checkout
+    - Checkov スキャン
+    - SARIF ファイルのアップロード（GitHub Security タブ連携）
+- [x] **3-3: Terraform Apply ワークフロー作成（手動/マージ時）**
+  - [x] ファイル: `.github/workflows/gcp-terraform-apply.yml`
+  - トリガー: `push` (main ブランチへのマージ時) または `workflow_dispatch` (手動実行)
+  - ステップ:
+    - Checkout
+    - Workload Identity Federation 認証
+    - Terraform Init, Plan, Apply
+    - 実行結果の Slack 通知（オプション、将来対応）
+- [x] **3-4: ワークフロー動作確認**
+  - [x] テスト用 PR を作成し、Terraform CI と Security Scan が正常に動作することを確認
+  - Plan 結果が PR コメントに表示されることを確認（実際の PR で検証予定）
 
 ### 🏛️ **フェーズ 2: GCP プロジェクト基盤構築**
 
@@ -354,7 +443,9 @@
 1. **状態ファイル管理**:
 
    - 開発/本番で状態ファイルを分離（ステージング削除）
-   - バックエンドは Cloud Storage、状態ロックは Cloud Spanner
+   - **バックエンドは Cloudflare R2**（Cloudflare 側と統一）
+   - バケット: `pose-est-terraform-state`、キー: `gcp/terraform.tfstate`
+   - 状態ロックは CI/CD ジョブの直列化で実現（R2 はネイティブロック非対応）
    - 状態ファイルの定期的なバックアップ
 
 2. **シークレット管理**:
