@@ -33,8 +33,22 @@ while [[ "$#" -gt 0 ]]; do
   shift
 done
 
+# 依存関係チェック
+if ! command -v gcloud &> /dev/null; then
+  echo -e "${RED}Error: 'gcloud' command is required but not found.${NC}"
+  exit 1
+fi
+
 echo -e "${YELLOW}🔒 R2 クレデンシャル登録ツール (${ENV})${NC}"
 echo "Project: ${PROJECT_ID}"
+echo ""
+
+# 確認プロンプト (誤操作防止)
+read -p "Are you sure you want to register secrets to this project? (y/N) " CONFIRM
+if [[ ! "$CONFIRM" =~ ^[Yy]$ ]]; then
+  echo "Aborted."
+  exit 0
+fi
 echo ""
 
 # クレデンシャル入力
