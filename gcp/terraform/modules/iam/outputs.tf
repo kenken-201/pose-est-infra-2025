@@ -24,3 +24,17 @@ output "cloud_build_sa_id" {
   description = "Cloud Build 実行用サービスアカウントのリソース名"
   value       = google_service_account.cloud_build.name
 }
+
+# -----------------------------------------------------------------------------
+# 便利機能: IAM メンバー形式
+# -----------------------------------------------------------------------------
+
+output "cloud_run_sa_member" {
+  description = "IAM ポリシーバインディングで使用可能な形式 (serviceAccount:<email>)"
+  value       = "serviceAccount:${google_service_account.cloud_run.email}"
+}
+
+output "cloud_build_sa_member" {
+  description = "IAM ポリシーバインディングで使用可能な形式 (serviceAccount:<email>)"
+  value       = "serviceAccount:${google_service_account.cloud_build.email}"
+}
