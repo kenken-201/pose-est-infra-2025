@@ -49,46 +49,46 @@
   - [x] `.env.example` 作成と `.env` 設定手順の整備
   - [x] `scripts/init-backend.sh` の作成と動作確認
 
-#### ⬜ タスク 2: GCP 認証設定
+#### ✅ タスク 2: GCP 認証設定
 
 > [!NOTE]
 > GCP プロジェクト `kenken-pose-est` に対する認証設定を行います。
 > ローカル開発用と CI/CD（GitHub Actions）用の両方を整備します。
 
-- [ ] **2-1: ローカル認証設定（gcloud CLI）**
-  - `gcloud auth login` でユーザー認証
-  - `gcloud config set project kenken-pose-est` でプロジェクト設定
-  - `gcloud auth application-default login` で ADC（Application Default Credentials）設定
-  - `.env` に `GCP_PROJECT_ID` と `GCP_REGION` を追加（タスク 1 で設定済み）
-- [ ] **2-2: サービスアカウント作成（Terraform 用）**
-  - サービスアカウント名: `terraform-admin`
-  - 必要な権限（最小権限の原則）:
+- [x] **2-1: ローカル認証設定（gcloud CLI）**
+  - [x] `gcloud auth login` でユーザー認証
+  - [x] `gcloud config set project kenken-pose-est` でプロジェクト設定
+  - [x] `gcloud auth application-default login` で ADC（Application Default Credentials）設定
+  - [x] `.env` に `GCP_PROJECT_ID` と `GCP_REGION` を追加（タスク 1 で設定済み）
+- [x] **2-2: サービスアカウント作成（Terraform 用）**
+  - [x] サービスアカウント名: `terraform-admin`
+  - [x] 必要な権限（最小権限の原則）:
     - `roles/editor` または以下の個別ロール:
-      - `roles/run.admin` (Cloud Run)
-      - `roles/secretmanager.admin` (Secret Manager)
-      - `roles/artifactregistry.admin` (Artifact Registry)
-      - `roles/iam.serviceAccountUser` (サービスアカウント使用)
-      - `roles/storage.admin` (Cloud Storage - 一時ファイル用)
-  - キーファイル（JSON）のエクスポートは **非推奨**（Workload Identity Federation 推奨）
-- [ ] **2-3: Workload Identity Federation 設定（GitHub Actions 用）**
-  - Workload Identity Pool の作成
-  - GitHub プロバイダーの設定
-  - サービスアカウントへの IAM バインディング
+      - [x] `roles/run.admin` (Cloud Run)
+      - [x] `roles/secretmanager.admin` (Secret Manager)
+      - [x] `roles/artifactregistry.admin` (Artifact Registry)
+      - [x] `roles/iam.serviceAccountUser` (サービスアカウント使用)
+      - [x] `roles/storage.admin` (Cloud Storage - 一時ファイル用)
+  - [x] キーファイル（JSON）のエクスポートは **非推奨**（Workload Identity Federation 推奨）
+- [x] **2-3: Workload Identity Federation 設定（GitHub Actions 用）**
+  - [x] Workload Identity Pool の作成
+  - [x] GitHub プロバイダーの設定
+  - [x] サービスアカウントへの IAM バインディング
   - 参考: [GitHub Actions OIDC with GCP](https://cloud.google.com/iam/docs/workload-identity-federation-with-deployment-pipelines)
-- [ ] **2-4: 認証検証スクリプト作成**
-  - `scripts/verify-auth.sh` の作成
-  - 検証項目:
-    - `gcloud` CLI 認証状態
-    - プロジェクトアクセス確認
-    - R2 クレデンシャル存在確認（タスク 1 の継続）
-- [ ] **2-5: GitHub Secrets 設定（ドキュメント化）**
-  - 必要な Secrets 一覧:
+- [x] **2-4: 認証検証スクリプト作成**
+  - [x] `scripts/verify-auth.sh` の作成
+  - [x] 検証項目:
+    - [x] `gcloud` CLI 認証状態
+    - [x] プロジェクトアクセス確認
+    - [x] R2 クレデンシャル存在確認（タスク 1 の継続）
+- [x] **2-5: GitHub Secrets 設定（ドキュメント化）**
+  - [x] 必要な Secrets 一覧:
     - `GCP_PROJECT_ID`: `kenken-pose-est`
     - `GCP_REGION`: `asia-northeast1`
     - `GCP_WORKLOAD_IDENTITY_PROVIDER`: Workload Identity Pool プロバイダー
     - `GCP_SERVICE_ACCOUNT`: Terraform サービスアカウントメール
     - `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`: タスク 1 で設定済み
-  - 設定手順のドキュメント作成
+  - [x] 設定手順のドキュメント作成 (`docs/github-secrets.md`)
 
 #### ⬜ タスク 3: CI/CD 基本パイプライン作成
 
