@@ -14,7 +14,7 @@
 
 ## 🏗️ **フェーズ 1: 基本プロジェクト設定と認証**
 
-#### ⬜ タスク 1: リポジトリと基本設定
+#### ✅ タスク 1: リポジトリと基本設定
 
 > [!NOTE]
 > Cloudflare 側の既存実装 (`pose-est-infra/cloudflare/`) から流用可能なファイルを活用し、効率的に構築します。
@@ -51,12 +51,44 @@
 
 #### ⬜ タスク 2: GCP 認証設定
 
-- [ ] GCP サービスアカウント作成と権限設定
-  - 必要な権限: Project Owner, Cloud Run Admin, Secret Manager Admin
-- [ ] GitHub Secrets 設定
-  - `GCP_SA_KEY`, `GCP_PROJECT_ID`, `GCP_REGION`
-  - `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`（タスク 1 で設定済みを流用）
-- [ ] ローカル認証設定: `gcloud auth` と環境変数設定
+> [!NOTE]
+> GCP プロジェクト `kenken-pose-est` に対する認証設定を行います。
+> ローカル開発用と CI/CD（GitHub Actions）用の両方を整備します。
+
+- [ ] **2-1: ローカル認証設定（gcloud CLI）**
+  - `gcloud auth login` でユーザー認証
+  - `gcloud config set project kenken-pose-est` でプロジェクト設定
+  - `gcloud auth application-default login` で ADC（Application Default Credentials）設定
+  - `.env` に `GCP_PROJECT_ID` と `GCP_REGION` を追加（タスク 1 で設定済み）
+- [ ] **2-2: サービスアカウント作成（Terraform 用）**
+  - サービスアカウント名: `terraform-admin`
+  - 必要な権限（最小権限の原則）:
+    - `roles/editor` または以下の個別ロール:
+      - `roles/run.admin` (Cloud Run)
+      - `roles/secretmanager.admin` (Secret Manager)
+      - `roles/artifactregistry.admin` (Artifact Registry)
+      - `roles/iam.serviceAccountUser` (サービスアカウント使用)
+      - `roles/storage.admin` (Cloud Storage - 一時ファイル用)
+  - キーファイル（JSON）のエクスポートは **非推奨**（Workload Identity Federation 推奨）
+- [ ] **2-3: Workload Identity Federation 設定（GitHub Actions 用）**
+  - Workload Identity Pool の作成
+  - GitHub プロバイダーの設定
+  - サービスアカウントへの IAM バインディング
+  - 参考: [GitHub Actions OIDC with GCP](https://cloud.google.com/iam/docs/workload-identity-federation-with-deployment-pipelines)
+- [ ] **2-4: 認証検証スクリプト作成**
+  - `scripts/verify-auth.sh` の作成
+  - 検証項目:
+    - `gcloud` CLI 認証状態
+    - プロジェクトアクセス確認
+    - R2 クレデンシャル存在確認（タスク 1 の継続）
+- [ ] **2-5: GitHub Secrets 設定（ドキュメント化）**
+  - 必要な Secrets 一覧:
+    - `GCP_PROJECT_ID`: `kenken-pose-est`
+    - `GCP_REGION`: `asia-northeast1`
+    - `GCP_WORKLOAD_IDENTITY_PROVIDER`: Workload Identity Pool プロバイダー
+    - `GCP_SERVICE_ACCOUNT`: Terraform サービスアカウントメール
+    - `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`: タスク 1 で設定済み
+  - 設定手順のドキュメント作成
 
 #### ⬜ タスク 3: CI/CD 基本パイプライン作成
 
