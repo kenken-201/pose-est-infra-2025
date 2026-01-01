@@ -20,30 +20,31 @@
 > Cloudflare 側の既存実装 (`pose-est-infra/cloudflare/`) から流用可能なファイルを活用し、効率的に構築します。
 > tfstate 管理先は **Cloudflare R2** (`pose-est-terraform-state` バケット) を使用します。
 
-- [ ] **1-1: ディレクトリ構造作成**
-  - `pose-est-infra/gcp/terraform/` ディレクトリ作成
-  - `pose-est-infra/gcp/terraform/modules/` ディレクトリ作成
-  - `pose-est-infra/gcp/terraform/environments/` ディレクトリ作成
-  - `pose-est-infra/gcp/docs/` ディレクトリ作成
-  - `pose-est-infra/gcp/scripts/` ディレクトリ作成
-- [ ] **1-2: `.gitignore` 作成**
-  - Cloudflare 版 (`cloudflare/.gitignore`) をそのまま流用
-- [ ] **1-3: `README.md` 作成**
-  - Cloudflare 版を参考に GCP 向けに調整
-- [ ] **1-4: `SECURITY.md` 作成**
-  - Cloudflare 版をそのまま流用
-- [ ] **1-5: `terraform/versions.tf` 作成**
-  - Terraform バージョン固定: `>= 1.14.3`
-  - Google プロバイダー設定
-  - Google Beta プロバイダー設定（オプション）
-- [ ] **1-6: `terraform/backend.tf` 作成**
-  - Cloudflare R2 をバックエンドとして設定
-  - バケット: `pose-est-terraform-state`
-  - キー: `gcp/terraform.tfstate`
-  - Cloudflare 版 (`cloudflare/terraform/backend.tf`) を参考に作成
-- [ ] **1-7: R2 バックエンド初期化テスト**
-  - `terraform init` の実行確認
-  - tfstate ファイルが R2 に作成されることを確認
+- [x] **1-1: ディレクトリ構造作成**
+  - [x] `pose-est-infra/gcp/terraform/` ディレクトリ作成
+  - [x] `pose-est-infra/gcp/terraform/modules/` ディレクトリ作成
+  - [x] `pose-est-infra/gcp/terraform/environments/` ディレクトリ作成
+  - [x] `pose-est-infra/gcp/docs/` ディレクトリ作成
+  - [x] `pose-est-infra/gcp/scripts/` ディレクトリ作成
+- [x] **1-2: `.gitignore` 作成**
+  - [x] Cloudflare 版 (`cloudflare/.gitignore`) をそのまま流用
+- [x] **1-3: `README.md` 作成**
+  - [x] Cloudflare 版を参考に GCP 向けに調整
+- [x] **1-4: `SECURITY.md` 作成**
+  - [x] Cloudflare 版をそのまま流用
+- [x] **1-5: `terraform/versions.tf` 作成**
+  - [x] Terraform バージョン固定: `>= 1.14.3`
+  - [x] Google プロバイダー設定
+  - [x] Google Beta プロバイダー設定（オプション）
+- [x] **1-6: `terraform/backend.tf` 作成**
+  - [x] Cloudflare R2 をバックエンドとして設定
+  - [x] バケット: `pose-est-terraform-state`
+  - [x] キー: `gcp/terraform.tfstate`
+  - [x] Cloudflare 版 (`cloudflare/terraform/backend.tf`) を参考に作成
+- [x] **1-7: R2 バックエンド初期化テスト**
+  - [x] `terraform init` の実行確認
+  - [x] `terraform plan` の実行確認
+  - [x] `fstate ファイルが R2 に作成されることを確認
 
 #### ⬜ タスク 2: GCP 認証設定
 
