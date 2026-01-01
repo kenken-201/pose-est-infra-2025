@@ -92,9 +92,38 @@
 
 #### ⬜ タスク 3: CI/CD 基本パイプライン作成
 
-- [ ] GitHub Actions 基本ワークフロー作成
-- [ ] Terraform Plan ワークフロー作成（PR 時自動実行）
-- [ ] セキュリティスキャンワークフロー作成
+> [!NOTE]
+> Cloudflare 側の CI/CD 実装 (`cloudflare-terraform-ci.yml`, `cloudflare-security.yml`) を参考に、
+> GCP 向けのワークフローを作成します。Workload Identity Federation を使用したキーレス認証を採用。
+
+- [ ] **3-1: Terraform CI ワークフロー作成**
+  - ファイル: `.github/workflows/gcp-terraform-ci.yml`
+  - トリガー: `pull_request` (main ブランチへの PR 時、`pose-est-infra/gcp/**` パス変更時)
+  - ステップ:
+    - Checkout
+    - Workload Identity Federation 認証 (`google-github-actions/auth`)
+    - Terraform Setup
+    - TFLint Setup
+    - Format Check, Init, Validate, TFLint, Plan
+    - PR へのコメント（Plan 結果サマリー）
+- [ ] **3-2: セキュリティスキャンワークフロー作成**
+  - ファイル: `.github/workflows/gcp-security.yml`
+  - トリガー: `pull_request` (main ブランチへの PR 時)
+  - ステップ:
+    - Checkout
+    - Checkov スキャン
+    - SARIF ファイルのアップロード（GitHub Security タブ連携）
+- [ ] **3-3: Terraform Apply ワークフロー作成（手動/マージ時）**
+  - ファイル: `.github/workflows/gcp-terraform-apply.yml`
+  - トリガー: `push` (main ブランチへのマージ時) または `workflow_dispatch` (手動実行)
+  - ステップ:
+    - Checkout
+    - Workload Identity Federation 認証
+    - Terraform Init, Plan, Apply
+    - 実行結果の Slack 通知（オプション、将来対応）
+- [ ] **3-4: ワークフロー動作確認**
+  - テスト用 PR を作成し、Terraform CI と Security Scan が正常に動作することを確認
+  - Plan 結果が PR コメントに表示されることを確認
 
 ### 🏛️ **フェーズ 2: GCP プロジェクト基盤構築**
 
