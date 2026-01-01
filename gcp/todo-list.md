@@ -259,10 +259,16 @@
 
 #### ⬜ タスク 11: R2 環境設定
 
-- [ ] R2 エンドポイント URL 設定: `https://<account_id>.r2.cloudflarestorage.com`
-- [ ] R2 バケット名設定: 環境別バケット名（Cloudflare 側で作成）
-- [ ] 署名 URL 有効期限設定: デフォルト 1 時間、必要に応じて調整
-- [ ] R2 接続テストスクリプト作成: `scripts/test-r2-connection.sh`
+> [!NOTE]
+> 環境変数の Cloud Run への注入はフェーズ 5 で行います。
+> ここではドキュメント化と接続テストスクリプトの作成を行います。
+
+- [ ] **11-1: R2 環境設定ドキュメント作成**
+  - `docs/r2-environment.md`
+  - 内容: エンドポイント形式、バケット命名規則、署名 URL 有効期限
+- [ ] **11-2: R2 接続テストスクリプト作成**
+  - `scripts/test-r2-connection.sh`
+  - AWS CLI (S3 互換) を使用した接続テスト
 
 ### ☁️ **フェーズ 5: Cloud Run バックエンド環境構築**
 
