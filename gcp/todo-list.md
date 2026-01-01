@@ -227,12 +227,19 @@
 
 #### ⬜ タスク 9: R2 連携 Terraform モジュール作成
 
-- [ ] Terraform モジュール: `modules/r2-integration`
-- [ ] Secret Manager シークレットリソース定義:
-  - `r2-access-key-id`: R2 アクセスキー ID
-  - `r2-secret-access-key`: R2 シークレットアクセスキー
-- [ ] シークレットバージョン管理設定
-- [ ] アクセス権限設定: Cloud Run サービスアカウントへの権限付与
+> [!NOTE]
+> Terraform ではシークレットの「箱」のみを作成します。
+> 実際の値（R2 クレデンシャル）は、セキュリティ上の理由から `gcloud` CLI で手動登録します。
+
+- [ ] **9-1: `modules/secret-manager` モジュール作成**
+  - ファイル: `terraform/modules/secret-manager/main.tf`, `variables.tf`, `outputs.tf`
+  - 機能:
+    - Secret Manager シークレットリソース定義 (`r2-access-key-id`, `r2-secret-access-key`)
+    - リソースレベル IAM バインディング (Cloud Run SA への `secretAccessor` 付与)
+- [ ] **9-2: dev 環境への統合**
+  - `terraform/environments/dev/main.tf` に secret-manager モジュール呼び出しを追加
+- [ ] **9-3: 検証**
+  - `terraform plan` でシークレットと IAM バインディングが計画されることを確認
 
 #### ⬜ タスク 10: R2 クレデンシャル管理
 
