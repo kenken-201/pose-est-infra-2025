@@ -42,3 +42,15 @@ module "r2_bucket" {
   # tfvars 経由で環境ごとに異なる値を注入します
   cors_origins = var.cors_origins
 }
+
+/*
+  DNS / ゾーン設定モジュール
+  -----------------------------------------------------------------------------
+  ゾーンのセキュリティ設定 (SSL, DNSSEC) と基本レコードを管理します。
+*/
+module "dns" {
+  source = "./modules/dns"
+
+  zone_id     = var.cloudflare_zone_id
+  domain_name = var.domain_name
+}

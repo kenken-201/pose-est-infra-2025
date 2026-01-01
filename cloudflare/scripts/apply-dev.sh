@@ -15,6 +15,14 @@ if [ -f "$ENV_FILE" ]; then
   set +a
 fi
 
+# Zone ID Check & Normalize
+if [ -n "$CLOUDFLARE_ZONE_ID" ]; then
+  export TF_VAR_cloudflare_zone_id="$CLOUDFLARE_ZONE_ID"
+elif [ -n "$TF_VAR_CLOUDFLARE_ZONE_ID" ]; then
+  export TF_VAR_cloudflare_zone_id="$TF_VAR_CLOUDFLARE_ZONE_ID"
+fi
+export TF_VAR_cloudflare_account_id="$CLOUDFLARE_ACCOUNT_ID"
+
 cd "$(dirname "$0")/../terraform"
 
 echo "🚀 Terraform Apply を実行中 (Dev)..."

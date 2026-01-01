@@ -22,6 +22,18 @@ if [ -z "$CLOUDFLARE_ACCOUNT_ID" ] || [ -z "$R2_ACCESS_KEY_ID" ] || [ -z "$R2_SE
   exit 1
 fi
 
+# Zone ID Check & Normalize
+# ユーザーが TF_VAR_CLOUDFLARE_ZONE_ID (大文字) または CLOUDFLARE_ZONE_ID で設定している場合に対応
+if [ -n "$CLOUDFLARE_ZONE_ID" ]; then
+  echo "✅ Zone ID loaded from .env (CLOUDFLARE_ZONE_ID)"
+  export TF_VAR_cloudflare_zone_id="$CLOUDFLARE_ZONE_ID"
+elif [ -n "$TF_VAR_CLOUDFLARE_ZONE_ID" ]; then
+  echo "✅ Zone ID loaded from .env (TF_VAR_CLOUDFLARE_ZONE_ID)"
+  export TF_VAR_cloudflare_zone_id="$TF_VAR_CLOUDFLARE_ZONE_ID"
+else
+  echo "⚠️ Zone ID NOT found in .env. Please set CLOUDFLARE_ZONE_ID."
+fi
+
 # Terraform 変数の設定
 export TF_VAR_cloudflare_account_id="$CLOUDFLARE_ACCOUNT_ID"
 
