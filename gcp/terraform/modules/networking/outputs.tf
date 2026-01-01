@@ -1,24 +1,31 @@
+/*
+  出力値 - ネットワーキング設定
+  -----------------------------------------------------------------------------
+  作成されたネットワークリソースの ID やパラメータを出力します。
+  他のモジュールから参照するために使用されます。
+*/
+
 output "vpc_id" {
-  description = "The ID of the VPC"
+  description = "作成された VPC の ID"
   value       = google_compute_network.vpc.id
 }
 
 output "vpc_name" {
-  description = "The name of the VPC"
+  description = "作成された VPC の名前"
   value       = google_compute_network.vpc.name
 }
 
 output "subnet_id" {
-  description = "The ID of the subnet"
+  description = "作成されたサブネットの ID"
   value       = google_compute_subnetwork.subnet.id
 }
 
 output "subnet_name" {
-  description = "The name of the subnet"
+  description = "作成されたサブネットの名前"
   value       = google_compute_subnetwork.subnet.name
 }
 
 output "nat_ip" {
-  description = "The static IP address allocated to Cloud NAT"
+  description = "Cloud NAT に割り当てられた静的 IP アドレス"
   value       = google_compute_address.nat.address
 }

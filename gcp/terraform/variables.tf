@@ -9,8 +9,3 @@ variable "region" {
   default     = "asia-northeast1"
 }
 
-variable "environment" {
-  description = "The deployment environment (e.g., dev, production)"
-  type        = string
-  default     = "dev"
-}

@@ -1,3 +1,10 @@
+/*
+  Dev 環境メイン設定
+  -----------------------------------------------------------------------------
+  開発環境 (dev) 用のリソースを定義します。
+  各モジュール (gcp-project, networking) を呼び出してインフラを構築します。
+*/
+
 terraform {
   required_version = ">= 1.14.3"
 
@@ -23,16 +30,21 @@ provider "google-beta" {
   region  = var.region
 }
 
+# -----------------------------------------------------------------------------
+# GCP プロジェクト基本設定 (API, 予算)
+# -----------------------------------------------------------------------------
 module "gcp_project" {
   source = "../../modules/gcp-project"
 
   project_id  = var.project_id
-  region      = var.region
   environment = var.environment
-  
-  # billing_account_id はオプション（設定されなければ予算アラートは作成されない）
+
+  # billing_account_id はオプション（設定されなければ通知なし）
 }
 
+# -----------------------------------------------------------------------------
+# ネットワーク基盤 (VPC, NAT)
+# -----------------------------------------------------------------------------
 module "networking" {
   source = "../../modules/networking"
 
@@ -40,6 +52,6 @@ module "networking" {
   region      = var.region
   environment = var.environment
   subnet_cidr = "10.0.0.0/24"
-  
-  depends_on = [module.gcp_project] # API有効化が終わってから作成
+
+  depends_on = [module.gcp_project] # API 有効化後に実行
 }

@@ -1,32 +1,32 @@
-variable "project_id" {
-  description = "GCP Project ID"
-  type        = string
-}
+/*
+  入力変数 - GCP プロジェクト基本設定
+  -----------------------------------------------------------------------------
+  モジュールの動作を制御する入力変数を定義します。
+*/
 
-variable "region" {
-  description = "Default GCP Region"
+variable "project_id" {
+  description = "GCP プロジェクト ID"
   type        = string
-  default     = "asia-northeast1"
 }
 
 variable "environment" {
-  description = "Environment name (e.g. dev, production)"
+  description = "環境名 (dev, production)"
   type        = string
 }
 
 variable "billing_account_id" {
-  description = "Billing Account ID for budget alerts (optional)"
+  description = "予算アラート用の請求アカウント ID (省略可)"
   type        = string
   default     = ""
 }
 
 variable "budget_amount" {
-  description = "Monthly budget amount in USD"
+  description = "月額予算設定 (USD)"
   type        = number
   default     = 20
 
   validation {
     condition     = var.budget_amount > 0
-    error_message = "Budget amount must be greater than 0."
+    error_message = "予算額は 0 より大きい必要があります。"
   }
 }
