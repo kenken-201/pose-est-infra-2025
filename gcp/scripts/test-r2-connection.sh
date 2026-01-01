@@ -68,6 +68,9 @@ if [[ -z "$AWS_ACCESS_KEY_ID" || -z "$AWS_SECRET_ACCESS_KEY" ]]; then
   exit 1
 fi
 
+# R2 互換性: リージョン設定 (R2 は実際には無視するが AWS CLI の警告抑制のため)
+export AWS_DEFAULT_REGION="auto"
+
 # 接続テスト: バケット内のオブジェクト一覧取得 (ls)
 echo -e "${YELLOW}Running: aws s3 ls s3://${BUCKET_NAME} ...${NC}"
 
