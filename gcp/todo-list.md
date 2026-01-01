@@ -129,16 +129,26 @@
 
 #### ⬜ タスク 4: GCP プロジェクト設定
 
-- [ ] Terraform モジュール: `modules/gcp-project`
-- [ ] GCP プロジェクト作成:
-  - 開発: `pose-est-dev`
-  - 本番: `pose-est-production`
-- [ ] 必須 API の有効化:
-  - Cloud Run API, Cloud Build API, Artifact Registry API
-  - Secret Manager API, Cloud Storage API（状態管理用）, IAM API
-  - Monitoring API, Logging API
-- [ ] リージョン設定: asia-northeast1 (東京)
-- [ ] 予算アラート設定: 環境別に月間$20 アラート
+> [!NOTE]
+> 既存プロジェクト `kenken-pose-est` を継続使用します。
+> 新規プロジェクト作成は行わず、API 有効化と予算アラート設定に集中します。
+> 環境分離（dev/production）は Cloud Run サービス名で実現します。
+
+- [ ] **4-1: 環境ディレクトリ構造の確立**
+  - `terraform/environments/dev/` ディレクトリ作成
+  - `terraform/environments/production/` ディレクトリ作成（プレースホルダー）
+  - 各環境に `main.tf`, `terraform.tfvars` を配置
+- [ ] **4-2: `modules/gcp-project` モジュール作成**
+  - ファイル: `terraform/modules/gcp-project/main.tf`, `variables.tf`, `outputs.tf`
+  - 機能:
+    - 必須 API の有効化（Cloud Run, Cloud Build, Artifact Registry, Secret Manager, IAM, Monitoring, Logging）
+    - 予算アラート設定（月額 $20 アラート）
+- [ ] **4-3: dev 環境の初期設定**
+  - `terraform/environments/dev/terraform.tfvars` 作成
+  - `gcp-project` モジュールの呼び出し設定
+- [ ] **4-4: 検証**
+  - `terraform init` を `environments/dev` で実行
+  - `terraform plan` で API 有効化が計画されることを確認
 
 #### ⬜ タスク 5: ネットワーク基盤構築
 
