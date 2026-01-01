@@ -272,13 +272,13 @@
 
 ### ☁️ **フェーズ 5: Cloud Run バックエンド環境構築**
 
-#### ⬜ タスク 12: Cloud Run サービス基本設定
+#### ✅ タスク 12: Cloud Run サービス基本設定
 
 > [!NOTE]
 > Cloud Run v2 API を使用し、Secret Manager と連携して R2 クレデンシャルを注入します。
 > スケーリング詳細とネットワーク設定はタスク 13-14 で対応します。
 
-- [ ] **12-1: `modules/cloud-run` モジュール作成**
+- [x] **12-1: `modules/cloud-run` モジュール作成**
   - ファイル: `terraform/modules/cloud-run/main.tf`, `variables.tf`, `outputs.tf`, `versions.tf`
   - 機能:
     - `google_cloud_run_v2_service` リソース
@@ -286,11 +286,11 @@
     - Secret Manager からの環境変数注入
     - リソース制限 (CPU, メモリ)
     - サービスアカウント設定
-- [ ] **12-2: dev 環境への統合**
+- [x] **12-2: dev 環境への統合**
   - `terraform/environments/dev/main.tf` に cloud-run モジュール呼び出しを追加
-- [ ] **12-3: IAM 設定 (公開アクセス)**
+- [x] **12-3: IAM 設定 (公開アクセス)**
   - Dev 環境: `allUsers` に `roles/run.invoker` を付与 (認証なしアクセス)
-- [ ] **12-4: 検証**
+- [x] **12-4: 検証**
   - `terraform plan` でサービス作成が計画されることを確認
 
 #### ⬜ タスク 13: 自動スケーリング設定

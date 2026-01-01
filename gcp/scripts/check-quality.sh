@@ -100,6 +100,10 @@ if command -v tflint &> /dev/null; then
     echo "   モジュールを確認中: secret-manager..."
     tflint --chdir=modules/secret-manager --format=compact
 
+    # cloud-run モジュールを確認
+    echo "   モジュールを確認中: cloud-run..."
+    tflint --chdir=modules/cloud-run --format=compact
+
     # dev 環境を確認
     tflint --chdir=environments/dev --format=compact
     echo -e "   ${GREEN}✅ TFLint チェック完了${NC}"

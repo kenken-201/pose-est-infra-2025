@@ -25,3 +25,8 @@ variable "environment" {
     error_message = "環境名は 'dev' または 'production' である必要があります。"
   }
 }
+
+variable "r2_account_id" {
+  description = "Cloudflare Account ID (R2 エンドポイント構築用)"
+  type        = string
+}
