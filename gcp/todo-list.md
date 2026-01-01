@@ -225,28 +225,50 @@
 
 ### 🔐 **フェーズ 4: R2 連携とシークレット管理**
 
-#### ⬜ タスク 9: R2 連携 Terraform モジュール作成
+#### ✅ タスク 9: R2 連携 Terraform モジュール作成
 
-- [ ] Terraform モジュール: `modules/r2-integration`
-- [ ] Secret Manager シークレットリソース定義:
-  - `r2-access-key-id`: R2 アクセスキー ID
-  - `r2-secret-access-key`: R2 シークレットアクセスキー
-- [ ] シークレットバージョン管理設定
-- [ ] アクセス権限設定: Cloud Run サービスアカウントへの権限付与
+> [!NOTE]
+> Terraform ではシークレットの「箱」のみを作成します。
+> 実際の値（R2 クレデンシャル）は、セキュリティ上の理由から `gcloud` CLI で手動登録します。
 
-#### ⬜ タスク 10: R2 クレデンシャル管理
+- [x] **9-1: `modules/secret-manager` モジュール作成**
+  - ファイル: `terraform/modules/secret-manager/main.tf`, `variables.tf`, `outputs.tf`
+  - 機能:
+    - Secret Manager シークレットリソース定義 (`r2-access-key-id`, `r2-secret-access-key`)
+    - リソースレベル IAM バインディング (Cloud Run SA への `secretAccessor` 付与)
+- [x] **9-2: dev 環境への統合**
+  - `terraform/environments/dev/main.tf` に secret-manager モジュール呼び出しを追加
+- [x] **9-3: 検証**
+  - `terraform plan` でシークレットと IAM バインディングが計画されることを確認
 
-- [ ] R2 アクセスキー作成（手動または Terraform）
-- [ ] シークレットの GitHub Secrets 登録（CI/CD 用）
-- [ ] シークレットの Secret Manager 登録（本番用）
-- [ ] キーローテーションポリシー策定（3 ヶ月ごと推奨）
+#### ✅ タスク 10: R2 クレデンシャル管理
 
-#### ⬜ タスク 11: R2 環境設定
+> [!NOTE]
+> R2 アクセスキーは Cloudflare ダッシュボードから手動作成します。
+> シークレット登録はヘルパースクリプトで効率化します。
 
-- [ ] R2 エンドポイント URL 設定: `https://<account_id>.r2.cloudflarestorage.com`
-- [ ] R2 バケット名設定: 環境別バケット名（Cloudflare 側で作成）
-- [ ] 署名 URL 有効期限設定: デフォルト 1 時間、必要に応じて調整
-- [ ] R2 接続テストスクリプト作成: `scripts/test-r2-connection.sh`
+- [x] **10-1: R2 アクセスキー作成（手動）**
+  - Cloudflare ダッシュボード > R2 > API トークン から作成
+  - 必要な権限: Object Read/Write
+- [x] **10-2: シークレット登録スクリプト作成**
+  - `scripts/register-r2-secrets.sh`
+  - Secret Manager と GitHub Secrets への登録を自動化
+- [x] **10-3: キーローテーションポリシー策定**
+  - `docs/r2-key-rotation.md` にドキュメント化
+  - 推奨頻度: 90 日
+
+#### ✅ タスク 11: R2 環境設定
+
+> [!NOTE]
+> 環境変数の Cloud Run への注入はフェーズ 5 で行います。
+> ここではドキュメント化と接続テストスクリプトの作成を行います。
+
+- [x] **11-1: R2 環境設定ドキュメント作成**
+  - `docs/r2-environment.md`
+  - 内容: エンドポイント形式、バケット命名規則、署名 URL 有効期限
+- [x] **11-2: R2 接続テストスクリプト作成**
+  - `scripts/test-r2-connection.sh`
+  - AWS CLI (S3 互換) を使用した接続テスト
 
 ### ☁️ **フェーズ 5: Cloud Run バックエンド環境構築**
 
