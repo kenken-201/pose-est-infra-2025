@@ -208,16 +208,21 @@
 
 #### ⬜ タスク 8: Cloud Build 設定
 
-- [ ] Cloud Build トリガー作成:
-  - メインブランチプッシュ時トリガー
-  - タグプッシュ時トリガー（本番デプロイ用）
-- [ ] ビルド設定ファイル作成: `cloudbuild/backend-build.yaml`
-  - Docker ビルドステップ（R2 SDK 含む）
-  - ユニットテスト実行ステップ
-  - 脆弱性スキャンステップ
+> [!NOTE]
+> GitHub Actions + Cloud Build のハイブリッド構成を採用。
+> GitHub Actions がトリガーとなり、`gcloud builds submit` で Cloud Build を呼び出します。
+> これにより既存の WIF 認証をそのまま活用できます。
+
+- [ ] **8-1: `cloudbuild/backend-build.yaml` 作成**
+  - Docker ビルドステップ
   - Artifact Registry へのプッシュステップ
-- [ ] ビルドキャッシュ設定: ビルド時間短縮のためのキャッシュ
-- [ ] ビルド通知設定: ビルド失敗時の Slack 通知
+  - 置換変数 (`_REGION`, `_REPOSITORY`, `_IMAGE_TAG`) 定義
+- [ ] **8-2: GitHub Actions ワークフロー更新**
+  - `gcloud builds submit` 呼び出しステップ追加
+  - WIF 認証の統合
+- [ ] **8-3: 検証**
+  - `gcloud builds submit --dry-run=true` で構文検証
+  - `check-quality.sh` 実行
 
 ### 🔐 **フェーズ 4: R2 連携とシークレット管理**
 
