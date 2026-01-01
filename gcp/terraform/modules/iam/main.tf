@@ -98,12 +98,6 @@ resource "google_project_iam_member" "cloud_build_roles" {
 
   for_each = toset([
 
-    # ビルドした Docker イメージを Artifact Registry にプッシュするために必要
-
-    "roles/artifactregistry.writer",
-
-
-
     # Cloud Run サービスをデプロイ・更新するために必要 (run.admin ではなく developer で最小権限化)
 
     "roles/run.developer",
@@ -120,9 +114,9 @@ resource "google_project_iam_member" "cloud_build_roles" {
 
   project = var.project_id
 
-  role = each.key
+  role    = each.key
 
-  member = "serviceAccount:${google_service_account.cloud_build.email}"
+  member  = "serviceAccount:${google_service_account.cloud_build.email}"
 
 }
 

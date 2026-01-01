@@ -5,21 +5,6 @@
   クリーンアップポリシーと、CI/CD 用の IAM 権限設定（リソースレベル）を含みます。
 */
 
-terraform {
-  required_version = ">= 1.14.3"
-
-  required_providers {
-    google = {
-      source  = "hashicorp/google"
-      version = ">= 5.24.0" # cleanup_policies サポートバージョン
-    }
-    google-beta = {
-      source  = "hashicorp/google-beta"
-      version = ">= 5.24.0"
-    }
-  }
-}
-
 # -----------------------------------------------------------------------------
 # Artifact Registry リポジトリ作成
 # -----------------------------------------------------------------------------
