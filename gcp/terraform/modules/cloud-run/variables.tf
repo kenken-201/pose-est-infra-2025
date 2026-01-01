@@ -24,6 +24,17 @@ variable "environment" {
   }
 }
 
+variable "ingress" {
+  description = "Ingress トラフィック設定 (例: INGRESS_TRAFFIC_ALL, INGRESS_TRAFFIC_INTERNAL_LOAD_BALANCER)"
+  type        = string
+  default     = "INGRESS_TRAFFIC_ALL"
+
+  validation {
+    condition     = contains(["INGRESS_TRAFFIC_ALL", "INGRESS_TRAFFIC_INTERNAL_ONLY", "INGRESS_TRAFFIC_INTERNAL_LOAD_BALANCER"], var.ingress)
+    error_message = "Ingress 設定は 'INGRESS_TRAFFIC_ALL', 'INGRESS_TRAFFIC_INTERNAL_ONLY', 'INGRESS_TRAFFIC_INTERNAL_LOAD_BALANCER' のいずれかである必要があります。"
+  }
+}
+
 variable "image_url" {
   description = "デプロイするコンテナイメージの URL (例: asia-northeast1-docker.pkg.dev/...)"
   type        = string

@@ -9,7 +9,7 @@ resource "google_cloud_run_v2_service" "service" {
   name     = "pose-est-backend-${var.environment}"
   location = var.region
   project  = var.project_id
-  ingress  = "INGRESS_TRAFFIC_ALL" # 全トラフィックを許可 (必要に応じて INTERNAL_LOAD_BALANCER などに制限)
+  ingress  = var.ingress
 
   template {
     # サービスアカウント
