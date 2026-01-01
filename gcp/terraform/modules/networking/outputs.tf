@@ -17,3 +17,8 @@ output "subnet_name" {
   description = "The name of the subnet"
   value       = google_compute_subnetwork.subnet.name
 }
+
+output "nat_ip" {
+  description = "The static IP address allocated to Cloud NAT"
+  value       = google_compute_address.nat.address
+}

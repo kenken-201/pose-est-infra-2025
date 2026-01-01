@@ -40,6 +40,15 @@ resource "google_compute_router" "router" {
 }
 
 # -----------------------------------------------------------------------------
+# Cloud NAT Static IP
+# -----------------------------------------------------------------------------
+resource "google_compute_address" "nat" {
+  name    = "pose-est-nat-ip-${var.environment}"
+  project = var.project_id
+  region  = var.region
+}
+
+# -----------------------------------------------------------------------------
 # Cloud NAT
 # -----------------------------------------------------------------------------
 resource "google_compute_router_nat" "nat" {
@@ -47,7 +56,8 @@ resource "google_compute_router_nat" "nat" {
   project                            = var.project_id
   region                             = var.region
   router                             = google_compute_router.router.name
-  nat_ip_allocate_option             = "AUTO_ONLY"
+  nat_ip_allocate_option             = "MANUAL_ONLY"
+  nat_ips                            = [google_compute_address.nat.self_link]
   source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
 
   log_config {
