@@ -114,9 +114,9 @@ resource "google_project_iam_member" "cloud_build_roles" {
 
   project = var.project_id
 
-  role    = each.key
+  role = each.key
 
-  member  = "serviceAccount:${google_service_account.cloud_build.email}"
+  member = "serviceAccount:${google_service_account.cloud_build.email}"
 
 }
 

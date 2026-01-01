@@ -90,3 +90,21 @@ module "artifact_registry" {
     module.iam          # SA 作成後
   ]
 }
+
+# -----------------------------------------------------------------------------
+# Secret Manager (R2 クレデンシャル管理)
+# -----------------------------------------------------------------------------
+module "secret_manager" {
+  source = "../../modules/secret-manager"
+
+  project_id  = var.project_id
+  environment = var.environment
+
+  # IAM モジュールの出力 (member 形式) を使用
+  cloud_run_sa_member = module.iam.cloud_run_sa_member
+
+  depends_on = [
+    module.gcp_project,
+    module.iam
+  ]
+}
