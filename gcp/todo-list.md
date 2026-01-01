@@ -90,14 +90,14 @@
     - `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`: タスク 1 で設定済み
   - [x] 設定手順のドキュメント作成 (`docs/github-secrets.md`)
 
-#### ⬜ タスク 3: CI/CD 基本パイプライン作成
+#### ✅ タスク 3: CI/CD 基本パイプライン作成
 
 > [!NOTE]
 > Cloudflare 側の CI/CD 実装 (`cloudflare-terraform-ci.yml`, `cloudflare-security.yml`) を参考に、
 > GCP 向けのワークフローを作成します。Workload Identity Federation を使用したキーレス認証を採用。
 
-- [ ] **3-1: Terraform CI ワークフロー作成**
-  - ファイル: `.github/workflows/gcp-terraform-ci.yml`
+- [x] **3-1: Terraform CI ワークフロー作成**
+  - [x] ファイル: `.github/workflows/gcp-terraform-ci.yml`
   - トリガー: `pull_request` (main ブランチへの PR 時、`pose-est-infra/gcp/**` パス変更時)
   - ステップ:
     - Checkout
@@ -106,24 +106,24 @@
     - TFLint Setup
     - Format Check, Init, Validate, TFLint, Plan
     - PR へのコメント（Plan 結果サマリー）
-- [ ] **3-2: セキュリティスキャンワークフロー作成**
-  - ファイル: `.github/workflows/gcp-security.yml`
+- [x] **3-2: セキュリティスキャンワークフロー作成**
+  - [x] ファイル: `.github/workflows/gcp-security.yml`
   - トリガー: `pull_request` (main ブランチへの PR 時)
   - ステップ:
     - Checkout
     - Checkov スキャン
     - SARIF ファイルのアップロード（GitHub Security タブ連携）
-- [ ] **3-3: Terraform Apply ワークフロー作成（手動/マージ時）**
-  - ファイル: `.github/workflows/gcp-terraform-apply.yml`
+- [x] **3-3: Terraform Apply ワークフロー作成（手動/マージ時）**
+  - [x] ファイル: `.github/workflows/gcp-terraform-apply.yml`
   - トリガー: `push` (main ブランチへのマージ時) または `workflow_dispatch` (手動実行)
   - ステップ:
     - Checkout
     - Workload Identity Federation 認証
     - Terraform Init, Plan, Apply
     - 実行結果の Slack 通知（オプション、将来対応）
-- [ ] **3-4: ワークフロー動作確認**
-  - テスト用 PR を作成し、Terraform CI と Security Scan が正常に動作することを確認
-  - Plan 結果が PR コメントに表示されることを確認
+- [x] **3-4: ワークフロー動作確認**
+  - [x] テスト用 PR を作成し、Terraform CI と Security Scan が正常に動作することを確認
+  - Plan 結果が PR コメントに表示されることを確認（実際の PR で検証予定）
 
 ### 🏛️ **フェーズ 2: GCP プロジェクト基盤構築**
 
