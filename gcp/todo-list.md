@@ -168,21 +168,21 @@
 - [x] **5-3: 検証**
   - `terraform plan` で VPC, Subnet, Router, NAT が計画されることを確認
 
-#### ⬜ タスク 6: IAM とサービスアカウント設定
+#### ✅ タスク 6: IAM とサービスアカウント設定
 
 > [!NOTE]
 > 既存の `terraform-admin` サービスアカウントと WIF を GitHub Actions 用として流用します。
 > 新規作成は `cloud-run-sa` と `cloud-build-sa` のみです。
 
-- [ ] **6-1: `modules/iam` モジュール作成**
+- [x] **6-1: `modules/iam` モジュール作成**
   - ファイル: `terraform/modules/iam/main.tf`, `variables.tf`, `outputs.tf`
   - 機能:
     - `cloud-run-sa-{env}` サービスアカウント作成
     - `cloud-build-sa-{env}` サービスアカウント作成
     - 最小権限 IAM ロールバインディング
-- [ ] **6-2: dev 環境への統合**
+- [x] **6-2: dev 環境への統合**
   - `terraform/environments/dev/main.tf` に iam モジュール呼び出しを追加
-- [ ] **6-3: 検証**
+- [x] **6-3: 検証**
   - `terraform plan` でサービスアカウントと IAM バインディングが計画されることを確認
 
 ### 🐳 **フェーズ 3: コンテナレジストリとビルド環境**

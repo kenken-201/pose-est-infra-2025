@@ -69,6 +69,10 @@ if command -v tflint &> /dev/null; then
   # gcp-project モジュールを確認
   echo "   モジュールを確認中: gcp-project..."
   tflint --chdir=modules/gcp-project --format=compact
+
+  # iam モジュールを確認
+  echo "   モジュールを確認中: iam..."
+  tflint --chdir=modules/iam --format=compact
   
   # dev 環境を確認
   echo "   環境を確認中: dev..."

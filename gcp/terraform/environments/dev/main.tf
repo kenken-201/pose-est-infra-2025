@@ -55,3 +55,15 @@ module "networking" {
 
   depends_on = [module.gcp_project] # API 有効化後に実行
 }
+
+# -----------------------------------------------------------------------------
+# IAM (サービスアカウント & 権限)
+# -----------------------------------------------------------------------------
+module "iam" {
+  source = "../../modules/iam"
+
+  project_id  = var.project_id
+  environment = var.environment
+
+  depends_on = [module.gcp_project] # IAM API 有効化後に実行
+}
