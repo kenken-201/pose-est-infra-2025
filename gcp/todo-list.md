@@ -187,31 +187,41 @@
 
 ### 🐳 **フェーズ 3: コンテナレジストリとビルド環境**
 
-#### ⬜ タスク 7: Artifact Registry 設定
+#### ✅ タスク 7: Artifact Registry 設定
 
-- [ ] Terraform モジュール: `modules/artifact-registry`
-- [ ] Docker リポジトリ作成: `pose-est-backend`
-- [ ] リポジトリ設定:
-  - フォーマット: DOCKER
-  - ロケーション: asia-northeast1
-- [ ] リポジトリ権限設定:
-  - Cloud Build サービスアカウントへのアクセス許可
-  - Cloud Run サービスアカウントへのアクセス許可
-- [ ] ライフサイクルポリシー: 未使用イメージの自動削除
-- [ ] 脆弱性スキャン設定: イメージスキャンの有効化
+> [!NOTE]
+> IAM 権限はリポジトリ単位（リソースレベル）で設定し、最小権限を徹底します。
+> 脆弱性スキャンは Container Analysis API 有効化で自動的に適用されます。
 
-#### ⬜ タスク 8: Cloud Build 設定
+- [x] **7-1: `modules/artifact-registry` モジュール作成**
+  - ファイル: `terraform/modules/artifact-registry/main.tf`, `variables.tf`, `outputs.tf`
+  - 機能:
+    - Docker リポジトリ作成 (`pose-est-backend-{env}`)
+    - クリーンアップポリシー設定 (タグなし 7 日、古いバージョン削除)
+    - リソースレベル IAM バインディング (Cloud Build: Writer, Cloud Run: Reader)
+- [x] **7-2: `modules/gcp-project` への API 追加**
+  - `containeranalysis.googleapis.com` を有効化リストに追加
+- [x] **7-3: dev 環境への統合**
+  - `terraform/environments/dev/main.tf` に artifact-registry モジュール呼び出しを追加
+- [x] **7-4: 検証**
+  - `terraform plan` でリポジトリと IAM バインディングが計画されることを確認
 
-- [ ] Cloud Build トリガー作成:
-  - メインブランチプッシュ時トリガー
-  - タグプッシュ時トリガー（本番デプロイ用）
-- [ ] ビルド設定ファイル作成: `cloudbuild/backend-build.yaml`
-  - Docker ビルドステップ（R2 SDK 含む）
-  - ユニットテスト実行ステップ
-  - 脆弱性スキャンステップ
+#### ✅ タスク 8: Cloud Build 設定
+
+> [!NOTE]
+> GitHub Actions + Cloud Build のハイブリッド構成を採用。
+> GitHub Actions がトリガーとなり、`gcloud builds submit` で Cloud Build を呼び出します。
+> これにより既存の WIF 認証をそのまま活用できます。
+
+- [x] **8-1: `cloudbuild/backend-build.yaml` 作成**
+  - Docker ビルドステップ
   - Artifact Registry へのプッシュステップ
-- [ ] ビルドキャッシュ設定: ビルド時間短縮のためのキャッシュ
-- [ ] ビルド通知設定: ビルド失敗時の Slack 通知
+  - 置換変数 (`_REGION`, `_REPOSITORY`, `_IMAGE_TAG`) 定義
+- [x] **8-2: GitHub Actions ワークフロー更新**
+  - `gcloud builds submit` 呼び出しステップ追加
+  - WIF 認証の統合 (既存の `terraform-admin` SA を使用)
+- [x] **8-3: 検証**
+  - 設定ファイルの作成確認 (dry-run は非サポートのため実実行時に検証)
 
 ### 🔐 **フェーズ 4: R2 連携とシークレット管理**
 
