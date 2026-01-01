@@ -16,7 +16,9 @@ resource "google_secret_manager_secret" "r2_access_key_id" {
   project   = var.project_id
 
   replication {
-    auto {} # コストとシンプルさのため自動レプリケーション
+    # 自動レプリケーション (Google 管理キーで暗号化)
+    # コンプライアンス要件や高可用性要件が厳しい場合は user_managed ブロックでリージョン指定を検討してください
+    auto {} 
   }
 }
 
