@@ -3,6 +3,7 @@ name: Cloudflare Security Scan
 on:
   pull_request:
     branches: [main]
+    # 指定パス配下の変更がある場合のみ実行
     paths:
       - "pose-est-infra/cloudflare/**"
 
@@ -10,6 +11,7 @@ jobs:
   checkov:
     name: Checkov Scan
     runs-on: ubuntu-latest
+    # GitHub Advanced Security (Securityタブ) に結果をアップロードするために書き込み権限が必要
     permissions:
       contents: read
       security-events: write
@@ -18,19 +20,23 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # Checkov による静的解析 (IaC セキュリティスキャン) を実行
       - name: Run Checkov
         id: checkov
         uses: bridgecrewio/checkov-action@v12
         with:
           directory: pose-est-infra/cloudflare/terraform
           framework: terraform
+          # CLI出力とSARIF形式(GitHub Security用)の両方を出力
           output_format: cli,sarif
           output_file_path: console,results.sarif
+          # スキャンで失敗してもジョブ自体は失敗させない (結果の確認を優先)
           soft_fail: true
 
+      # スキャン結果 (SARIF) を GitHub の Security タブにアップロード
       - name: Upload SARIF file
         uses: github/codeql-action/upload-sarif@v3
-        if: always()
+        if: always() # スキャンが失敗しても実行する
         with:
           sarif_file: results.sarif
           category: checkov

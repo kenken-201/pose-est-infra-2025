@@ -1,5 +1,18 @@
 name: GCP Terraform Apply
 
+# -----------------------------------------------------------------------------
+# GCP Terraform Apply Workflow
+# -----------------------------------------------------------------------------
+# 本番環境へのTerraform適用を自動化するワークフローです。
+# mainブランチへのプッシュ、または手動実行でトリガーされます。
+#
+# 主な機能:
+# - Workload Identity Federationを使用した安全な認証
+# - R2バックエンドを使用したTerraform Init
+# - 状態ロックの代替としての並列実行制御 (concurrency)
+# - Terraform Plan & Apply の実行
+# -----------------------------------------------------------------------------
+
 on:
   push:
     branches: [main]
@@ -15,6 +28,12 @@ on:
         options:
           - production
 
+# 並列実行の制御（状態ロックの代替）
+# 同じグループのジョブが既に実行中の場合、それを待機またはキャンセルさせます
+concurrency:
+  group: gcp-terraform-apply-${{ github.ref }}
+  cancel-in-progress: false
+
 env:
   TF_WORKING_DIR: "pose-est-infra/gcp/terraform"
 
@@ -24,7 +43,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      id-token: write # Required for Workload Identity Federation
+      id-token: write # Workload Identity Federation に必須
 
     defaults:
       run:
@@ -34,6 +53,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
+      # Google Cloudへの認証 (キーレス認証)
       - name: Authenticate to Google Cloud
         id: auth
         uses: google-github-actions/auth@6fc4af4b145ae7821d527454aa9bd537d1f2dc5f # v2.1.7
@@ -46,6 +66,7 @@ jobs:
         with:
           terraform_version: 1.14.3
 
+      # Terraform初期化 (R2バックエンド)
       - name: Terraform Init
         id: init
         run: |
@@ -62,6 +83,7 @@ jobs:
         id: apply
         run: terraform apply -auto-approve tfplan
 
+      # 実行結果のサマリー出力
       - name: Output Apply Summary
         if: always()
         run: |

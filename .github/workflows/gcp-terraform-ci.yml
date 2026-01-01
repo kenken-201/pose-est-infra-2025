@@ -1,5 +1,18 @@
 name: GCP Terraform CI
 
+# -----------------------------------------------------------------------------
+# GCP Terraform CI Workflow
+# -----------------------------------------------------------------------------
+# プルリクエスト作成・更新時にTerraformの検証を行うワークフローです。
+#
+# 主な機能:
+# - コードフォーマットチェック (fmt)
+# - コード検証 (validate)
+# - 静的解析 (TFLint)
+# - 実行計画の作成 (Plan)
+# - Plan結果のPRコメントへの投稿
+# -----------------------------------------------------------------------------
+
 on:
   pull_request:
     branches: [main]
@@ -15,8 +28,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      pull-requests: write
-      id-token: write # Required for Workload Identity Federation
+      pull-requests: write # PRへのコメント投稿に必須
+      id-token: write # Workload Identity Federation に必須
 
     defaults:
       run:
@@ -26,6 +39,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
+      # Google Cloudへの認証 (キーレス認証)
       - name: Authenticate to Google Cloud
         id: auth
         uses: google-github-actions/auth@6fc4af4b145ae7821d527454aa9bd537d1f2dc5f # v2.1.7
@@ -43,11 +57,13 @@ jobs:
         with:
           tflint_version: v0.50.3
 
+      # フォーマットチェック
       - name: Terraform Format Check
         id: fmt
         run: terraform fmt -check -recursive
         continue-on-error: true
 
+      # Terraform初期化 (R2バックエンド)
       - name: Terraform Init
         id: init
         run: |
@@ -56,10 +72,12 @@ jobs:
             -backend-config="secret_key=${{ secrets.R2_SECRET_ACCESS_KEY }}" \
             -backend-config="endpoint=https://${{ secrets.CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com"
 
+      # 構文検証
       - name: Terraform Validate
         id: validate
         run: terraform validate -no-color
 
+      # TFLint初期化と実行
       - name: Init TFLint
         run: tflint --init
 
@@ -68,11 +86,13 @@ jobs:
         run: tflint --chdir=. --format=compact
         continue-on-error: true
 
+      # Plan実行
       - name: Terraform Plan
         id: plan
         run: terraform plan -no-color -out=tfplan
         continue-on-error: true
 
+      # Plan結果をPRにコメント
       - name: Comment Plan on PR
         uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
         if: github.event_name == 'pull_request'
@@ -93,21 +113,33 @@ jobs:
 
             | Step | Status |
             |------|--------|
-            | 🖌 Format | \`${{ steps.fmt.outcome }}\` |
-            | ⚙️ Init | \`${{ steps.init.outcome }}\` |
-            | 🔍 Validate | \`${{ steps.validate.outcome }}\` |
-            | 🧹 TFLint | \`${{ steps.tflint.outcome }}\` |
-            | 📋 Plan | \`${{ steps.plan.outcome }}\` |
+            | 🖌 Format | 
+${{ steps.fmt.outcome }}
+ |
+            | ⚙️ Init | 
+${{ steps.init.outcome }}
+ |
+            | 🔍 Validate | 
+${{ steps.validate.outcome }}
+ |
+            | 🧹 TFLint | 
+${{ steps.tflint.outcome }}
+ |
+            | 📋 Plan | 
+${{ steps.plan.outcome }}
+ |
 
             <details><summary>Show Plan Output</summary>
 
-            \`\`\`terraform
+            ```terraform
             ${{ steps.plan.outputs.stdout }}
-            \`\`\`
+            ```
 
             </details>
 
-            *Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
+            *Pushed by: @${{ github.actor }}, Action: 
+${{ github.event_name }}
+*`;
 
             if (botComment) {
               await github.rest.issues.updateComment({

@@ -3,6 +3,7 @@ name: Cloudflare Terraform CI
 on:
   pull_request:
     branches: [main]
+    # 指定パス配下の変更がある場合のみ実行
     paths:
       - "pose-est-infra/cloudflare/**"
 
@@ -13,6 +14,7 @@ jobs:
   terraform:
     name: Terraform CI
     runs-on: ubuntu-latest
+    # PR にコメントを投稿するために書き込み権限が必要
     permissions:
       contents: read
       pull-requests: write
@@ -24,21 +26,27 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # Terraform CLI のセットアップ
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.14.3
 
+      # TFLint のセットアップ (Terraform 用リンター)
       - name: Setup TFLint
         uses: terraform-linters/setup-tflint@v4
         with:
           tflint_version: v0.50.3
 
+      # コードフォーマットのチェック
+      # エラーがあっても処理を継続し、後続のステップでまとめて報告する
       - name: Terraform Format Check
         id: fmt
         run: terraform fmt -check -recursive
         continue-on-error: true
 
+      # Terraform の初期化
+      # バックエンド (R2) への接続情報を動的に注入
       - name: Terraform Init
         id: init
         run: |
@@ -49,18 +57,23 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
 
+      # 設定ファイルの構文検証
       - name: Terraform Validate
         id: validate
         run: terraform validate -no-color
 
+      # TFLint の初期化 (プラグインのインストールなど)
       - name: Init TFLint
         run: tflint --init
 
+      # TFLint の実行
       - name: Run TFLint
         id: tflint
         run: tflint --chdir=. --format=compact
         continue-on-error: true
 
+      # 実行計画 (Plan) の作成
+      # 変更内容を確認するため、tfplan ファイルに出力
       - name: Terraform Plan
         id: plan
         run: terraform plan -no-color -out=tfplan
@@ -68,6 +81,8 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         continue-on-error: true
 
+      # Plan 結果や各ステップのステータスを PR にコメントとして投稿
+      # 既存の Bot コメントがあれば更新し、なければ新規作成する
       - name: Comment Plan on PR
         uses: actions/github-script@v7
         if: github.event_name == 'pull_request'
@@ -121,6 +136,7 @@ jobs:
               });
             }
 
+      # Plan が失敗していた場合はジョブを失敗させる
       - name: Plan Status
         if: steps.plan.outcome == 'failure'
         run: exit 1
