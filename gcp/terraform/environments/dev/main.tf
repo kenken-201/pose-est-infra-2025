@@ -67,3 +67,23 @@ module "iam" {
 
   depends_on = [module.gcp_project] # IAM API 有効化後に実行
 }
+
+# -----------------------------------------------------------------------------
+# Artifact Registry (コンテナレジストリ)
+# -----------------------------------------------------------------------------
+module "artifact_registry" {
+  source = "../../modules/artifact-registry"
+
+  project_id  = var.project_id
+  region      = var.region
+  environment = var.environment
+
+  # IAM モジュールの出力 (member 形式) を使用
+  cloud_build_sa_member = module.iam.cloud_build_sa_member
+  cloud_run_sa_member   = module.iam.cloud_run_sa_member
+
+  depends_on = [
+    module.gcp_project, # API 有効化後
+    module.iam          # SA 作成後
+  ]
+}

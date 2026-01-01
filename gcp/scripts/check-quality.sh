@@ -87,7 +87,16 @@ if command -v tflint &> /dev/null; then
     tflint --format=compact
     tflint --chdir=modules/networking --format=compact
     tflint --chdir=modules/gcp-project --format=compact
+
+    # iam モジュールを確認
+    echo "   モジュールを確認中: iam..."
     tflint --chdir=modules/iam --format=compact
+
+    # artifact-registry モジュールを確認
+    echo "   モジュールを確認中: artifact-registry..."
+    tflint --chdir=modules/artifact-registry --format=compact
+    
+    # dev 環境を確認
     tflint --chdir=environments/dev --format=compact
     echo -e "   ${GREEN}✅ TFLint チェック完了${NC}"
   ) &

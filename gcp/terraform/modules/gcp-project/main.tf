@@ -27,6 +27,7 @@ resource "google_project_service" "apis" {
     "secretmanager.googleapis.com",        # Secret Manager: 機密情報管理 (R2 クレデンシャル等)
     "iam.googleapis.com",                  # IAM: アクセス権限管理
     "cloudresourcemanager.googleapis.com", # Resource Manager: プロジェクトメタデータ管理
+    "containeranalysis.googleapis.com",    # Container Analysis: 脆弱性スキャン
     "monitoring.googleapis.com",           # Cloud Monitoring: 監視
     "logging.googleapis.com",              # Cloud Logging: ログ収集
     "cloudbilling.googleapis.com",         # Cloud Billing: 請求管理 (予算 API 用)
