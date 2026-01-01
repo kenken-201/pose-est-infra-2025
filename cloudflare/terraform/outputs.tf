@@ -10,6 +10,17 @@ output "r2_bucket_name" {
   value       = module.r2_bucket.bucket_name
 }
 
+output "r2_retention_days" {
+  description = "R2 バケットの保持期間 (日)"
+  value       = module.r2_bucket.retention_days
+}
+
+output "dnssec_ds_record" {
+  description = "DNSSEC DS Record (Registrar 設定用)"
+  value       = module.dns.dnssec_ds_record
+  sensitive   = true
+}
+
 output "r2_bucket_domain" {
   description = "R2 バケットのドメイン"
   value       = module.r2_bucket.bucket_domain
