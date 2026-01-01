@@ -16,10 +16,34 @@
 
 #### ⬜ タスク 1: リポジトリと基本設定
 
-- [ ] GCP ディレクトリ作成: `pose-est-infra/gcp/`
-- [ ] 基本ファイル作成: README.md, .gitignore, SECURITY.md
-- [ ] Terraform バージョン固定: `versions.tf` 作成
-- [ ] Terraform バックエンド設定: Cloud Storage バケット準備（状態管理用）
+> [!NOTE]
+> Cloudflare 側の既存実装 (`pose-est-infra/cloudflare/`) から流用可能なファイルを活用し、効率的に構築します。
+> tfstate 管理先は **Cloudflare R2** (`pose-est-terraform-state` バケット) を使用します。
+
+- [ ] **1-1: ディレクトリ構造作成**
+  - `pose-est-infra/gcp/terraform/` ディレクトリ作成
+  - `pose-est-infra/gcp/terraform/modules/` ディレクトリ作成
+  - `pose-est-infra/gcp/terraform/environments/` ディレクトリ作成
+  - `pose-est-infra/gcp/docs/` ディレクトリ作成
+  - `pose-est-infra/gcp/scripts/` ディレクトリ作成
+- [ ] **1-2: `.gitignore` 作成**
+  - Cloudflare 版 (`cloudflare/.gitignore`) をそのまま流用
+- [ ] **1-3: `README.md` 作成**
+  - Cloudflare 版を参考に GCP 向けに調整
+- [ ] **1-4: `SECURITY.md` 作成**
+  - Cloudflare 版をそのまま流用
+- [ ] **1-5: `terraform/versions.tf` 作成**
+  - Terraform バージョン固定: `>= 1.14.3`
+  - Google プロバイダー設定
+  - Google Beta プロバイダー設定（オプション）
+- [ ] **1-6: `terraform/backend.tf` 作成**
+  - Cloudflare R2 をバックエンドとして設定
+  - バケット: `pose-est-terraform-state`
+  - キー: `gcp/terraform.tfstate`
+  - Cloudflare 版 (`cloudflare/terraform/backend.tf`) を参考に作成
+- [ ] **1-7: R2 バックエンド初期化テスト**
+  - `terraform init` の実行確認
+  - tfstate ファイルが R2 に作成されることを確認
 
 #### ⬜ タスク 2: GCP 認証設定
 
@@ -27,7 +51,7 @@
   - 必要な権限: Project Owner, Cloud Run Admin, Secret Manager Admin
 - [ ] GitHub Secrets 設定
   - `GCP_SA_KEY`, `GCP_PROJECT_ID`, `GCP_REGION`
-  - `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`（開発用）
+  - `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`（タスク 1 で設定済みを流用）
 - [ ] ローカル認証設定: `gcloud auth` と環境変数設定
 
 #### ⬜ タスク 3: CI/CD 基本パイプライン作成
@@ -354,7 +378,9 @@
 1. **状態ファイル管理**:
 
    - 開発/本番で状態ファイルを分離（ステージング削除）
-   - バックエンドは Cloud Storage、状態ロックは Cloud Spanner
+   - **バックエンドは Cloudflare R2**（Cloudflare 側と統一）
+   - バケット: `pose-est-terraform-state`、キー: `gcp/terraform.tfstate`
+   - 状態ロックは CI/CD ジョブの直列化で実現（R2 はネイティブロック非対応）
    - 状態ファイルの定期的なバックアップ
 
 2. **シークレット管理**:
