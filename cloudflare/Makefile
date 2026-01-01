@@ -1,5 +1,10 @@
 .PHONY: init plan apply fmt validate lint verify-auth
 
+# .env ファイルが存在すれば読み込み、変数をエクスポートする
+# これにより TF_VAR_CLOUDFLARE_ZONE_ID などを Terraform コマンドに渡せます
+-include .env
+export
+
 TERRAFORM_DIR := terraform
 SCRIPTS_DIR := scripts
 
