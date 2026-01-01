@@ -189,16 +189,22 @@
 
 #### ⬜ タスク 7: Artifact Registry 設定
 
-- [ ] Terraform モジュール: `modules/artifact-registry`
-- [ ] Docker リポジトリ作成: `pose-est-backend`
-- [ ] リポジトリ設定:
-  - フォーマット: DOCKER
-  - ロケーション: asia-northeast1
-- [ ] リポジトリ権限設定:
-  - Cloud Build サービスアカウントへのアクセス許可
-  - Cloud Run サービスアカウントへのアクセス許可
-- [ ] ライフサイクルポリシー: 未使用イメージの自動削除
-- [ ] 脆弱性スキャン設定: イメージスキャンの有効化
+> [!NOTE]
+> IAM 権限はリポジトリ単位（リソースレベル）で設定し、最小権限を徹底します。
+> 脆弱性スキャンは Container Analysis API 有効化で自動的に適用されます。
+
+- [ ] **7-1: `modules/artifact-registry` モジュール作成**
+  - ファイル: `terraform/modules/artifact-registry/main.tf`, `variables.tf`, `outputs.tf`
+  - 機能:
+    - Docker リポジトリ作成 (`pose-est-backend-{env}`)
+    - クリーンアップポリシー設定 (タグなし 7 日、古いバージョン削除)
+    - リソースレベル IAM バインディング (Cloud Build: Writer, Cloud Run: Reader)
+- [ ] **7-2: `modules/gcp-project` への API 追加**
+  - `containeranalysis.googleapis.com` を有効化リストに追加
+- [ ] **7-3: dev 環境への統合**
+  - `terraform/environments/dev/main.tf` に artifact-registry モジュール呼び出しを追加
+- [ ] **7-4: 検証**
+  - `terraform plan` でリポジトリと IAM バインディングが計画されることを確認
 
 #### ⬜ タスク 8: Cloud Build 設定
 
