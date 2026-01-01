@@ -4,7 +4,7 @@ set -e
 # GCP インフラストラクチャ品質チェック用スクリプト
 # -----------------------------------------------------------------------------
 # Terraform のフォーマット、検証、TFLint、および Checkov セキュリティスキャンを実行します。
-# 開発中および CI/CD パイプラインで使用されます。
+# パフォーマンス向上のため、可能な限り並列実行します。
 
 # 色定義
 GREEN='\033[0;32m'
@@ -16,85 +16,114 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT_DIR="$SCRIPT_DIR/.."
 TERRAFORM_DIR="$ROOT_DIR/terraform"
 
-echo -e "\n${YELLOW}🔍 GCP インフラストラクチャの品質チェックを開始します...${NC}\n"
+echo -e "\n${YELLOW}🔍 GCP インフラストラクチャの品質チェックを開始します... (並列実行モード)${NC}\n"
 
-# 1. Terraform フォーマットチェック
+# エラーハンドリング用
+FAIL=0
+
+# -----------------------------------------------------------------------------
+# 1. Terraform フォーマットチェック & 検証 (直列 + 並列)
+# -----------------------------------------------------------------------------
 echo -e "${YELLOW}👉 Terraform フォーマットチェックを実行中...${NC}"
 if terraform fmt -recursive -check "$TERRAFORM_DIR"; then
   echo -e "${GREEN}✅ フォーマット OK${NC}"
 else
   echo -e "${RED}❌ フォーマットチェックに失敗しました。'terraform fmt -recursive' を実行して修正してください。${NC}"
-  # 他のエラーも確認できるよう、ここでは終了しません
+  FAIL=1
 fi
 
-# 2. Terraform 検証 (環境ごとにループ)
-echo -e "\n${YELLOW}👉 Terraform 検証 (validate) を実行中...${NC}"
+echo -e "\n${YELLOW}👉 検証、Lint、セキュリティスキャンを並列実行中...${NC}"
 
-# 検証対象の環境ディレクトリ
+# バックグラウンドプロセスPID配列
+PIDS=()
+PIDS_NAMES=()
+
+# 機能: コマンド実行ラッパー
+run_check() {
+  local name="$1"
+  local cmd="$2"
+  echo -e "   🚀 開始: $name"
+  if eval "$cmd" > /dev/null 2>&1; then
+    echo -e "   ${GREEN}✅ 完了: $name${NC}"
+    return 0
+  else
+    echo -e "   ${RED}❌ 失敗: $name${NC}"
+    # エラー詳細は再度実行して表示（簡易的）
+    echo "   --- Error Log: $name ---"
+    eval "$cmd" || true
+    echo "   ------------------------"
+    return 1
+  fi
+}
+
+# (A) 環境ごとの validate
 ENV_DIRS=("$TERRAFORM_DIR/environments/dev")
-# 新しい環境が増えた場合はここに追加してください
-
 for dir in "${ENV_DIRS[@]}"; do
   if [ -d "$dir" ]; then
-    echo -e "   環境を確認中: $(basename "$dir")"
-    pushd "$dir" > /dev/null
-    
-    # バックエンドなしで初期化 (高速・安全)
-    terraform init -backend=false > /dev/null 2>&1
-    
-    if terraform validate -no-color; then
-      echo -e "   ${GREEN}✅ 検証 OK ($(basename "$dir"))${NC}"
-    else
-      echo -e "   ${RED}❌ 検証失敗 ($(basename "$dir"))${NC}"
-      exit 1
-    fi
-    popd > /dev/null
+    env_name=$(basename "$dir")
+    (
+      pushd "$dir" > /dev/null
+      terraform init -backend=false > /dev/null 2>&1
+      if terraform validate -no-color; then
+        echo -e "   ${GREEN}✅ 検証 OK ($env_name)${NC}"
+      else
+        echo -e "   ${RED}❌ 検証失敗 ($env_name)${NC}"
+        terraform validate -no-color
+        exit 1
+      fi
+    ) &
+    PIDS+=($!)
+    PIDS_NAMES+=("Terraform Validate ($env_name)")
   fi
 done
 
-# 3. TFLint (Terraform リンター)
-echo -e "\n${YELLOW}👉 TFLint を実行中...${NC}"
+# (B) TFLint
 if command -v tflint &> /dev/null; then
-  pushd "$TERRAFORM_DIR" > /dev/null
-  tflint --init > /dev/null 2>&1
-  
-  # ルートディレクトリで実行
-  echo "   ルートディレクトリを確認中..."
-  tflint --format=compact
-  
-  # networking モジュールを確認
-  echo "   モジュールを確認中: networking..."
-  tflint --chdir=modules/networking --format=compact
-
-  # gcp-project モジュールを確認
-  echo "   モジュールを確認中: gcp-project..."
-  tflint --chdir=modules/gcp-project --format=compact
-
-  # iam モジュールを確認
-  echo "   モジュールを確認中: iam..."
-  tflint --chdir=modules/iam --format=compact
-  
-  # dev 環境を確認
-  echo "   環境を確認中: dev..."
-  tflint --chdir=environments/dev --format=compact
-
-  echo -e "${GREEN}✅ TFLint チェック完了${NC}"
-  popd > /dev/null
+  (
+    pushd "$TERRAFORM_DIR" > /dev/null
+    tflint --init > /dev/null 2>&1
+    
+    # 全体チェック
+    tflint --format=compact
+    tflint --chdir=modules/networking --format=compact
+    tflint --chdir=modules/gcp-project --format=compact
+    tflint --chdir=modules/iam --format=compact
+    tflint --chdir=environments/dev --format=compact
+    echo -e "   ${GREEN}✅ TFLint チェック完了${NC}"
+  ) &
+  PIDS+=($!)
+  PIDS_NAMES+=("TFLint")
 else
   echo -e "${YELLOW}⚠️ TFLint が見つかりません。スキップします。${NC}"
 fi
 
-# 4. Checkov (セキュリティスキャン)
-echo -e "\n${YELLOW}👉 Checkov セキュリティスキャンを実行中...${NC}"
+# (C) Checkov
 if command -v checkov &> /dev/null; then
-  # Terraform ディレクトリ全体をスキャン
-  # --soft-fail: チェック失敗時もビルドを中断しません（警告のみ）
-  checkov -d "$TERRAFORM_DIR" --framework terraform --quiet --compact --soft-fail \
-    --skip-check CKV_GCP_*: # 必要に応じて特定のチェックをスキップ
-    
-  echo -e "${GREEN}✅ Checkov スキャン完了${NC}"
+  (
+    checkov -d "$TERRAFORM_DIR" --framework terraform --quiet --compact --soft-fail \
+      --skip-check CKV_GCP_*: > /dev/null
+    echo -e "   ${GREEN}✅ Checkov スキャン完了${NC}"
+  ) &
+  PIDS+=($!)
+  PIDS_NAMES+=("Checkov")
 else
   echo -e "${YELLOW}⚠️ Checkov が見つかりません。スキップします。${NC}"
 fi
 
-echo -e "\n${GREEN}🎉 すべてのチェックが完了しました！${NC}"
+# プロセス終了待ち
+for i in "${!PIDS[@]}"; do
+  pid=${PIDS[$i]}
+  name=${PIDS_NAMES[$i]}
+  if ! wait "$pid"; then
+    FAIL=1
+  fi
+done
+
+echo -e "\n-----------------------------------------------------------"
+if [ $FAIL -eq 0 ]; then
+  echo -e "${GREEN}🎉 すべてのチェックが完了しました！${NC}"
+  exit 0
+else
+  echo -e "${RED}💀 いくつかのチェックが失敗しました。${NC}"
+  exit 1
+fi

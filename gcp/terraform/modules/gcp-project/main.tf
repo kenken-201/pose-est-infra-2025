@@ -21,15 +21,16 @@ terraform {
 # -----------------------------------------------------------------------------
 resource "google_project_service" "apis" {
   for_each = toset([
-    "run.googleapis.com",              # Cloud Run: コンテナ実行
-    "cloudbuild.googleapis.com",       # Cloud Build: CI/CD ビルド
-    "artifactregistry.googleapis.com", # Artifact Registry: コンテナイメージ保存
-    "secretmanager.googleapis.com",    # Secret Manager: 機密情報管理 (R2 クレデンシャル等)
-    "iam.googleapis.com",              # IAM: アクセス権限管理
-    "monitoring.googleapis.com",       # Cloud Monitoring: 監視
-    "logging.googleapis.com",          # Cloud Logging: ログ収集
-    "cloudbilling.googleapis.com",     # Cloud Billing: 請求管理 (予算 API 用)
-    "billingbudgets.googleapis.com"    # Budget API: 予算アラート用
+    "run.googleapis.com",                  # Cloud Run: コンテナ実行
+    "cloudbuild.googleapis.com",           # Cloud Build: CI/CD ビルド
+    "artifactregistry.googleapis.com",     # Artifact Registry: コンテナイメージ保存
+    "secretmanager.googleapis.com",        # Secret Manager: 機密情報管理 (R2 クレデンシャル等)
+    "iam.googleapis.com",                  # IAM: アクセス権限管理
+    "cloudresourcemanager.googleapis.com", # Resource Manager: プロジェクトメタデータ管理
+    "monitoring.googleapis.com",           # Cloud Monitoring: 監視
+    "logging.googleapis.com",              # Cloud Logging: ログ収集
+    "cloudbilling.googleapis.com",         # Cloud Billing: 請求管理 (予算 API 用)
+    "billingbudgets.googleapis.com"        # Budget API: 予算アラート用
   ])
 
   project                    = var.project_id

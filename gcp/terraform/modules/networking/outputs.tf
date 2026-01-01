@@ -15,6 +15,11 @@ output "vpc_name" {
   value       = google_compute_network.vpc.name
 }
 
+output "vpc_self_link" {
+  description = "作成された VPC の Self Link (URI)"
+  value       = google_compute_network.vpc.self_link
+}
+
 output "subnet_id" {
   description = "作成されたサブネットの ID"
   value       = google_compute_subnetwork.subnet.id
@@ -23,6 +28,11 @@ output "subnet_id" {
 output "subnet_name" {
   description = "作成されたサブネットの名前"
   value       = google_compute_subnetwork.subnet.name
+}
+
+output "subnet_self_link" {
+  description = "作成されたサブネットの Self Link (URI)"
+  value       = google_compute_subnetwork.subnet.self_link
 }
 
 output "nat_ip" {
