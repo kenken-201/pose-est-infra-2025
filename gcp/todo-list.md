@@ -150,22 +150,22 @@
   - `terraform init` を `environments/dev` で実行
   - `terraform plan` で API 有効化が計画されることを確認
 
-#### ⬜ タスク 5: ネットワーク基盤構築
+#### ✅ タスク 5: ネットワーク基盤構築
 
 > [!NOTE]
 > VPC Service Controls は初期段階では設定の複雑さを考慮し、フェーズ 4（セキュリティ強化）で検討します。
 > Cloud Run は VPC 外で動作しますが、VPC Connector を通じて内部リソースにアクセス可能な構成とします。
 
-- [ ] **5-1: `modules/networking` モジュール作成**
+- [x] **5-1: `modules/networking` モジュール作成**
   - ファイル: `terraform/modules/networking/main.tf`, `variables.tf`, `outputs.tf`
   - 機能:
     - VPC ネットワーク作成 (`pose-est-vpc-{env}`)
     - サブネット作成 (`asia-northeast1`, `10.0.0.0/24`)
     - Cloud Router 作成
     - Cloud NAT 作成（VPC 内リソースのインターネットアクセス用）
-- [ ] **5-2: dev 環境への統合**
+- [x] **5-2: dev 環境への統合**
   - `terraform/environments/dev/main.tf` に networking モジュール呼び出しを追加
-- [ ] **5-3: 検証**
+- [x] **5-3: 検証**
   - `terraform plan` で VPC, Subnet, Router, NAT が計画されることを確認
 
 #### ⬜ タスク 6: IAM とサービスアカウント設定

@@ -32,3 +32,14 @@ module "gcp_project" {
   
   # billing_account_id はオプション（設定されなければ予算アラートは作成されない）
 }
+
+module "networking" {
+  source = "../../modules/networking"
+
+  project_id  = var.project_id
+  region      = var.region
+  environment = var.environment
+  subnet_cidr = "10.0.0.0/24"
+  
+  depends_on = [module.gcp_project] # API有効化が終わってから作成
+}
