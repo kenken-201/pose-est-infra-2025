@@ -206,7 +206,7 @@
 - [x] **7-4: 検証**
   - `terraform plan` でリポジトリと IAM バインディングが計画されることを確認
 
-#### ⬜ タスク 8: Cloud Build 設定
+#### ✅ タスク 8: Cloud Build 設定
 
 > [!NOTE]
 > GitHub Actions + Cloud Build のハイブリッド構成を採用。
