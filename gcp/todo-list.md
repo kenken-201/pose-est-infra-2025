@@ -243,10 +243,19 @@
 
 #### ⬜ タスク 10: R2 クレデンシャル管理
 
-- [ ] R2 アクセスキー作成（手動または Terraform）
-- [ ] シークレットの GitHub Secrets 登録（CI/CD 用）
-- [ ] シークレットの Secret Manager 登録（本番用）
-- [ ] キーローテーションポリシー策定（3 ヶ月ごと推奨）
+> [!NOTE]
+> R2 アクセスキーは Cloudflare ダッシュボードから手動作成します。
+> シークレット登録はヘルパースクリプトで効率化します。
+
+- [ ] **10-1: R2 アクセスキー作成（手動）**
+  - Cloudflare ダッシュボード > R2 > API トークン から作成
+  - 必要な権限: Object Read/Write
+- [ ] **10-2: シークレット登録スクリプト作成**
+  - `scripts/register-r2-secrets.sh`
+  - Secret Manager と GitHub Secrets への登録を自動化
+- [ ] **10-3: キーローテーションポリシー策定**
+  - `docs/r2-key-rotation.md` にドキュメント化
+  - 推奨頻度: 90 日
 
 #### ⬜ タスク 11: R2 環境設定
 
