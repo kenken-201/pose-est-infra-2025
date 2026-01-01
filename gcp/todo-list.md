@@ -44,7 +44,10 @@
 - [x] **1-7: R2 バックエンド初期化テスト**
   - [x] `terraform init` の実行確認
   - [x] `terraform plan` の実行確認
-  - [x] `fstate ファイルが R2 に作成されることを確認
+  - [x] tfstate ファイルが R2 に作成されることを確認
+- [x] **1-8: 環境変数設定 (.env)**
+  - [x] `.env.example` 作成と `.env` 設定手順の整備
+  - [x] `scripts/init-backend.sh` の作成と動作確認
 
 #### ⬜ タスク 2: GCP 認証設定
 

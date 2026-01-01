@@ -10,6 +10,9 @@
   並列で terraform apply を実行しないようにしてください。
 
   初期化コマンド:
+    推奨: ./scripts/init-backend.sh を使用してください。
+
+    手動実行の場合:
     terraform init \
       -backend-config="access_key=$R2_ACCESS_KEY_ID" \
       -backend-config="secret_key=$R2_SECRET_ACCESS_KEY" \
@@ -19,7 +22,7 @@
 terraform {
   backend "s3" {
     # バケットは pose-est-infra/cloudflare で既に作成済み
-    # 参照: ../cloudflare/scripts/init-backend.sh
+    # 初期化は scripts/init-backend.sh を使用してください
     bucket                      = "pose-est-terraform-state"
     key                         = "gcp/terraform.tfstate"
     region                      = "auto"
