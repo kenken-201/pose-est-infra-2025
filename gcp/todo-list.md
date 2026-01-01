@@ -152,14 +152,21 @@
 
 #### ⬜ タスク 5: ネットワーク基盤構築
 
-- [ ] Terraform モジュール: `modules/networking`
-- [ ] VPC ネットワーク作成: `pose-est-vpc`
-- [ ] サブネット設定:
-  - `asia-northeast1` リージョンのサブネット
-  - プライベート IP 範囲の割り当て
-- [ ] Cloud NAT 設定（プライベート Cloud Run 用）
-- [ ] ファイアウォールルール基本設定
-- [ ] VPC Service Controls 設定（セキュリティ境界）
+> [!NOTE]
+> VPC Service Controls は初期段階では設定の複雑さを考慮し、フェーズ 4（セキュリティ強化）で検討します。
+> Cloud Run は VPC 外で動作しますが、VPC Connector を通じて内部リソースにアクセス可能な構成とします。
+
+- [ ] **5-1: `modules/networking` モジュール作成**
+  - ファイル: `terraform/modules/networking/main.tf`, `variables.tf`, `outputs.tf`
+  - 機能:
+    - VPC ネットワーク作成 (`pose-est-vpc-{env}`)
+    - サブネット作成 (`asia-northeast1`, `10.0.0.0/24`)
+    - Cloud Router 作成
+    - Cloud NAT 作成（VPC 内リソースのインターネットアクセス用）
+- [ ] **5-2: dev 環境への統合**
+  - `terraform/environments/dev/main.tf` に networking モジュール呼び出しを追加
+- [ ] **5-3: 検証**
+  - `terraform plan` で VPC, Subnet, Router, NAT が計画されることを確認
 
 #### ⬜ タスク 6: IAM とサービスアカウント設定
 
