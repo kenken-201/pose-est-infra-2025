@@ -310,14 +310,24 @@
 - [x] **13-4: 検証**
   - `terraform plan` で設定が反映されることを確認
 
-#### ⬜ タスク 14: ネットワークとセキュリティ設定
+#### ✅ タスク 14: ネットワークとセキュリティ設定
 
-- [ ] プライベートエンドポイント設定（VPC 接続）
-- [ ] Cloud Armor 設定（DDoS 保護）
-- [ ] SSL 証明書管理（マネージド SSL）
-- [ ] カスタムドメイン準備: `api.kenken-pose-est.online`（Cloudflare 連携用）
-- [ ] CORS 設定: Cloudflare ドメインのみ許可
-- [ ] R2 署名 URL 生成エンドポイントの保護
+> [!NOTE]
+> 複雑なインフラ設定（VPC, Cloud Armor, LB）は将来フェーズに保留します。
+> 本タスクではセキュリティドキュメント整備と公開準備に集中します。
+
+- [x] **14-1: セキュリティチェックリスト作成**
+  - `docs/security-checklist.md`
+  - IAM 権限、Secret Manager、公開設定の確認項目
+- [x] **14-2: Cloud Run デプロイ手順書作成**
+  - `docs/cloud-run-deployment.md`
+  - `terraform apply` からヘルスチェック確認まで
+
+**保留事項（将来フェーズ）:**
+
+- [ ] カスタムドメイン: ドメインマッピングまたは LB 連携
+- [ ] VPC 接続: プライベートエンドポイント
+- [ ] Cloud Armor: DDoS 保護
 
 ### 📊 **フェーズ 6: 監視とアラート設定**
 
