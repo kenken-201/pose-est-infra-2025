@@ -13,3 +13,8 @@ output "service_name" {
   description = "Cloud Run サービス名"
   value       = module.cloud_run.service_name
 }
+
+output "artifact_registry_url" {
+  description = "Artifact Registry リポジトリ URL"
+  value       = module.artifact_registry.repository_url
+}

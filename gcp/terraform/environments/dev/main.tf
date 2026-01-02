@@ -143,6 +143,10 @@ module "cloud_run" {
   max_request_concurrency = 80
   cpu_idle                = true
 
+  # リソース制限 (Dev用: 最小構成)
+  cpu_limit    = "1"
+  memory_limit = "512Mi"
+
   depends_on = [
     module.secret_manager,
     module.artifact_registry,

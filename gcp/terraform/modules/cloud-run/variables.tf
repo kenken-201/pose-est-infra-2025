@@ -79,7 +79,7 @@ variable "min_instance_count" {
   description = "最小インスタンス数 (常時起動数)"
   type        = number
   default     = 0
-  
+
   validation {
     condition     = var.min_instance_count >= 0
     error_message = "最小インスタンス数は 0 以上である必要があります。"
@@ -112,4 +112,17 @@ variable "cpu_idle" {
   description = "CPU アイドル時の割り当て解除 (true: リクエスト時のみ CPU 割り当て / false: 常時割り当て)"
   type        = bool
   default     = true
+}
+
+# リソース制限
+variable "cpu_limit" {
+  description = "コンテナの CPU 上限 (例: '1', '2')"
+  type        = string
+  default     = "1"
+}
+
+variable "memory_limit" {
+  description = "コンテナのメモリ上限 (例: '512Mi', '1Gi')"
+  type        = string
+  default     = "512Mi"
 }

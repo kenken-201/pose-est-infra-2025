@@ -79,8 +79,8 @@ resource "google_cloud_run_v2_service" "service" {
       # -------------------------------------------------------------------------
       resources {
         limits = {
-          cpu    = "1"
-          memory = "512Mi"
+          cpu    = var.cpu_limit
+          memory = var.memory_limit
         }
         cpu_idle = var.cpu_idle
       }
