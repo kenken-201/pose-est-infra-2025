@@ -114,6 +114,12 @@ variable "cpu_idle" {
   default     = true
 }
 
+variable "startup_cpu_boost" {
+  description = "起動時に一時的に CPU 割り当てを増やすか"
+  type        = bool
+  default     = true
+}
+
 # リソース制限
 variable "cpu_limit" {
   description = "コンテナの CPU 上限 (例: '1', '2')"
@@ -125,4 +131,10 @@ variable "memory_limit" {
   description = "コンテナのメモリ上限 (例: '512Mi', '1Gi')"
   type        = string
   default     = "512Mi"
+}
+
+variable "labels" {
+  description = "Cloud Run サービスに付与するラベル"
+  type        = map(string)
+  default     = {}
 }

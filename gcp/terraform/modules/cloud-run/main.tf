@@ -11,9 +11,22 @@ resource "google_cloud_run_v2_service" "service" {
   project  = var.project_id
   ingress  = var.ingress
 
+  # カスタムラベルの付与
+  labels = merge(
+    {
+      "managed-by"  = "terraform"
+      "environment" = var.environment
+      "service"     = "pose-est-backend"
+    },
+    var.labels
+  )
+
   template {
     # サービスアカウント
     service_account = var.service_account_email
+
+    # 第2世代実行環境を明示的に指定 (パフォーマンス向上)
+    execution_environment = "EXECUTION_ENVIRONMENT_GEN2"
 
     containers {
       image = var.image_url
@@ -75,7 +88,7 @@ resource "google_cloud_run_v2_service" "service" {
       }
 
       # -------------------------------------------------------------------------
-      # リソース制限 (Dev 環境用: 最小構成)
+      # リソース制限
       # -------------------------------------------------------------------------
       resources {
         limits = {
@@ -83,10 +96,12 @@ resource "google_cloud_run_v2_service" "service" {
           memory = var.memory_limit
         }
         cpu_idle = var.cpu_idle
+        # 起動時の CPU ブーストを有効化
+        startup_cpu_boost = var.startup_cpu_boost
       }
 
       # -------------------------------------------------------------------------
-      # ヘルスチェック (Startup Probe)
+      # ヘルスチェック (Startup / Liveness)
       # -------------------------------------------------------------------------
       startup_probe {
         http_get {
@@ -97,6 +112,18 @@ resource "google_cloud_run_v2_service" "service" {
         timeout_seconds       = 3
         failure_threshold     = 3
         period_seconds        = 10
+      }
+
+      liveness_probe {
+        http_get {
+          path = "/health"
+          port = 8080
+        }
+        # コンテナが起動してから一定時間後にチェック開始
+        initial_delay_seconds = 60
+        timeout_seconds       = 3
+        failure_threshold     = 3
+        period_seconds        = 30
       }
     }
 

@@ -49,7 +49,26 @@ curl "${SERVICE_URL}/health"
 
 (または FastAPI の定義に準じた 200 OK レスポンス)
 
-## 5. 次のステップ (Cloudflare 連携)
+## 5. ログと監視の確認
+
+デプロイ後、アプリケーションが正しく動作しているか GCP コンソールまたは CLI で確認します。
+
+### 5.1 Cloud Logging (ログ確認)
+
+以下のコマンドで最新のアプリケーションログを確認できます。
+
+```bash
+gcloud logging read "resource.type=cloud_run_revision AND resource.labels.service_name=pose-est-backend-dev" --limit 20
+```
+
+### 5.2 Cloud Monitoring (メトリクス確認)
+
+GCP コンソールの Cloud Run 画面 > 「モニタリング」タブで以下を確認します。
+- リクエスト数 (Requests)
+- インスタンス数 (Active Instances)
+- メモリ/CPU 使用率 (Utilization)
+
+## 6. 次のステップ (Cloudflare 連携)
 
 この URL を使用して、Cloudflare 側で CNAME レコード ("api") を作成します。
 (詳細は Cloudflare インフラ側のドキュメントを参照)

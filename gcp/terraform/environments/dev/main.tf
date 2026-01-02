@@ -147,6 +147,11 @@ module "cloud_run" {
   cpu_limit    = "1"
   memory_limit = "512Mi"
 
+  # 管理用ラベル
+  labels = {
+    "component" = "api"
+  }
+
   depends_on = [
     module.secret_manager,
     module.artifact_registry,
