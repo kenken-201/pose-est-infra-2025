@@ -79,18 +79,33 @@ variable "min_instance_count" {
   description = "最小インスタンス数 (常時起動数)"
   type        = number
   default     = 0
+  
+  validation {
+    condition     = var.min_instance_count >= 0
+    error_message = "最小インスタンス数は 0 以上である必要があります。"
+  }
 }
 
 variable "max_instance_count" {
   description = "最大インスタンス数"
   type        = number
   default     = 2
+
+  validation {
+    condition     = var.max_instance_count >= 1
+    error_message = "最大インスタンス数は 1 以上である必要があります。"
+  }
 }
 
 variable "max_request_concurrency" {
   description = "インスタンスあたりの最大同時リクエスト数"
   type        = number
   default     = 80
+
+  validation {
+    condition     = var.max_request_concurrency >= 1 && var.max_request_concurrency <= 1000
+    error_message = "最大同時リクエスト数は 1 から 1000 の間である必要があります。"
+  }
 }
 
 variable "cpu_idle" {
