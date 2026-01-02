@@ -7,6 +7,13 @@
 - [ ] **最小権限**: サービスアカウント `cloud-run-sa` は必要なリソース (Artifact Registry, Secret Manager, Cloud Logging) **のみ** へのアクセス権を持っているか？
   - [x] Artifact Registry: `roles/artifactregistry.reader` (リソースレベル)
   - [x] Secret Manager: `roles/secretmanager.secretAccessor` (リソースレベル)
+  - 確認コマンド:
+    ```bash
+    gcloud projects get-iam-policy kenken-pose-est \
+      --flatten="bindings[].members" \
+      --filter="bindings.members:cloud-run-sa-dev@" \
+      --format="table(bindings.role)"
+    ```
 - [ ] **公開範囲**: Dev 環境の `roles/run.invoker` は `allUsers` (認証なし) になっているか？
   - ※ 本番環境では IAP や Cloudflare Access による制限を検討すること。
 

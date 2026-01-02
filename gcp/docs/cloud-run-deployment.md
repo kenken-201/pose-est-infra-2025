@@ -37,7 +37,7 @@ module.cloud_run.service_url = "https://pose-est-backend-dev-xxxxxxxx.a.run.app"
 取得した URL に `/health` エンドポイントを付けてアクセスします。
 
 ```bash
-SERVICE_URL=$(terraform output -raw service_url) # module階層によってはパス調整が必要
+SERVICE_URL=$(terraform output -raw service_url)
 curl "${SERVICE_URL}/health"
 ```
 
@@ -53,3 +53,46 @@ curl "${SERVICE_URL}/health"
 
 この URL を使用して、Cloudflare 側で CNAME レコード ("api") を作成します。
 (詳細は Cloudflare インフラ側のドキュメントを参照)
+
+---
+
+## トラブルシューティング
+
+### イメージが見つからない (ImageNotFound)
+
+```
+Error: oci runtime error: image not found
+```
+
+**原因**: Artifact Registry にコンテナイメージがプッシュされていない。
+
+**対応**:
+
+1. GitHub Actions (`docker-build-push.yml`) を実行してイメージをプッシュ。
+2. または、手動でプッシュ:
+   ```bash
+   docker tag pose-est-backend:latest asia-northeast1-docker.pkg.dev/kenken-pose-est/pose-est-backend-dev/pose-est-backend:latest
+   docker push asia-northeast1-docker.pkg.dev/kenken-pose-est/pose-est-backend-dev/pose-est-backend:latest
+   ```
+
+### シークレットが見つからない (SecretVersionAccessDenied)
+
+```
+Error: Secret version not found or access denied
+```
+
+**原因**: Secret Manager にシークレット値が登録されていないか、バージョンが存在しない。
+
+**対応**:
+
+1. `scripts/register-r2-secrets.sh` を実行してシークレット値を登録。
+2. Secret Manager コンソールでバージョンが存在するか確認。
+
+### ヘルスチェック失敗 (HealthCheckFailed)
+
+**原因**: アプリケーションが `/health` エンドポイントで 200 を返していない。
+
+**対応**:
+
+1. ローカルで Docker イメージを起動し、`curl localhost:8080/health` でレスポンスを確認。
+2. FastAPI アプリケーションのルート定義を確認。
