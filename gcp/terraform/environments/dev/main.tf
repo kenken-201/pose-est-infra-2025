@@ -142,6 +142,7 @@ module "cloud_run" {
   max_instance_count      = 2
   max_request_concurrency = 80
   cpu_idle                = true
+  startup_cpu_boost       = false
 
   # リソース制限 (Dev用: 最小構成)
   cpu_limit    = "1"

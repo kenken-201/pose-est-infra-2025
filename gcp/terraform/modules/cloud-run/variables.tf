@@ -117,7 +117,7 @@ variable "cpu_idle" {
 variable "startup_cpu_boost" {
   description = "起動時に一時的に CPU 割り当てを増やすか"
   type        = bool
-  default     = true
+  default     = false
 }
 
 # リソース制限
