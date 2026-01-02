@@ -137,6 +137,12 @@ module "cloud_run" {
   # 公開アクセス設定 (Dev環境は許可)
   allow_unauthenticated = true
 
+  # スケーリング設定 (Dev用 Low Cost)
+  min_instance_count      = 0
+  max_instance_count      = 2
+  max_request_concurrency = 80
+  cpu_idle                = true
+
   depends_on = [
     module.secret_manager,
     module.artifact_registry,

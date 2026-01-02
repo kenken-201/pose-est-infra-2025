@@ -293,21 +293,21 @@
 - [x] **12-4: 検証**
   - `terraform plan` でサービス作成が計画されることを確認
 
-#### ⬜ タスク 13: 自動スケーリング設定
+#### ✅ タスク 13: 自動スケーリング設定
 
 > [!NOTE]
 > Cloud Run のスケーリングはマネージドです。
 > ここでは、スケーリングパラメータを変数化して環境ごとのチューニングを可能にします。
 
-- [ ] **13-1: スケーリング変数の追加**
+- [x] **13-1: スケーリング変数の追加**
   - `modules/cloud-run/variables.tf` に変数追加:
     - `min_instance_count`, `max_instance_count`
     - `max_request_concurrency`, `cpu_idle`
-- [ ] **13-2: Cloud Run モジュール更新**
+- [x] **13-2: Cloud Run モジュール更新**
   - `modules/cloud-run/main.tf` で変数を使用するように修正
-- [ ] **13-3: Dev 環境への設定反映**
+- [x] **13-3: Dev 環境への設定反映**
   - `environments/dev/main.tf` でパラメータを指定
-- [ ] **13-4: 検証**
+- [x] **13-4: 検証**
   - `terraform plan` で設定が反映されることを確認
 
 #### ⬜ タスク 14: ネットワークとセキュリティ設定

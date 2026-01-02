@@ -73,3 +73,28 @@ variable "allow_unauthenticated" {
   type        = bool
   default     = false
 }
+
+# スケーリング設定
+variable "min_instance_count" {
+  description = "最小インスタンス数 (常時起動数)"
+  type        = number
+  default     = 0
+}
+
+variable "max_instance_count" {
+  description = "最大インスタンス数"
+  type        = number
+  default     = 2
+}
+
+variable "max_request_concurrency" {
+  description = "インスタンスあたりの最大同時リクエスト数"
+  type        = number
+  default     = 80
+}
+
+variable "cpu_idle" {
+  description = "CPU アイドル時の割り当て解除 (true: リクエスト時のみ CPU 割り当て / false: 常時割り当て)"
+  type        = bool
+  default     = true
+}

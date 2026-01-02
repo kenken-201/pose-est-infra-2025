@@ -82,7 +82,7 @@ resource "google_cloud_run_v2_service" "service" {
           cpu    = "1"
           memory = "512Mi"
         }
-        cpu_idle = true # CPU 常時割り当てなし (コスト削減)
+        cpu_idle = var.cpu_idle
       }
 
       # -------------------------------------------------------------------------
@@ -100,11 +100,13 @@ resource "google_cloud_run_v2_service" "service" {
       }
     }
 
-    # スケーリング設定 (タスク13で詳細化するが、基本設定として配置)
+    # スケーリング設定
     scaling {
-      min_instance_count = 0 # 開発環境は0 (コールドスタート許容)
-      max_instance_count = 2 # 開発環境はコスト抑制のため制限
+      min_instance_count = var.min_instance_count
+      max_instance_count = var.max_instance_count
     }
+
+    max_instance_request_concurrency = var.max_request_concurrency
   }
 }
 
