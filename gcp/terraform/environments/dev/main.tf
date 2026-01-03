@@ -142,11 +142,11 @@ module "cloud_run" {
   max_instance_count      = 2
   max_request_concurrency = 1
   cpu_idle                = true
-  startup_cpu_boost       = false
+  startup_cpu_boost       = true
 
-  # リソース制限 (Dev用: 最小構成)
-  cpu_limit    = "1"
-  memory_limit = "512Mi"
+  # リソース制限 (Dev用: TensorFlow 向けに増強)
+  cpu_limit    = "2"
+  memory_limit = "2Gi"
 
   # 管理用ラベル
   labels = {

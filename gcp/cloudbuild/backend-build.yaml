@@ -10,6 +10,8 @@ steps:
   # ビルド引数でキャッシュを活用し、高速化を図ります。
   - name: 'gcr.io/cloud-builders/docker'
     id: 'Build'
+    env:
+      - 'DOCKER_BUILDKIT=1'
     args:
       - 'build'
       - '--no-cache' # 初回はキャッシュなし、以降は最適化検討

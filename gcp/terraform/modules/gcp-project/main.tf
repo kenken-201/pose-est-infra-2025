@@ -31,7 +31,8 @@ resource "google_project_service" "apis" {
     "monitoring.googleapis.com",           # Cloud Monitoring: 監視
     "logging.googleapis.com",              # Cloud Logging: ログ収集
     "cloudbilling.googleapis.com",         # Cloud Billing: 請求管理 (予算 API 用)
-    "billingbudgets.googleapis.com"        # Budget API: 予算アラート用
+    "billingbudgets.googleapis.com",       # Budget API: 予算アラート用
+    "compute.googleapis.com"               # Compute Engine: VPC, NAT 用
   ])
 
   project                    = var.project_id
