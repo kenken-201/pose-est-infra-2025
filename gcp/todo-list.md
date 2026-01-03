@@ -14,155 +14,320 @@
 
 ## 🏗️ **フェーズ 1: 基本プロジェクト設定と認証**
 
-#### ⬜ タスク 1: リポジトリと基本設定
+#### ✅ タスク 1: リポジトリと基本設定
 
-- [ ] GCP ディレクトリ作成: `pose-est-infra/gcp/`
-- [ ] 基本ファイル作成: README.md, .gitignore, SECURITY.md
-- [ ] Terraform バージョン固定: `versions.tf` 作成
-- [ ] Terraform バックエンド設定: Cloud Storage バケット準備（状態管理用）
+> [!NOTE]
+> Cloudflare 側の既存実装 (`pose-est-infra/cloudflare/`) から流用可能なファイルを活用し、効率的に構築します。
+> tfstate 管理先は **Cloudflare R2** (`pose-est-terraform-state` バケット) を使用します。
 
-#### ⬜ タスク 2: GCP 認証設定
+- [x] **1-1: ディレクトリ構造作成**
+  - [x] `pose-est-infra/gcp/terraform/` ディレクトリ作成
+  - [x] `pose-est-infra/gcp/terraform/modules/` ディレクトリ作成
+  - [x] `pose-est-infra/gcp/terraform/environments/` ディレクトリ作成
+  - [x] `pose-est-infra/gcp/docs/` ディレクトリ作成
+  - [x] `pose-est-infra/gcp/scripts/` ディレクトリ作成
+- [x] **1-2: `.gitignore` 作成**
+  - [x] Cloudflare 版 (`cloudflare/.gitignore`) をそのまま流用
+- [x] **1-3: `README.md` 作成**
+  - [x] Cloudflare 版を参考に GCP 向けに調整
+- [x] **1-4: `SECURITY.md` 作成**
+  - [x] Cloudflare 版をそのまま流用
+- [x] **1-5: `terraform/versions.tf` 作成**
+  - [x] Terraform バージョン固定: `>= 1.14.3`
+  - [x] Google プロバイダー設定
+  - [x] Google Beta プロバイダー設定（オプション）
+- [x] **1-6: `terraform/backend.tf` 作成**
+  - [x] Cloudflare R2 をバックエンドとして設定
+  - [x] バケット: `pose-est-terraform-state`
+  - [x] キー: `gcp/terraform.tfstate`
+  - [x] Cloudflare 版 (`cloudflare/terraform/backend.tf`) を参考に作成
+- [x] **1-7: R2 バックエンド初期化テスト**
+  - [x] `terraform init` の実行確認
+  - [x] `terraform plan` の実行確認
+  - [x] tfstate ファイルが R2 に作成されることを確認
+- [x] **1-8: 環境変数設定 (.env)**
+  - [x] `.env.example` 作成と `.env` 設定手順の整備
+  - [x] `scripts/init-backend.sh` の作成と動作確認
 
-- [ ] GCP サービスアカウント作成と権限設定
-  - 必要な権限: Project Owner, Cloud Run Admin, Secret Manager Admin
-- [ ] GitHub Secrets 設定
-  - `GCP_SA_KEY`, `GCP_PROJECT_ID`, `GCP_REGION`
-  - `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`（開発用）
-- [ ] ローカル認証設定: `gcloud auth` と環境変数設定
+#### ✅ タスク 2: GCP 認証設定
 
-#### ⬜ タスク 3: CI/CD 基本パイプライン作成
+> [!NOTE]
+> GCP プロジェクト `kenken-pose-est` に対する認証設定を行います。
+> ローカル開発用と CI/CD（GitHub Actions）用の両方を整備します。
 
-- [ ] GitHub Actions 基本ワークフロー作成
-- [ ] Terraform Plan ワークフロー作成（PR 時自動実行）
-- [ ] セキュリティスキャンワークフロー作成
+- [x] **2-1: ローカル認証設定（gcloud CLI）**
+  - [x] `gcloud auth login` でユーザー認証
+  - [x] `gcloud config set project kenken-pose-est` でプロジェクト設定
+  - [x] `gcloud auth application-default login` で ADC（Application Default Credentials）設定
+  - [x] `.env` に `GCP_PROJECT_ID` と `GCP_REGION` を追加（タスク 1 で設定済み）
+- [x] **2-2: サービスアカウント作成（Terraform 用）**
+  - [x] サービスアカウント名: `terraform-admin`
+  - [x] 必要な権限（最小権限の原則）:
+    - `roles/editor` または以下の個別ロール:
+      - [x] `roles/run.admin` (Cloud Run)
+      - [x] `roles/secretmanager.admin` (Secret Manager)
+      - [x] `roles/artifactregistry.admin` (Artifact Registry)
+      - [x] `roles/iam.serviceAccountUser` (サービスアカウント使用)
+      - [x] `roles/storage.admin` (Cloud Storage - 一時ファイル用)
+  - [x] キーファイル（JSON）のエクスポートは **非推奨**（Workload Identity Federation 推奨）
+- [x] **2-3: Workload Identity Federation 設定（GitHub Actions 用）**
+  - [x] Workload Identity Pool の作成
+  - [x] GitHub プロバイダーの設定
+  - [x] サービスアカウントへの IAM バインディング
+  - 参考: [GitHub Actions OIDC with GCP](https://cloud.google.com/iam/docs/workload-identity-federation-with-deployment-pipelines)
+- [x] **2-4: 認証検証スクリプト作成**
+  - [x] `scripts/verify-auth.sh` の作成
+  - [x] 検証項目:
+    - [x] `gcloud` CLI 認証状態
+    - [x] プロジェクトアクセス確認
+    - [x] R2 クレデンシャル存在確認（タスク 1 の継続）
+- [x] **2-5: GitHub Secrets 設定（ドキュメント化）**
+  - [x] 必要な Secrets 一覧:
+    - `GCP_PROJECT_ID`: `kenken-pose-est`
+    - `GCP_REGION`: `asia-northeast1`
+    - `GCP_WORKLOAD_IDENTITY_PROVIDER`: Workload Identity Pool プロバイダー
+    - `GCP_SERVICE_ACCOUNT`: Terraform サービスアカウントメール
+    - `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`: タスク 1 で設定済み
+  - [x] 設定手順のドキュメント作成 (`docs/github-secrets.md`)
+
+#### ✅ タスク 3: CI/CD 基本パイプライン作成
+
+> [!NOTE]
+> Cloudflare 側の CI/CD 実装 (`cloudflare-terraform-ci.yml`, `cloudflare-security.yml`) を参考に、
+> GCP 向けのワークフローを作成します。Workload Identity Federation を使用したキーレス認証を採用。
+
+- [x] **3-1: Terraform CI ワークフロー作成**
+  - [x] ファイル: `.github/workflows/gcp-terraform-ci.yml`
+  - トリガー: `pull_request` (main ブランチへの PR 時、`pose-est-infra/gcp/**` パス変更時)
+  - ステップ:
+    - Checkout
+    - Workload Identity Federation 認証 (`google-github-actions/auth`)
+    - Terraform Setup
+    - TFLint Setup
+    - Format Check, Init, Validate, TFLint, Plan
+    - PR へのコメント（Plan 結果サマリー）
+- [x] **3-2: セキュリティスキャンワークフロー作成**
+  - [x] ファイル: `.github/workflows/gcp-security.yml`
+  - トリガー: `pull_request` (main ブランチへの PR 時)
+  - ステップ:
+    - Checkout
+    - Checkov スキャン
+    - SARIF ファイルのアップロード（GitHub Security タブ連携）
+- [x] **3-3: Terraform Apply ワークフロー作成（手動/マージ時）**
+  - [x] ファイル: `.github/workflows/gcp-terraform-apply.yml`
+  - トリガー: `push` (main ブランチへのマージ時) または `workflow_dispatch` (手動実行)
+  - ステップ:
+    - Checkout
+    - Workload Identity Federation 認証
+    - Terraform Init, Plan, Apply
+    - 実行結果の Slack 通知（オプション、将来対応）
+- [x] **3-4: ワークフロー動作確認**
+  - [x] テスト用 PR を作成し、Terraform CI と Security Scan が正常に動作することを確認
+  - Plan 結果が PR コメントに表示されることを確認（実際の PR で検証予定）
 
 ### 🏛️ **フェーズ 2: GCP プロジェクト基盤構築**
 
-#### ⬜ タスク 4: GCP プロジェクト設定
+#### ✅ タスク 4: GCP プロジェクト設定
 
-- [ ] Terraform モジュール: `modules/gcp-project`
-- [ ] GCP プロジェクト作成:
-  - 開発: `pose-est-dev`
-  - 本番: `pose-est-production`
-- [ ] 必須 API の有効化:
-  - Cloud Run API, Cloud Build API, Artifact Registry API
-  - Secret Manager API, Cloud Storage API（状態管理用）, IAM API
-  - Monitoring API, Logging API
-- [ ] リージョン設定: asia-northeast1 (東京)
-- [ ] 予算アラート設定: 環境別に月間$20 アラート
+> [!NOTE]
+> 既存プロジェクト `kenken-pose-est` を継続使用します。
+> 新規プロジェクト作成は行わず、API 有効化と予算アラート設定に集中します。
+> 環境分離（dev/production）は Cloud Run サービス名で実現します。
 
-#### ⬜ タスク 5: ネットワーク基盤構築
+- [x] **4-1: 環境ディレクトリ構造の確立**
+  - `terraform/environments/dev/` ディレクトリ作成
+  - `terraform/environments/production/` ディレクトリ作成（プレースホルダー）
+  - 各環境に `main.tf`, `terraform.tfvars` を配置
+- [x] **4-2: `modules/gcp-project` モジュール作成**
+  - ファイル: `terraform/modules/gcp-project/main.tf`, `variables.tf`, `outputs.tf`
+  - 機能:
+    - 必須 API の有効化（Cloud Run, Cloud Build, Artifact Registry, Secret Manager, IAM, Monitoring, Logging）
+    - 予算アラート設定（月額 $20 アラート）
+- [x] **4-3: dev 環境の初期設定**
+  - `terraform/environments/dev/terraform.tfvars` 作成
+  - `gcp-project` モジュールの呼び出し設定
+- [x] **4-4: 検証**
+  - `terraform init` を `environments/dev` で実行
+  - `terraform plan` で API 有効化が計画されることを確認
 
-- [ ] Terraform モジュール: `modules/networking`
-- [ ] VPC ネットワーク作成: `pose-est-vpc`
-- [ ] サブネット設定:
-  - `asia-northeast1` リージョンのサブネット
-  - プライベート IP 範囲の割り当て
-- [ ] Cloud NAT 設定（プライベート Cloud Run 用）
-- [ ] ファイアウォールルール基本設定
-- [ ] VPC Service Controls 設定（セキュリティ境界）
+#### ✅ タスク 5: ネットワーク基盤構築
 
-#### ⬜ タスク 6: IAM とサービスアカウント設定
+> [!NOTE]
+> VPC Service Controls は初期段階では設定の複雑さを考慮し、フェーズ 4（セキュリティ強化）で検討します。
+> Cloud Run は VPC 外で動作しますが、VPC Connector を通じて内部リソースにアクセス可能な構成とします。
 
-- [ ] Terraform モジュール: `modules/iam`
-- [ ] サービスアカウント作成:
-  - `cloud-run-sa` (Cloud Run 実行用)
-  - `cloud-build-sa` (Cloud Build 実行用)
-  - `github-actions-sa` (GitHub Actions 実行用)
-- [ ] IAM ロール割り当て（最小権限の原則）
-- [ ] カスタム IAM ロール作成（必要に応じて）
+- [x] **5-1: `modules/networking` モジュール作成**
+  - ファイル: `terraform/modules/networking/main.tf`, `variables.tf`, `outputs.tf`
+  - 機能:
+    - VPC ネットワーク作成 (`pose-est-vpc-{env}`)
+    - サブネット作成 (`asia-northeast1`, `10.0.0.0/24`)
+    - Cloud Router 作成
+    - Cloud NAT 作成（VPC 内リソースのインターネットアクセス用）
+- [x] **5-2: dev 環境への統合**
+  - `terraform/environments/dev/main.tf` に networking モジュール呼び出しを追加
+- [x] **5-3: 検証**
+  - `terraform plan` で VPC, Subnet, Router, NAT が計画されることを確認
+
+#### ✅ タスク 6: IAM とサービスアカウント設定
+
+> [!NOTE]
+> 既存の `terraform-admin` サービスアカウントと WIF を GitHub Actions 用として流用します。
+> 新規作成は `cloud-run-sa` と `cloud-build-sa` のみです。
+
+- [x] **6-1: `modules/iam` モジュール作成**
+  - ファイル: `terraform/modules/iam/main.tf`, `variables.tf`, `outputs.tf`
+  - 機能:
+    - `cloud-run-sa-{env}` サービスアカウント作成
+    - `cloud-build-sa-{env}` サービスアカウント作成
+    - 最小権限 IAM ロールバインディング
+- [x] **6-2: dev 環境への統合**
+  - `terraform/environments/dev/main.tf` に iam モジュール呼び出しを追加
+- [x] **6-3: 検証**
+  - `terraform plan` でサービスアカウントと IAM バインディングが計画されることを確認
 
 ### 🐳 **フェーズ 3: コンテナレジストリとビルド環境**
 
-#### ⬜ タスク 7: Artifact Registry 設定
+#### ✅ タスク 7: Artifact Registry 設定
 
-- [ ] Terraform モジュール: `modules/artifact-registry`
-- [ ] Docker リポジトリ作成: `pose-est-backend`
-- [ ] リポジトリ設定:
-  - フォーマット: DOCKER
-  - ロケーション: asia-northeast1
-- [ ] リポジトリ権限設定:
-  - Cloud Build サービスアカウントへのアクセス許可
-  - Cloud Run サービスアカウントへのアクセス許可
-- [ ] ライフサイクルポリシー: 未使用イメージの自動削除
-- [ ] 脆弱性スキャン設定: イメージスキャンの有効化
+> [!NOTE]
+> IAM 権限はリポジトリ単位（リソースレベル）で設定し、最小権限を徹底します。
+> 脆弱性スキャンは Container Analysis API 有効化で自動的に適用されます。
 
-#### ⬜ タスク 8: Cloud Build 設定
+- [x] **7-1: `modules/artifact-registry` モジュール作成**
+  - ファイル: `terraform/modules/artifact-registry/main.tf`, `variables.tf`, `outputs.tf`
+  - 機能:
+    - Docker リポジトリ作成 (`pose-est-backend-{env}`)
+    - クリーンアップポリシー設定 (タグなし 7 日、古いバージョン削除)
+    - リソースレベル IAM バインディング (Cloud Build: Writer, Cloud Run: Reader)
+- [x] **7-2: `modules/gcp-project` への API 追加**
+  - `containeranalysis.googleapis.com` を有効化リストに追加
+- [x] **7-3: dev 環境への統合**
+  - `terraform/environments/dev/main.tf` に artifact-registry モジュール呼び出しを追加
+- [x] **7-4: 検証**
+  - `terraform plan` でリポジトリと IAM バインディングが計画されることを確認
 
-- [ ] Cloud Build トリガー作成:
-  - メインブランチプッシュ時トリガー
-  - タグプッシュ時トリガー（本番デプロイ用）
-- [ ] ビルド設定ファイル作成: `cloudbuild/backend-build.yaml`
-  - Docker ビルドステップ（R2 SDK 含む）
-  - ユニットテスト実行ステップ
-  - 脆弱性スキャンステップ
+#### ✅ タスク 8: Cloud Build 設定
+
+> [!NOTE]
+> GitHub Actions + Cloud Build のハイブリッド構成を採用。
+> GitHub Actions がトリガーとなり、`gcloud builds submit` で Cloud Build を呼び出します。
+> これにより既存の WIF 認証をそのまま活用できます。
+
+- [x] **8-1: `cloudbuild/backend-build.yaml` 作成**
+  - Docker ビルドステップ
   - Artifact Registry へのプッシュステップ
-- [ ] ビルドキャッシュ設定: ビルド時間短縮のためのキャッシュ
-- [ ] ビルド通知設定: ビルド失敗時の Slack 通知
+  - 置換変数 (`_REGION`, `_REPOSITORY`, `_IMAGE_TAG`) 定義
+- [x] **8-2: GitHub Actions ワークフロー更新**
+  - `gcloud builds submit` 呼び出しステップ追加
+  - WIF 認証の統合 (既存の `terraform-admin` SA を使用)
+- [x] **8-3: 検証**
+  - 設定ファイルの作成確認 (dry-run は非サポートのため実実行時に検証)
 
 ### 🔐 **フェーズ 4: R2 連携とシークレット管理**
 
-#### ⬜ タスク 9: R2 連携 Terraform モジュール作成
+#### ✅ タスク 9: R2 連携 Terraform モジュール作成
 
-- [ ] Terraform モジュール: `modules/r2-integration`
-- [ ] Secret Manager シークレットリソース定義:
-  - `r2-access-key-id`: R2 アクセスキー ID
-  - `r2-secret-access-key`: R2 シークレットアクセスキー
-- [ ] シークレットバージョン管理設定
-- [ ] アクセス権限設定: Cloud Run サービスアカウントへの権限付与
+> [!NOTE]
+> Terraform ではシークレットの「箱」のみを作成します。
+> 実際の値（R2 クレデンシャル）は、セキュリティ上の理由から `gcloud` CLI で手動登録します。
 
-#### ⬜ タスク 10: R2 クレデンシャル管理
+- [x] **9-1: `modules/secret-manager` モジュール作成**
+  - ファイル: `terraform/modules/secret-manager/main.tf`, `variables.tf`, `outputs.tf`
+  - 機能:
+    - Secret Manager シークレットリソース定義 (`r2-access-key-id`, `r2-secret-access-key`)
+    - リソースレベル IAM バインディング (Cloud Run SA への `secretAccessor` 付与)
+- [x] **9-2: dev 環境への統合**
+  - `terraform/environments/dev/main.tf` に secret-manager モジュール呼び出しを追加
+- [x] **9-3: 検証**
+  - `terraform plan` でシークレットと IAM バインディングが計画されることを確認
 
-- [ ] R2 アクセスキー作成（手動または Terraform）
-- [ ] シークレットの GitHub Secrets 登録（CI/CD 用）
-- [ ] シークレットの Secret Manager 登録（本番用）
-- [ ] キーローテーションポリシー策定（3 ヶ月ごと推奨）
+#### ✅ タスク 10: R2 クレデンシャル管理
 
-#### ⬜ タスク 11: R2 環境設定
+> [!NOTE]
+> R2 アクセスキーは Cloudflare ダッシュボードから手動作成します。
+> シークレット登録はヘルパースクリプトで効率化します。
 
-- [ ] R2 エンドポイント URL 設定: `https://<account_id>.r2.cloudflarestorage.com`
-- [ ] R2 バケット名設定: 環境別バケット名（Cloudflare 側で作成）
-- [ ] 署名 URL 有効期限設定: デフォルト 1 時間、必要に応じて調整
-- [ ] R2 接続テストスクリプト作成: `scripts/test-r2-connection.sh`
+- [x] **10-1: R2 アクセスキー作成（手動）**
+  - Cloudflare ダッシュボード > R2 > API トークン から作成
+  - 必要な権限: Object Read/Write
+- [x] **10-2: シークレット登録スクリプト作成**
+  - `scripts/register-r2-secrets.sh`
+  - Secret Manager と GitHub Secrets への登録を自動化
+- [x] **10-3: キーローテーションポリシー策定**
+  - `docs/r2-key-rotation.md` にドキュメント化
+  - 推奨頻度: 90 日
+
+#### ✅ タスク 11: R2 環境設定
+
+> [!NOTE]
+> 環境変数の Cloud Run への注入はフェーズ 5 で行います。
+> ここではドキュメント化と接続テストスクリプトの作成を行います。
+
+- [x] **11-1: R2 環境設定ドキュメント作成**
+  - `docs/r2-environment.md`
+  - 内容: エンドポイント形式、バケット命名規則、署名 URL 有効期限
+- [x] **11-2: R2 接続テストスクリプト作成**
+  - `scripts/test-r2-connection.sh`
+  - AWS CLI (S3 互換) を使用した接続テスト
 
 ### ☁️ **フェーズ 5: Cloud Run バックエンド環境構築**
 
-#### ⬜ タスク 12: Cloud Run サービス基本設定
+#### ✅ タスク 12: Cloud Run サービス基本設定
 
-- [ ] Terraform モジュール: `modules/cloud-run`
-- [ ] Cloud Run サービス作成: `pose-est-backend-{env}`
-- [ ] コンテナ設定:
-  - イメージソース: Artifact Registry (`pose-est-backend`)
-  - ポート: 8080 (FastAPI デフォルト)
-  - 環境変数: R2 設定を Secret Manager から注入
-  - ヘルスチェックパス: `/health`
-- [ ] リソース制限:
-  - CPU: 1-2 コア
-  - メモリ: 1-4GB
-  - 最大インスタンス数: 10
-  - 最小インスタンス数: 0 (開発環境), 1 (本番)
+> [!NOTE]
+> Cloud Run v2 API を使用し、Secret Manager と連携して R2 クレデンシャルを注入します。
+> スケーリング詳細とネットワーク設定はタスク 13-14 で対応します。
 
-#### ⬜ タスク 13: 自動スケーリング設定
+- [x] **12-1: `modules/cloud-run` モジュール作成**
+  - ファイル: `terraform/modules/cloud-run/main.tf`, `variables.tf`, `outputs.tf`, `versions.tf`
+  - 機能:
+    - `google_cloud_run_v2_service` リソース
+    - コンテナ設定（イメージ、ポート、ヘルスチェック）
+    - Secret Manager からの環境変数注入
+    - リソース制限 (CPU, メモリ)
+    - サービスアカウント設定
+- [x] **12-2: dev 環境への統合**
+  - `terraform/environments/dev/main.tf` に cloud-run モジュール呼び出しを追加
+- [x] **12-3: IAM 設定 (公開アクセス)**
+  - Dev 環境: `allUsers` に `roles/run.invoker` を付与 (認証なしアクセス)
+- [x] **12-4: 検証**
+  - `terraform plan` でサービス作成が計画されることを確認
 
-- [ ] スケーリングポリシー定義:
-  - CPU 使用率: 60%ターゲット
-  - リクエスト数: 100 リクエスト/インスタンス
-  - 最大同時リクエスト: 80
-- [ ] コールドスタート対策:
-  - 最小インスタンス数調整（本番環境）
-  - コンテナインスタンスウォームアップ設定
-- [ ] スケールダウン設定:
-  - アイドルタイムアウト: 5 分
-  - スケールダウン遅延設定
+#### ✅ タスク 13: 自動スケーリング設定
 
-#### ⬜ タスク 14: ネットワークとセキュリティ設定
+> [!NOTE]
+> Cloud Run のスケーリングはマネージドです。
+> ここでは、スケーリングパラメータを変数化して環境ごとのチューニングを可能にします。
 
-- [ ] プライベートエンドポイント設定（VPC 接続）
-- [ ] Cloud Armor 設定（DDoS 保護）
-- [ ] SSL 証明書管理（マネージド SSL）
-- [ ] カスタムドメイン準備: `api.kenken-pose-est.online`（Cloudflare 連携用）
-- [ ] CORS 設定: Cloudflare ドメインのみ許可
-- [ ] R2 署名 URL 生成エンドポイントの保護
+- [x] **13-1: スケーリング変数の追加**
+  - `modules/cloud-run/variables.tf` に変数追加:
+    - `min_instance_count`, `max_instance_count`
+    - `max_request_concurrency`, `cpu_idle`
+- [x] **13-2: Cloud Run モジュール更新**
+  - `modules/cloud-run/main.tf` で変数を使用するように修正
+- [x] **13-3: Dev 環境への設定反映**
+  - `environments/dev/main.tf` でパラメータを指定
+- [x] **13-4: 検証**
+  - `terraform plan` で設定が反映されることを確認
+
+#### ✅ タスク 14: ネットワークとセキュリティ設定
+
+> [!NOTE]
+> 複雑なインフラ設定（VPC, Cloud Armor, LB）は将来フェーズに保留します。
+> 本タスクではセキュリティドキュメント整備と公開準備に集中します。
+
+- [x] **14-1: セキュリティチェックリスト作成**
+  - `docs/security-checklist.md`
+  - IAM 権限、Secret Manager、公開設定の確認項目
+- [x] **14-2: Cloud Run デプロイ手順書作成**
+  - `docs/cloud-run-deployment.md`
+  - `terraform apply` からヘルスチェック確認まで
+
+**保留事項（将来フェーズ）:**
+
+- [ ] カスタムドメイン: Cloudflare Proxy 経由で対応可能。まず `*.a.run.app` で動作確認を優先。
+- [ ] VPC 接続: R2 はインターネット経由アクセス。VPC 内リソースへの接続がないため不要。
+- [ ] Cloud Armor: LB 必須の機能。初期 MVP に DDoS 保護は過剰。コスト増を回避。
 
 ### 📊 **フェーズ 6: 監視とアラート設定**
 
@@ -354,7 +519,9 @@
 1. **状態ファイル管理**:
 
    - 開発/本番で状態ファイルを分離（ステージング削除）
-   - バックエンドは Cloud Storage、状態ロックは Cloud Spanner
+   - **バックエンドは Cloudflare R2**（Cloudflare 側と統一）
+   - バケット: `pose-est-terraform-state`、キー: `gcp/terraform.tfstate`
+   - 状態ロックは CI/CD ジョブの直列化で実現（R2 はネイティブロック非対応）
    - 状態ファイルの定期的なバックアップ
 
 2. **シークレット管理**:
