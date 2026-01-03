@@ -21,8 +21,6 @@ steps:
       - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/pose-est-backend:latest'
       - '.'
 
-      - '.'
-
 # 画像の保存先
 images:
   - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/pose-est-backend:${_IMAGE_TAG}'

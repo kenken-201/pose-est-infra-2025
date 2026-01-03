@@ -18,3 +18,8 @@ output "location" {
   description = "Cloud Run サービスのリージョン"
   value       = google_cloud_run_v2_service.service.location
 }
+
+output "service_id" {
+  description = "Cloud Run サービスの完全修飾 ID (projects/.../services/...)"
+  value       = google_cloud_run_v2_service.service.id
+}
