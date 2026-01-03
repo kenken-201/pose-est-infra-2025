@@ -100,7 +100,7 @@ variable "max_instance_count" {
 variable "max_request_concurrency" {
   description = "インスタンスあたりの最大同時リクエスト数"
   type        = number
-  default     = 80
+  default     = 2
 
   validation {
     condition     = var.max_request_concurrency >= 1 && var.max_request_concurrency <= 1000

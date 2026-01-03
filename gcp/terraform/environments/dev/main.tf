@@ -140,7 +140,7 @@ module "cloud_run" {
   # スケーリング設定 (Dev用 Low Cost)
   min_instance_count      = 0
   max_instance_count      = 2
-  max_request_concurrency = 80
+  max_request_concurrency = 1
   cpu_idle                = true
   startup_cpu_boost       = false
 
