@@ -1,0 +1,99 @@
+name: GCP Terraform Apply
+
+# -----------------------------------------------------------------------------
+# GCP Terraform Apply Workflow
+# -----------------------------------------------------------------------------
+# 本番環境へのTerraform適用を自動化するワークフローです。
+# mainブランチへのプッシュ、または手動実行でトリガーされます。
+#
+# 主な機能:
+# - Workload Identity Federationを使用した安全な認証
+# - R2バックエンドを使用したTerraform Init
+# - 状態ロックの代替としての並列実行制御 (concurrency)
+# - Terraform Plan & Apply の実行
+# -----------------------------------------------------------------------------
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "pose-est-infra/gcp/**"
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Target environment"
+        required: true
+        default: "production"
+        type: choice
+        options:
+          - production
+
+# 並列実行の制御（状態ロックの代替）
+# 同じグループのジョブが既に実行中の場合、それを待機またはキャンセルさせます
+concurrency:
+  group: gcp-terraform-apply-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  TF_WORKING_DIR: "pose-est-infra/gcp/terraform"
+
+jobs:
+  terraform-apply:
+    name: Terraform Apply
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # Workload Identity Federation に必須
+
+    defaults:
+      run:
+        working-directory: ${{ env.TF_WORKING_DIR }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      # Google Cloudへの認証 (キーレス認証)
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@6fc4af4b145ae7821d527454aa9bd537d1f2dc5f # v2.1.7
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@a1502cd9e758c50496cc9ac5308c48ae4db1d30d # v3.0.0
+        with:
+          terraform_version: 1.14.3
+
+      # Terraform初期化 (R2バックエンド)
+      - name: Terraform Init
+        id: init
+        run: |
+          terraform init \
+            -backend-config="access_key=${{ secrets.R2_ACCESS_KEY_ID }}" \
+            -backend-config="secret_key=${{ secrets.R2_SECRET_ACCESS_KEY }}" \
+            -backend-config="endpoint=https://${{ secrets.CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com"
+
+      - name: Terraform Plan
+        id: plan
+        run: terraform plan -no-color -out=tfplan
+
+      - name: Terraform Apply
+        id: apply
+        run: terraform apply -auto-approve tfplan
+
+      # 実行結果のサマリー出力
+      - name: Output Apply Summary
+        if: always()
+        run: |
+          echo "## Terraform Apply Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.apply.outcome }}" == "success" ]; then
+            echo "✅ **Apply completed successfully**" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **Apply failed**" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- Triggered by: @${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Commit: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY

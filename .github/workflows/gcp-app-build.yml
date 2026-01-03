@@ -1,0 +1,55 @@
+name: GCP App Build & Push (Backend)
+
+on:
+  workflow_dispatch: # 手動実行のみ (テンプレートとして機能)
+  push:
+    branches:
+      - main
+    paths:
+      - "pose-est-back/**" # 注意: このパスはアプリケーションコードが同リポジトリにある場合のみ有効です。
+                           # 別リポジトリの場合は、このワークフローをそのリポジトリに配置してください。
+
+env:
+  PROJECT_ID: kenken-pose-est
+  REGION: asia-northeast1
+  REPOSITORY: pose-est-backend-dev
+  # GitHub Actions 認証用 (Terraform Admin 権限)
+  WORKLOAD_IDENTITY_PROVIDER: projects/134440306236/locations/global/workloadIdentityPools/github-actions-pool/providers/github-actions-provider
+  SERVICE_ACCOUNT: terraform-admin@kenken-pose-est.iam.gserviceaccount.com
+  # Cloud Build 実行用 (Artifact Registry 書き込み権限を持つ SA)
+  BUILD_SERVICE_ACCOUNT: projects/kenken-pose-est/serviceAccounts/cloud-build-sa-dev@kenken-pose-est.iam.gserviceaccount.com
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # -----------------------------------------------------------------------
+      # 1. GCP 認証 (Workload Identity Federation)
+      # -----------------------------------------------------------------------
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ env.WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ env.SERVICE_ACCOUNT }}
+
+      # -----------------------------------------------------------------------
+      # 2. Cloud Build 実行
+      # -----------------------------------------------------------------------
+      - name: Submit Build
+        # 注: 実際のディレクトリ構成に合わせて --source オプションを調整してください
+        # 例: アプリコードが 'backend' ディレクトリにある場合: --source=backend
+        run: |
+          gcloud builds submit \
+            --config=gcp/cloudbuild/backend-build.yaml \
+            --service-account=${{ env.BUILD_SERVICE_ACCOUNT }} \
+            --substitutions=_REGION=${{ env.REGION }},_REPOSITORY=${{ env.REPOSITORY }},_IMAGE_TAG=${{ github.sha }} \
+            --region=${{ env.REGION }} \
+            . # ビルドコンテキスト (ここをアプリのルートにする必要あり)
+

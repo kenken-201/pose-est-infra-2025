@@ -1,0 +1,36 @@
+# Cloud Build 設定ファイル: バックエンドビルド & プッシュ
+# -----------------------------------------------------------------------------
+# GitHub Actions から `gcloud builds submit` で呼び出されることを想定しています。
+# 変数（_REGION, _REPOSITORY, _IMAGE_TAG）は呼び出し元で指定する必要があります。
+
+steps:
+  # 1. Docker ビルド
+  # -----------------------------------------------------------------------------
+  # R2 SDK などの依存関係も含めてビルドします。
+  # ビルド引数でキャッシュを活用し、高速化を図ります。
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'Build'
+    env:
+      - 'DOCKER_BUILDKIT=1'
+    args:
+      - 'build'
+      - '--no-cache' # 初回はキャッシュなし、以降は最適化検討
+      - '-t'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/pose-est-backend:${_IMAGE_TAG}'
+      - '-t'
+      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/pose-est-backend:latest'
+      - '.'
+
+# 画像の保存先
+images:
+  - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/pose-est-backend:${_IMAGE_TAG}'
+  - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/pose-est-backend:latest'
+
+# 置換変数（デフォルト値なし、必須）
+substitutions:
+  _REGION: 'asia-northeast1'
+  _REPOSITORY: 'pose-est-backend-dev'
+  _IMAGE_TAG: 'latest'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
