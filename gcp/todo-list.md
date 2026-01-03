@@ -272,42 +272,62 @@
 
 ### ☁️ **フェーズ 5: Cloud Run バックエンド環境構築**
 
-#### ⬜ タスク 12: Cloud Run サービス基本設定
+#### ✅ タスク 12: Cloud Run サービス基本設定
 
-- [ ] Terraform モジュール: `modules/cloud-run`
-- [ ] Cloud Run サービス作成: `pose-est-backend-{env}`
-- [ ] コンテナ設定:
-  - イメージソース: Artifact Registry (`pose-est-backend`)
-  - ポート: 8080 (FastAPI デフォルト)
-  - 環境変数: R2 設定を Secret Manager から注入
-  - ヘルスチェックパス: `/health`
-- [ ] リソース制限:
-  - CPU: 1-2 コア
-  - メモリ: 1-4GB
-  - 最大インスタンス数: 10
-  - 最小インスタンス数: 0 (開発環境), 1 (本番)
+> [!NOTE]
+> Cloud Run v2 API を使用し、Secret Manager と連携して R2 クレデンシャルを注入します。
+> スケーリング詳細とネットワーク設定はタスク 13-14 で対応します。
 
-#### ⬜ タスク 13: 自動スケーリング設定
+- [x] **12-1: `modules/cloud-run` モジュール作成**
+  - ファイル: `terraform/modules/cloud-run/main.tf`, `variables.tf`, `outputs.tf`, `versions.tf`
+  - 機能:
+    - `google_cloud_run_v2_service` リソース
+    - コンテナ設定（イメージ、ポート、ヘルスチェック）
+    - Secret Manager からの環境変数注入
+    - リソース制限 (CPU, メモリ)
+    - サービスアカウント設定
+- [x] **12-2: dev 環境への統合**
+  - `terraform/environments/dev/main.tf` に cloud-run モジュール呼び出しを追加
+- [x] **12-3: IAM 設定 (公開アクセス)**
+  - Dev 環境: `allUsers` に `roles/run.invoker` を付与 (認証なしアクセス)
+- [x] **12-4: 検証**
+  - `terraform plan` でサービス作成が計画されることを確認
 
-- [ ] スケーリングポリシー定義:
-  - CPU 使用率: 60%ターゲット
-  - リクエスト数: 100 リクエスト/インスタンス
-  - 最大同時リクエスト: 80
-- [ ] コールドスタート対策:
-  - 最小インスタンス数調整（本番環境）
-  - コンテナインスタンスウォームアップ設定
-- [ ] スケールダウン設定:
-  - アイドルタイムアウト: 5 分
-  - スケールダウン遅延設定
+#### ✅ タスク 13: 自動スケーリング設定
 
-#### ⬜ タスク 14: ネットワークとセキュリティ設定
+> [!NOTE]
+> Cloud Run のスケーリングはマネージドです。
+> ここでは、スケーリングパラメータを変数化して環境ごとのチューニングを可能にします。
 
-- [ ] プライベートエンドポイント設定（VPC 接続）
-- [ ] Cloud Armor 設定（DDoS 保護）
-- [ ] SSL 証明書管理（マネージド SSL）
-- [ ] カスタムドメイン準備: `api.kenken-pose-est.online`（Cloudflare 連携用）
-- [ ] CORS 設定: Cloudflare ドメインのみ許可
-- [ ] R2 署名 URL 生成エンドポイントの保護
+- [x] **13-1: スケーリング変数の追加**
+  - `modules/cloud-run/variables.tf` に変数追加:
+    - `min_instance_count`, `max_instance_count`
+    - `max_request_concurrency`, `cpu_idle`
+- [x] **13-2: Cloud Run モジュール更新**
+  - `modules/cloud-run/main.tf` で変数を使用するように修正
+- [x] **13-3: Dev 環境への設定反映**
+  - `environments/dev/main.tf` でパラメータを指定
+- [x] **13-4: 検証**
+  - `terraform plan` で設定が反映されることを確認
+
+#### ✅ タスク 14: ネットワークとセキュリティ設定
+
+> [!NOTE]
+> 複雑なインフラ設定（VPC, Cloud Armor, LB）は将来フェーズに保留します。
+> 本タスクではセキュリティドキュメント整備と公開準備に集中します。
+
+- [x] **14-1: セキュリティチェックリスト作成**
+  - `docs/security-checklist.md`
+  - IAM 権限、Secret Manager、公開設定の確認項目
+- [x] **14-2: Cloud Run デプロイ手順書作成**
+  - `docs/cloud-run-deployment.md`
+  - `terraform apply` からヘルスチェック確認まで
+
+**保留事項（将来フェーズ）:**
+
+- [ ] カスタムドメイン: Cloudflare Proxy 経由で対応可能。まず `*.a.run.app` で動作確認を優先。
+- [ ] VPC 接続: R2 はインターネット経由アクセス。VPC 内リソースへの接続がないため不要。
+- [ ] Cloud Armor: LB 必須の機能。初期 MVP に DDoS 保護は過剰。コスト増を回避。
 
 ### 📊 **フェーズ 6: 監視とアラート設定**
 

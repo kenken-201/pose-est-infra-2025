@@ -108,3 +108,54 @@ module "secret_manager" {
     module.iam
   ]
 }
+
+# -----------------------------------------------------------------------------
+# Cloud Run (バックエンド API)
+# -----------------------------------------------------------------------------
+module "cloud_run" {
+  source = "../../modules/cloud-run"
+
+  project_id  = var.project_id
+  region      = var.region
+  environment = var.environment
+
+  # コンテナイメージ (Artifact Registry)
+  image_url = "${module.artifact_registry.repository_url}/pose-est-backend:latest"
+
+  # サービスアカウント
+  service_account_email = module.iam.cloud_run_sa_email
+
+  # R2 クレデンシャル (Secret Manager Secret ID を渡す)
+  # modules/secret-manager の output を使用
+  r2_access_key_id_secret_id     = module.secret_manager.r2_access_key_id_secret_id
+  r2_secret_access_key_secret_id = module.secret_manager.r2_secret_access_key_secret_id
+
+  # R2 環境設定 (変数から取得)
+  r2_account_id  = var.r2_account_id
+  r2_bucket_name = "pose-est-media-${var.environment}"
+
+  # 公開アクセス設定 (Dev環境は許可)
+  allow_unauthenticated = true
+
+  # スケーリング設定 (Dev用 Low Cost)
+  min_instance_count      = 0
+  max_instance_count      = 2
+  max_request_concurrency = 1
+  cpu_idle                = true
+  startup_cpu_boost       = true
+
+  # リソース制限 (Dev用: TensorFlow 向けに増強)
+  cpu_limit    = "2"
+  memory_limit = "2Gi"
+
+  # 管理用ラベル
+  labels = {
+    "component" = "api"
+  }
+
+  depends_on = [
+    module.secret_manager,
+    module.artifact_registry,
+    module.iam
+  ]
+}

@@ -10,6 +10,8 @@ steps:
   # ビルド引数でキャッシュを活用し、高速化を図ります。
   - name: 'gcr.io/cloud-builders/docker'
     id: 'Build'
+    env:
+      - 'DOCKER_BUILDKIT=1'
     args:
       - 'build'
       - '--no-cache' # 初回はキャッシュなし、以降は最適化検討
@@ -18,16 +20,6 @@ steps:
       - '-t'
       - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/pose-est-backend:latest'
       - '.'
-
-  # 2. Artifact Registry へのプッシュ
-  # -----------------------------------------------------------------------------
-  # ビルドされたイメージを Artifact Registry にプッシュします。
-  - name: 'gcr.io/cloud-builders/docker'
-    id: 'Push'
-    args:
-      - 'push'
-      - '--all-tags'
-      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/pose-est-backend'
 
 # 画像の保存先
 images:
