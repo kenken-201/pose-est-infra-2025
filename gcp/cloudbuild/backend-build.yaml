@@ -21,15 +21,7 @@ steps:
       - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/pose-est-backend:latest'
       - '.'
 
-  # 2. Artifact Registry へのプッシュ
-  # -----------------------------------------------------------------------------
-  # ビルドされたイメージを Artifact Registry にプッシュします。
-  - name: 'gcr.io/cloud-builders/docker'
-    id: 'Push'
-    args:
-      - 'push'
-      - '--all-tags'
-      - '${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/pose-est-backend'
+      - '.'
 
 # 画像の保存先
 images:

@@ -11,6 +11,10 @@ resource "google_cloud_run_v2_service" "service" {
   project  = var.project_id
   ingress  = var.ingress
 
+  # 開発環境での再作成を容易にするため、削除保護を無効化
+  # 本番環境では true にすることを推奨
+  deletion_protection = false
+
   # カスタムラベルの付与
   labels = merge(
     {
@@ -105,7 +109,7 @@ resource "google_cloud_run_v2_service" "service" {
       # -------------------------------------------------------------------------
       startup_probe {
         http_get {
-          path = "/health"
+          path = "/api/v1/health"
           port = 8080
         }
         initial_delay_seconds = 5
@@ -116,7 +120,7 @@ resource "google_cloud_run_v2_service" "service" {
 
       liveness_probe {
         http_get {
-          path = "/health"
+          path = "/api/v1/health"
           port = 8080
         }
         # コンテナが起動してから一定時間後にチェック開始
