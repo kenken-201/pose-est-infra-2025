@@ -8,6 +8,7 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ENV_FILE="$SCRIPT_DIR/../.env"
+TF_DIR="$SCRIPT_DIR/../terraform/environments/dev"
 
 # .env ファイルの読み込み
 if [ -f "$ENV_FILE" ]; then
@@ -37,7 +38,7 @@ fi
 # Terraform 変数の設定
 export TF_VAR_cloudflare_account_id="$CLOUDFLARE_ACCOUNT_ID"
 
-cd "$(dirname "$0")/../terraform"
+cd "$TF_DIR"
 
 echo "📦 Terraform Backend を初期化中..."
 terraform init \
@@ -47,6 +48,4 @@ terraform init \
   -backend-config="endpoint=https://$CLOUDFLARE_ACCOUNT_ID.r2.cloudflarestorage.com"
 
 echo "📋 Terraform Plan を実行中 (Dev)..."
-terraform plan \
-  -var-file="environments/dev/terraform.tfvars" \
-  -out=dev.tfplan
+terraform plan -out=dev.tfplan

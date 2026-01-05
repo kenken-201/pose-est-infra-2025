@@ -1,17 +1,24 @@
 #!/bin/bash
 set -e
 
-# Change to the terraform directory
-cd "$(dirname "$0")/../terraform"
+# Quality Check スクリプト
+# -----------------------------------------------------------------------------
+# Terraform コードの品質チェックを実行します。
+# environments/dev ディレクトリを対象にチェックを行います。
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+TF_DIR="$SCRIPT_DIR/../terraform/environments/dev"
+
+cd "$TF_DIR"
 
 echo "🎨 Running Terraform Format Check..."
 terraform fmt -recursive -check
 echo "✅ Format OK"
 
-echo "� Initializing Terraform (Backend Disabled)..."
+echo "📦 Initializing Terraform (Backend Disabled)..."
 terraform init -backend=false
 
-echo "�🔎 Running Terraform Validate..."
+echo "🔎 Running Terraform Validate..."
 terraform validate -no-color
 echo "✅ Validate OK"
 

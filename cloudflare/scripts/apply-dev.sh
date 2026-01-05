@@ -8,7 +8,9 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ENV_FILE="$SCRIPT_DIR/../.env"
+TF_DIR="$SCRIPT_DIR/../terraform/environments/dev"
 
+# .env ファイルの読み込み
 if [ -f "$ENV_FILE" ]; then
   set -a
   source "$ENV_FILE"
@@ -23,14 +25,14 @@ elif [ -n "$TF_VAR_CLOUDFLARE_ZONE_ID" ]; then
 fi
 export TF_VAR_cloudflare_account_id="$CLOUDFLARE_ACCOUNT_ID"
 
-cd "$(dirname "$0")/../terraform"
+cd "$TF_DIR"
 
 echo "🚀 Terraform Apply を実行中 (Dev)..."
 if [ -f "dev.tfplan" ]; then
   terraform apply "dev.tfplan"
 else
   echo "⚠️ dev.tfplan が見つかりません。まず plan を実行します..."
-  ../scripts/plan-dev.sh
+  "$SCRIPT_DIR/plan-dev.sh"
   terraform apply "dev.tfplan"
 fi
 

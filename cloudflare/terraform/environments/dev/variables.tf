@@ -1,5 +1,5 @@
 /*
-  入力変数
+  入力変数 (Dev 環境)
   -----------------------------------------------------------------------------
   Cloudflare インフラストラクチャモジュールの入力変数を定義します。
   これらの変数により、インフラストラクチャのデプロイをカスタマイズできます。
@@ -45,7 +45,6 @@ variable "cors_origins" {
   default     = ["*"]
 }
 
-
 variable "additional_records" {
   description = "追加の DNS レコードリスト (サブドメイン等)"
   type = list(object({
@@ -65,8 +64,6 @@ variable "additional_records" {
     error_message = "DNS レコードタイプは A, AAAA, CNAME, TXT, MX, NS, SPF, SRV のいずれかである必要があります。"
   }
 }
-
-
 
 # ==============================================================================
 # Cloudflare Pages Variables
