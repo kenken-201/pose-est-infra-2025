@@ -57,3 +57,25 @@ module "dns" {
   additional_records = var.additional_records
 }
 
+
+/*
+  Cloudflare Pages モジュール (フロントエンドホスティング)
+  -----------------------------------------------------------------------------
+  Pages プロジェクトの設定 (ビルド、デプロイ、環境変数) を管理します。
+  ※ GitHub 連携 (source) は手動設定 → import が必要です。
+*/
+
+module "pages" {
+  source = "./modules/pages"
+
+  account_id   = var.cloudflare_account_id
+  project_name = var.pages_project_name
+
+  # ビルド設定
+  build_config = var.pages_build_config
+  node_version = var.node_version
+
+  # デプロイメント設定 (環境変数)
+  preview_vars    = var.pages_preview_vars
+  production_vars = var.pages_production_vars
+}

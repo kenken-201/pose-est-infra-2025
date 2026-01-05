@@ -16,7 +16,7 @@ resource "cloudflare_pages_project" "this" {
   # ---------------------------------------------------------------------------
   # Build Configuration
   # ---------------------------------------------------------------------------
-  build_config {
+  build_config = {
     build_command       = var.build_config.command
     destination_dir     = var.build_config.destination_dir
     root_dir            = var.build_config.root_dir
@@ -27,10 +27,8 @@ resource "cloudflare_pages_project" "this" {
   # ---------------------------------------------------------------------------
   # Deployment Configurations (Environment Variables)
   # ---------------------------------------------------------------------------
-  # deployment_configs ブロックは v5 で単一のネストされた属性になりました
-
-  deployment_configs {
-    preview {
+  deployment_configs = {
+    preview = {
       environment_variables = merge(
         { "NODE_VERSION" = var.node_version },
         var.preview_vars
@@ -39,7 +37,7 @@ resource "cloudflare_pages_project" "this" {
       compatibility_flags = ["nodejs_compat"]
     }
 
-    production {
+    production = {
       environment_variables = merge(
         { "NODE_VERSION" = var.node_version },
         var.production_vars
@@ -47,8 +45,8 @@ resource "cloudflare_pages_project" "this" {
       compatibility_date  = var.compatibility_date
       compatibility_flags = ["nodejs_compat"]
     }
-
   }
+
 
   lifecycle {
     # source 設定は外部(Dashboard)で管理されるため、Terraform での変更を無視します
