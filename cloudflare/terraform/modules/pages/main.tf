@@ -35,7 +35,7 @@ resource "cloudflare_pages_project" "this" {
         { "NODE_VERSION" = var.node_version },
         var.preview_vars
       )
-      compatibility_date  = "2024-04-01" # 必要に応じて更新
+      compatibility_date  = var.compatibility_date
       compatibility_flags = ["nodejs_compat"]
     }
 
@@ -44,9 +44,10 @@ resource "cloudflare_pages_project" "this" {
         { "NODE_VERSION" = var.node_version },
         var.production_vars
       )
-      compatibility_date  = "2024-04-01"
+      compatibility_date  = var.compatibility_date
       compatibility_flags = ["nodejs_compat"]
     }
+
   }
 
   lifecycle {
