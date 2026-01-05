@@ -154,14 +154,52 @@
 
 #### ⬜ タスク 10: Pages プロジェクト設定
 
-- [ ] Terraform モジュール: `modules/pages`
-- [ ] Cloudflare Pages プロジェクト作成: `pose-est-frontend`
-- [ ] ソース連携: GitHub リポジトリ接続
-- [ ] ビルド設定:
-  - ビルドコマンド: `npm run build`
-  - 出力ディレクトリ: `dist`
-  - Node バージョン: 18
-- [ ] 環境変数設定: API エンドポイント URL など
+**目的**: Cloudflare Pages でフロントエンドアプリケーションをホストし、自動デプロイを実現
+
+> [!WARNING] > **Terraform Provider v5 の制限**: `source` (GitHub 連携) 設定が読み取り専用になったため、
+> GitHub 連携は Cloudflare Dashboard で手動設定が必要です。Terraform ではプロジェクトの
+> ビルド設定・環境変数・デプロイ設定のみを管理します。
+
+**依存関係**:
+
+- ✅ 前提なし (Task 8 完了後に実装可能)
+- ⚠️ 環境変数 `VITE_API_URL` は GCP 完了後に最終値を設定
+
+**サブタスク**:
+
+- [ ] **10-1: Terraform モジュール作成 (`modules/pages`)**
+
+  - [ ] `modules/pages/main.tf`: `cloudflare_pages_project` リソース定義
+  - [ ] `modules/pages/variables.tf`: account_id, project_name, production_branch 等
+  - [ ] `modules/pages/outputs.tf`: project_name, subdomain, domains
+  - [ ] `modules/pages/versions.tf`: Provider 制約
+
+- [ ] **10-2: ビルド設定 (build_config)**
+
+  - [ ] ビルドコマンド: `npm run build`
+  - [ ] 出力ディレクトリ: `dist`
+  - [ ] ルートディレクトリ: `pose-est-front` (モノレポ対応)
+  - [ ] Node バージョン: 環境変数 `NODE_VERSION=20` で指定
+
+- [ ] **10-3: デプロイ設定 (deployment_configs)**
+
+  - [ ] Preview 環境設定: 開発用環境変数
+  - [ ] Production 環境設定: 本番用環境変数
+  - [ ] 環境変数: `VITE_API_URL` (プレースホルダー値で初期設定)
+  - [ ] 互換性フラグ: 必要に応じて設定
+
+- [ ] **10-4: GitHub 連携 (手動設定)**
+
+  - [ ] Cloudflare Dashboard で GitHub アカウント接続
+  - [ ] リポジトリ選択: `pose-est` (またはフロントエンド専用リポ)
+  - [ ] ブランチ設定: `main` → Production, その他 → Preview
+  - [ ] ⚠️ 設定完了後、Terraform で `import` して状態管理に含める
+
+- [ ] **10-5: ルートモジュール統合**
+  - [ ] `terraform/main.tf` に `module "pages"` ブロック追加
+  - [ ] `terraform/variables.tf` に Pages 用変数追加
+  - [ ] `terraform/outputs.tf` に Pages 出力追加
+  - [ ] 環境別 `tfvars` に Pages 設定追加
 
 #### ⬜ タスク 11: カスタムドメイン設定
 
