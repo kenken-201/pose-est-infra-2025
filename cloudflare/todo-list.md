@@ -126,11 +126,11 @@
 
 **サブタスク**:
 
-- [ ] **9-1: DNS モジュール拡張 (汎用レコード対応)**
+- [x] **9-1: DNS モジュール拡張 (汎用レコード対応)**
 
-  - [ ] `modules/dns` に汎用 DNS レコード作成機能を追加
-  - [ ] 変数: `additional_records` (list of objects: name, type, content, proxied)
-  - [ ] 既存の SPF/DMARC とは別に、動的レコード追加を可能に
+  - [x] `modules/dns` に汎用 DNS レコード作成機能を追加
+  - [x] 変数: `additional_records` (list of objects: name, type, value, proxied, ttl, comment)
+  - [x] 既存の SPF/DMARC とは別に、動的レコード追加を可能に
 
 - [ ] **9-2: 開発環境 DNS レコード設定 (Pages 依存)**
 

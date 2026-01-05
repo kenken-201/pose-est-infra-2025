@@ -44,3 +44,17 @@ variable "cors_origins" {
   type        = list(string)
   default     = ["*"]
 }
+
+variable "additional_records" {
+  description = "追加の DNS レコードリスト (サブドメイン等)"
+  type = list(object({
+    name    = string
+    type    = string
+    value   = string
+    proxied = bool
+    ttl     = number
+    comment = optional(string)
+  }))
+  default = []
+}
+

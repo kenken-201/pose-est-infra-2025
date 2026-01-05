@@ -21,3 +21,16 @@ variable "domain_name" {
     error_message = "有効なドメイン名を指定してください (例: example.com)。"
   }
 }
+
+variable "additional_records" {
+  description = "追加の DNS レコードリスト (サブドメイン等)"
+  type = list(object({
+    name    = string
+    type    = string
+    value   = string
+    proxied = bool
+    ttl     = number
+    comment = optional(string)
+  }))
+  default = []
+}

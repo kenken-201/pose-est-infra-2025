@@ -48,9 +48,12 @@ module "r2_bucket" {
   -----------------------------------------------------------------------------
   ゾーンのセキュリティ設定 (SSL, DNSSEC) と基本レコードを管理します。
 */
+
 module "dns" {
   source = "./modules/dns"
 
-  zone_id     = var.cloudflare_zone_id
-  domain_name = var.domain_name
+  zone_id            = var.cloudflare_zone_id
+  domain_name        = var.domain_name
+  additional_records = var.additional_records
 }
+
