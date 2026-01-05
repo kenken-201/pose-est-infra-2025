@@ -5,6 +5,3 @@ cors_origins = [
   "https://dev.kenken-pose-est.online",
   "https://pose-est-front.pages.dev"
 ]
-
-
-
