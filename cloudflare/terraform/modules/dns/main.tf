@@ -108,3 +108,21 @@ resource "cloudflare_dns_record" "dmarc" {
   ttl     = 3600
   comment = "Email Security: DMARC - Reject all unauthenticated mail"
 }
+
+# -----------------------------------------------------------------------------
+# Additional DNS Records (Dynamic)
+# -----------------------------------------------------------------------------
+# variables で渡されたリストに基づいて、汎用的な DNS レコードを作成します。
+# 主に開発環境や API サブドメインの CNAME レコードなどに使用します。
+
+resource "cloudflare_dns_record" "additional" {
+  for_each = { for idx, record in var.additional_records : "${record.name}-${record.type}" => record }
+
+  zone_id = var.zone_id
+  name    = each.value.name
+  type    = each.value.type
+  content = each.value.value
+  proxied = each.value.proxied
+  ttl     = each.value.ttl
+  comment = each.value.comment
+}

@@ -21,3 +21,25 @@ variable "domain_name" {
     error_message = "有効なドメイン名を指定してください (例: example.com)。"
   }
 }
+
+
+variable "additional_records" {
+  description = "追加の DNS レコードリスト (サブドメイン等)"
+  type = list(object({
+    name    = string
+    type    = string
+    value   = string
+    proxied = bool
+    ttl     = number
+    comment = optional(string)
+  }))
+  default = []
+
+  validation {
+    condition = alltrue([
+      for r in var.additional_records : contains(["A", "AAAA", "CNAME", "TXT", "MX", "NS", "SPF", "SRV"], r.type)
+    ])
+    error_message = "DNS レコードタイプは A, AAAA, CNAME, TXT, MX, NS, SPF, SRV のいずれかである必要があります。"
+  }
+}
+
