@@ -84,7 +84,7 @@ variable "pages_build_config" {
   description = "Pages ビルド設定"
   type = object({
     command         = optional(string, "npm run build")
-    destination_dir = optional(string, "dist")
+    destination_dir = optional(string, "build/client")
     root_dir        = optional(string, "")
   })
   default = {}
@@ -106,4 +106,16 @@ variable "pages_production_vars" {
   description = "Pages 本番環境用環境変数"
   type        = map(string)
   default     = {}
+}
+
+variable "api_target" {
+  description = "バックエンド API のターゲット URL (Cloud Run URL)"
+  type        = string
+  default     = ""
+}
+
+variable "pages_dev_target" {
+  description = "Pages の開発環境 (Preview) URL"
+  type        = string
+  default     = ""
 }

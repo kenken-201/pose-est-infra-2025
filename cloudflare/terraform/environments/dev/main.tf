@@ -47,7 +47,11 @@ module "r2_bucket" {
 
   # 開発環境はすべてのオリジンを許可、本番環境は特定ドメインのみに制限可能
   # tfvars 経由で環境ごとに異なる値を注入します
-  cors_origins = var.cors_origins
+  # pages_dev_target (プレビュー環境) が指定されていれば追加します
+  cors_origins = concat(
+    var.cors_origins,
+    var.pages_dev_target != "" ? [var.pages_dev_target] : []
+  )
 }
 
 # -----------------------------------------------------------------------------
@@ -80,6 +84,14 @@ module "pages" {
   node_version = var.node_version
 
   # デプロイメント設定 (環境変数)
-  preview_vars    = var.pages_preview_vars
-  production_vars = var.pages_production_vars
+  # tfvars の設定に加えて、環境変数 (TF_VAR_api_target) から動的に値を注入
+  preview_vars = merge(
+    var.pages_preview_vars,
+    var.api_target != "" ? { VITE_API_URL = var.api_target } : {}
+  )
+
+  production_vars = merge(
+    var.pages_production_vars,
+    var.api_target != "" ? { VITE_API_URL = var.api_target } : {}
+  )
 }

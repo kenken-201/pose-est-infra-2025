@@ -1,0 +1,31 @@
+environment = "dev"
+domain_name = "kenken-pose-est.online"
+
+# Cloudflare ID
+cloudflare_account_id = "YOUR_ACCOUNT_ID"
+cloudflare_zone_id    = "YOUR_ZONE_ID"
+
+cors_origins = [
+  "http://localhost:3000",
+  "https://dev.kenken-pose-est.online"
+  # pages_dev_target (TF_VAR_pages_dev_target) は自動的に追加されます
+]
+
+# Pages 設定
+pages_project_name = "pose-est-frontend" # プロジェクト名
+node_version       = "20"                # LTS 推奨
+
+pages_build_config = {
+  command         = "npm run build"
+  destination_dir = "build/client"
+  root_dir        = "pose-est-front" # モノレポ構成のため指定
+}
+
+pages_preview_vars = {
+  # VITE_API_URL は TF_VAR_api_target から自動注入されます
+  # その他 環境変数があればここに記述
+}
+
+pages_production_vars = {
+  # VITE_API_URL は TF_VAR_api_target から自動注入されます
+}

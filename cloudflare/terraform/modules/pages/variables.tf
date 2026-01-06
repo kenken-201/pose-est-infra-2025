@@ -34,7 +34,7 @@ variable "build_config" {
   description = "ビルド設定"
   type = object({
     command         = optional(string, "npm run build")
-    destination_dir = optional(string, "dist")
+    destination_dir = optional(string, "build/client")
     root_dir        = optional(string, "") # モノレポの場合は指定
   })
   default = {}
