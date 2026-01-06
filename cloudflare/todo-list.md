@@ -168,14 +168,14 @@
 **サブタスク**:
 
 - [x] **10-1〜10-5**: Pages モジュール作成（完了、Workers 移行により一部無効）
-- [ ] **10-6: Workers モジュール作成 (`modules/workers`)**
-  - [ ] Workers 用 Terraform リソース定義の調査
-  - [ ] `cloudflare_worker_script` または `cloudflare_workers_script` の使用検討
-  - [ ] ※ Workers Builds は Dashboard 連携が主のため、Terraform 管理範囲を決定
-- [ ] **10-7: DNS 設定**
-  - [ ] Dev: `dev.kenken-pose-est.online` → Workers (develop ブランチ)
-  - [ ] Prod: `kenken-pose-est.online` → Workers (main ブランチ)
-  - [ ] CNAME レコードを Terraform で管理
+- [ ] **10-6: Pages リソースのクリーンアップ**
+  - [ ] `modules/pages` の削除または無効化
+  - [ ] `terraform state rm module.pages` (または類似コマンド) で既存の Pages リソースを State から削除
+  - [ ] 不要になった `terraform.tfvars` の Pages 設定を削除
+- [ ] **10-7: Workers カスタムドメイン設定**
+  - [ ] `cloudflare_worker_domain` リソースの使用
+  - [ ] Dev: `dev.kenken-pose-est.online` → `pose-est-frontend` (Service Name)
+  - [ ] Prod: `kenken-pose-est.online` → `pose-est-frontend` (Service Name)
 
 #### ⬜ タスク 11: カスタムドメイン設定
 
