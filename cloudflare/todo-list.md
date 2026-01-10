@@ -168,13 +168,13 @@
 **サブタスク**:
 
 - [x] **10-1〜10-5**: Pages モジュール作成（完了、Workers 移行により一部無効）
-- [ ] **10-6: Pages リソースのクリーンアップ**
-  - [ ] `modules/pages` の削除または無効化
-  - [ ] `terraform state rm module.pages` (または類似コマンド) で既存の Pages リソースを State から削除
-  - [ ] 不要になった `terraform.tfvars` の Pages 設定を削除
-- [ ] **10-7: Workers カスタムドメイン設定**
-  - [ ] `cloudflare_worker_domain` リソースの使用
-  - [ ] Dev: `dev.kenken-pose-est.online` → `pose-est-frontend` (Service Name)
+- [x] **10-6: Pages リソースのクリーンアップ**
+  - [x] `modules/pages` の削除または無効化
+  - [x] `terraform state rm module.pages` (または類似コマンド) で既存の Pages リソースを State から削除
+  - [x] 不要になった `terraform.tfvars` の Pages 設定を削除
+- [x] **10-7: Workers カスタムドメイン設定**
+  - [x] `cloudflare_workers_custom_domain` リソースの使用
+  - [x] Dev: `dev.kenken-pose-est.online` → `pose-est-frontend` (Service Name)
   - [ ] Prod: `kenken-pose-est.online` → `pose-est-frontend` (Service Name)
 
 #### ⬜ タスク 11: カスタムドメイン設定
