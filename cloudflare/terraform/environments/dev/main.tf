@@ -47,11 +47,7 @@ module "r2_bucket" {
 
   # 開発環境はすべてのオリジンを許可、本番環境は特定ドメインのみに制限可能
   # tfvars 経由で環境ごとに異なる値を注入します
-  # pages_dev_target (プレビュー環境) が指定されていれば追加します
-  cors_origins = concat(
-    var.cors_origins,
-    var.pages_dev_target != "" ? [var.pages_dev_target] : []
-  )
+  cors_origins = var.cors_origins
 }
 
 # -----------------------------------------------------------------------------
@@ -68,30 +64,14 @@ module "dns" {
 }
 
 # -----------------------------------------------------------------------------
-# Cloudflare Pages モジュール (フロントエンドホスティング)
+# Workers カスタムドメイン設定
 # -----------------------------------------------------------------------------
-# Pages プロジェクトの設定 (ビルド、デプロイ、環境変数) を管理します。
-# ※ GitHub 連携 (source) は手動設定 → import が必要です。
+# フロントエンド (Workers) 用の DNS レコードとルート設定
+# ※ Workers 本体 (Script) はフロントエンドリポジトリ (wrangler) で管理
 
-# module "pages" {
-#   source = "../../modules/pages"
-# 
-#   account_id   = var.cloudflare_account_id
-#   project_name = var.pages_project_name
-# 
-#   # ビルド設定
-#   build_config = var.pages_build_config
-#   node_version = var.node_version
-# 
-#   # デプロイメント設定 (環境変数)
-#   # tfvars の設定に加えて、環境変数 (TF_VAR_api_target) から動的に値を注入
-#   preview_vars = merge(
-#     var.pages_preview_vars,
-#     var.api_target != "" ? { VITE_API_URL = var.api_target } : {}
-#   )
-# 
-#   production_vars = merge(
-#     var.pages_production_vars,
-#     var.api_target != "" ? { VITE_API_URL = var.api_target } : {}
-#   )
-# }
+resource "cloudflare_workers_custom_domain" "frontend_dev" {
+  account_id = var.cloudflare_account_id
+  zone_id    = var.cloudflare_zone_id
+  service    = "pose-est-frontend" # wrangler.jsonc の "name" と一致させる
+  hostname   = "dev.kenken-pose-est.online"
+}

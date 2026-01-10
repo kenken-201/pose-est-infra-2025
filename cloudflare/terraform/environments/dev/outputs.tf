@@ -27,17 +27,3 @@ output "r2_bucket_domain" {
   sensitive   = true
 }
 
-output "pages_project_name" {
-  description = "Cloudflare Pages プロジェクト名"
-  value       = module.pages.name
-}
-
-output "pages_subdomain" {
-  description = "Cloudflare Pages デフォルトサブドメイン"
-  value       = module.pages.subdomain
-}
-
-output "pages_domains" {
-  description = "Cloudflare Pages カスタムドメイン一覧"
-  value       = module.pages.domains
-}
