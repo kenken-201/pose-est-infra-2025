@@ -1,5 +1,5 @@
 /*
-  出力値
+  出力値 (Dev 環境)
   -----------------------------------------------------------------------------
   デプロイされたインフラストラクチャに関する主要な情報を公開するための出力値を定義します。
   これらの出力は、他のモジュールや CI/CD パイプラインとの連携に役立ちます。
@@ -25,4 +25,9 @@ output "r2_bucket_domain" {
   description = "R2 バケットのドメイン"
   value       = module.r2_bucket.bucket_domain
   sensitive   = true
+}
+
+output "workers_frontend_hostname" {
+  description = "フロントエンド Workers のカスタムドメイン"
+  value       = cloudflare_workers_custom_domain.frontend_dev.hostname
 }
