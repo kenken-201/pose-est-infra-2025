@@ -236,16 +236,33 @@
 
 ### 🔒 **フェーズ 5: セキュリティ設定**
 
-#### ⬜ タスク 13: WAF 設定
+#### ⬜ タスク 13: WAF とセキュリティルール設定
 
-- [ ] Terraform モジュール: `modules/security`
-- [ ] マネージド WAF ルールセットの有効化:
-  - Cloudflare Managed Ruleset
-  - OWASP Core Ruleset
-- [ ] カスタムファイアウォールルール:
-  - API エンドポイント保護
-  - 管理者パス保護
-- [ ] ボット対策: ボットファイトモード有効化
+**目的**: Web アプリケーションファイアウォール (WAF) を導入し、悪意のあるトラフィックやボットからアプリケーションを保護する
+
+**サブタスク**:
+
+- [ ] **13-1: セキュリティモジュール作成 (`modules/security`)**
+
+  - [ ] `cloudflare_ruleset` リソースを使用した WAF 設定のモジュール化
+  - [ ] 変数定義: `zone_id`, `environment`
+  - [ ] 出力定義
+
+- [ ] **13-2: マネージド WAF ルールセット (Managed Rules)**
+
+  - [ ] **Cloudflare Managed Ruleset**: 一般的な脆弱性対策 (有効化)
+  - [ ] **OWASP Core Ruleset**: OWASP Top 10 対策 (感度調整: Low/Medium)
+  - [ ] **Free プラン制限**: Free プランで使用可能な範囲で設定
+
+- [ ] **13-3: カスタムファイアウォールルール (Custom Rules)**
+
+  - [ ] **API 保護**: `/api/*` への不審なリクエストブロック
+  - [ ] **国別制限 (Geo-blocking)**: 許可国以外からの攻撃的なアクセスをチャレンジ
+  - [ ] **脅威スコア制限**: Threat Score が高い IP のブロック
+
+- [ ] **13-4: ボット対策 (Bot Fight Mode)**
+  - [ ] Terraform または Dashboard で Bot Fight Mode を有効化
+  - [ ] 自動化されたボットアクセスの軽減
 
 #### ⬜ タスク 14: R2 セキュリティ強化
 
