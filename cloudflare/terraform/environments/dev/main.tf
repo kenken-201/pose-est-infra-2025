@@ -79,13 +79,12 @@ resource "cloudflare_workers_custom_domain" "frontend_dev" {
 # -----------------------------------------------------------------------------
 # セキュリティモジュール (WAF)
 # -----------------------------------------------------------------------------
-# マネージド WAF ルールセットとカスタムファイアウォールルールを適用します。
-# Free プランの制限内で設定を行います。
+# カスタムファイアウォールルールを適用します。
+# Note: Managed WAF は Free プラン制限のため Dashboard で設定
 
 module "security" {
   source = "../../modules/security"
 
   zone_id     = var.cloudflare_zone_id
   environment = var.environment
-  enable_waf  = true
 }

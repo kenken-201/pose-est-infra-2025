@@ -8,17 +8,14 @@ terraform {
 }
 
 # -----------------------------------------------------------------------------
-# Cloudflare Managed Rulesets (WAF)
+# Custom Firewall Rules (カスタムファイアウォールルール)
 # -----------------------------------------------------------------------------
-# Free プランで使用可能なマネージドルールセットを適用します。
-# - Cloudflare Managed Ruleset (Free)
-# - OWASP ModSecurity Core Rule Set (Free)
-
-# Reference: https://developers.cloudflare.com/waf/managed-rules/
-# Free プランでは Zone レベルの WAF 設定が可能です。
-
-# Note: Managed WAF Rulesets (Cloudflare Managed Ruleset) are not available via Terraform for Free plan.
-# To enable Free Managed Rules, please use the Cloudflare Dashboard.
+# Free プランで使用可能なカスタムルールを定義します。
+# Managed WAF (OWASP 等) は Free では Terraform 非対応のため Dashboard で設定してください。
+#
+# Reference:
+# - https://developers.cloudflare.com/waf/custom-rules/
+# - https://developers.cloudflare.com/ruleset-engine/rules-language/operators/
 
 # -----------------------------------------------------------------------------
 # Custom Firewall Rules
