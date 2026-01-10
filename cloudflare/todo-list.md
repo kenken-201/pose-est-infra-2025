@@ -207,12 +207,34 @@
   - [x] Always Use HTTPS: On
   - [x] Min TLS Version: 1.2
 
-#### ⬜ タスク 12: ルーティングとヘッダー設定
+#### ⬜ タスク 12: セキュリティヘッダーとキャッシュ設定
 
-- [ ] `_routes.json` 設定: SPA 用キャッチオールルート
-- [ ] `_headers.json` 設定: セキュリティヘッダー追加
-- [ ] `_redirects.json` 設定: カスタムリダイレクト
-- [ ] キャッシュポリシー: 静的アセットの最適化
+**目的**: フロントエンド Workers のセキュリティとパフォーマンスを最適化する
+
+> [!WARNING] > **⚠️ アーキテクチャ変更に伴う注意**
+> Pages 用の `_routes.json`, `_headers.json`, `_redirects.json` は **Workers では使用不可**。
+> これらの機能は **Worker スクリプト内で実装**するか、**Cloudflare Rules** で設定します。
+
+**サブタスク**:
+
+- [ ] **12-1: セキュリティヘッダー設定 (フロントエンド側)**
+
+  - [ ] Worker スクリプトでレスポンスヘッダーを追加
+  - [ ] 対象ヘッダー: `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`
+  - [ ] CSP (Content-Security-Policy): 慎重に設定
+  - [ ] 📍 実装場所: `pose-est-front` (Worker handler)
+
+- [ ] **12-2: キャッシュ設定 (Cloudflare 側 or フロントエンド側)**
+
+  - [ ] 静的アセット (JS/CSS/画像) の長期キャッシュ
+  - [ ] HTML/API レスポンスの短期キャッシュまたはキャッシュ無効化
+  - [ ] 📍 選択肢:
+    - A: Worker スクリプトで `Cache-Control` ヘッダー設定 (`pose-est-front`)
+    - B: Cloudflare Cache Rules を Terraform で設定 (`pose-est-infra/cloudflare`)
+
+- [ ] **12-3: リダイレクト設定 (必要に応じて)**
+  - [ ] `www` → apex ドメインリダイレクト (Production 構築時)
+  - [ ] 📍 実装場所: Worker スクリプト or Cloudflare Redirect Rules
 
 ### 🔒 **フェーズ 5: セキュリティ設定**
 
