@@ -27,3 +27,7 @@ output "r2_bucket_domain" {
   sensitive   = true
 }
 
+output "workers_frontend_hostname" {
+  description = "フロントエンド Workers のカスタムドメイン"
+  value       = cloudflare_workers_custom_domain.frontend_dev.hostname
+}

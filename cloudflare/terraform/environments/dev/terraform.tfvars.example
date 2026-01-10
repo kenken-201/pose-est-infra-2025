@@ -1,31 +1,49 @@
+# -----------------------------------------------------------------------------
+# Dev Environment Terraform Variables Example
+# -----------------------------------------------------------------------------
+# This file serves as a template for terraform.tfvars.
+# Copy this file to terraform.tfvars and fill in your actual values.
+# terraform.tfvars is gitignored to protect sensitive information.
+# -----------------------------------------------------------------------------
+
 environment = "dev"
 domain_name = "kenken-pose-est.online"
 
-# Cloudflare ID
-cloudflare_account_id = "YOUR_ACCOUNT_ID"
-cloudflare_zone_id    = "YOUR_ZONE_ID"
+# -----------------------------------------------------------------------------
+# Cloudflare Credentials (Required)
+# -----------------------------------------------------------------------------
+# These can also be provided via environment variables:
+# - TF_VAR_cloudflare_account_id
+# - TF_VAR_cloudflare_zone_id
+
+cloudflare_account_id = "YOUR_ACCOUNT_ID"  # 32-character hex string
+cloudflare_zone_id    = "YOUR_ZONE_ID"     # 32-character hex string
+
+# -----------------------------------------------------------------------------
+# R2 CORS Configuration
+# -----------------------------------------------------------------------------
+# Specify allowed origins for R2 bucket CORS policy.
+# Include your Workers custom domain and development server.
 
 cors_origins = [
   "http://localhost:3000",
-  "https://dev.kenken-pose-est.online"
-  # pages_dev_target (TF_VAR_pages_dev_target) は自動的に追加されます
+  "https://dev.kenken-pose-est.online",
+  "https://pose-est-frontend.kenken-pose-est.workers.dev"
 ]
 
-# Pages 設定
-pages_project_name = "pose-est-frontend" # プロジェクト名
-node_version       = "20"                # LTS 推奨
-
-pages_build_config = {
-  command         = "npm run build"
-  destination_dir = "build/client"
-  root_dir        = "pose-est-front" # モノレポ構成のため指定
-}
-
-pages_preview_vars = {
-  # VITE_API_URL は TF_VAR_api_target から自動注入されます
-  # その他 環境変数があればここに記述
-}
-
-pages_production_vars = {
-  # VITE_API_URL は TF_VAR_api_target から自動注入されます
-}
+# -----------------------------------------------------------------------------
+# Additional DNS Records (Optional)
+# -----------------------------------------------------------------------------
+# Use this to add custom DNS records managed by Terraform.
+# Example:
+# additional_records = [
+#   {
+#     name    = "api"
+#     type    = "CNAME"
+#     value   = "your-cloud-run-url.run.app"
+#     proxied = true
+#     ttl     = 1
+#     comment = "API endpoint (Cloud Run)"
+#   }
+# ]
+additional_records = []
