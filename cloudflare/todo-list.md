@@ -156,7 +156,7 @@
 > **Cloudflare Workers** に変更しました。Terraform での IaC 管理は引き続き行いますが、
 > Workers 固有の設定（wrangler.toml 等）はフロントエンドリポジトリ側で管理します。
 
-#### ⬜ タスク 10: Workers プロジェクト設定
+#### ✅ タスク 10: Workers プロジェクト設定
 
 **目的**: Cloudflare Workers でフロントエンドアプリケーション (SSR) をホストし、自動デプロイを実現
 
@@ -169,20 +169,43 @@
 
 - [x] **10-1〜10-5**: Pages モジュール作成（完了、Workers 移行により一部無効）
 - [x] **10-6: Pages リソースのクリーンアップ**
-  - [x] `modules/pages` の削除または無効化
-  - [x] `terraform state rm module.pages` (または類似コマンド) で既存の Pages リソースを State から削除
-  - [x] 不要になった `terraform.tfvars` の Pages 設定を削除
+  - [x] `modules/pages` の削除: **実施済み (ディレクトリ削除)**
+  - [x] `terraform state rm module.pages`: **実施済み**
+  - [x] `terraform.tfvars` の Pages 設定削除: **実施済み**
 - [x] **10-7: Workers カスタムドメイン設定**
   - [x] `cloudflare_workers_custom_domain` リソースの使用
   - [x] Dev: `dev.kenken-pose-est.online` → `pose-est-frontend` (Service Name)
   - [ ] Prod: `kenken-pose-est.online` → `pose-est-frontend` (Service Name)
+- [ ] **10-8: Workers モジュール化の検討 (将来的な課題)**
+  - [ ] 現状は `main.tf` 内の単一リソースで十分なため、`modules/workers` は作成しない
+  - [ ] Workers 関連リソース (KV, Durable Objects 等) が増えた場合にモジュール化を再検討
 
-#### ⬜ タスク 11: カスタムドメイン設定
+#### ✅ タスク 11: カスタムドメイン設定
 
-- [ ] プライマリドメイン: `kenken-pose-est.online`
-- [ ] エイリアスドメイン: `www.kenken-pose-est.online`
-- [ ] HTTPS 強制: 自動的に HTTPS へリダイレクト
-- [ ] 証明書管理: 自動 SSL 証明書発行
+**目的**: Workers アプリケーションに対してカスタムドメインを割り当て、HTTPS アクセスを確保する
+
+> [!NOTE]
+> Workers へのドメイン割り当ては `cloudflare_workers_custom_domain` リソースで管理。
+> HTTPS 強制・証明書管理は Cloudflare が自動的に処理するため、追加設定は不要。
+
+**サブタスク**:
+
+- [x] **11-1: 開発環境ドメイン**
+
+  - [x] `dev.kenken-pose-est.online` → `pose-est-frontend` (Task 10-7 で実施済み)
+  - [x] HTTPS 強制: Cloudflare 自動処理 (Zone Settings で `always_use_https` 有効済み)
+  - [x] SSL 証明書: Cloudflare Edge Certificate 自動発行済み
+
+- [ ] **11-2: 本番環境ドメイン (Production 環境構築後)**
+
+  - [ ] `kenken-pose-est.online` → `pose-est-frontend` (Production)
+  - [ ] `www.kenken-pose-est.online` → リダイレクト設定 (apex へ)
+  - [ ] ⚠️ Production 環境の Terraform 構成が必要
+
+- [x] **11-3: Zone レベルセキュリティ設定 (Task 8 で実施済み)**
+  - [x] SSL/TLS: Full (Strict)
+  - [x] Always Use HTTPS: On
+  - [x] Min TLS Version: 1.2
 
 #### ⬜ タスク 12: ルーティングとヘッダー設定
 
