@@ -75,3 +75,17 @@ resource "cloudflare_workers_custom_domain" "frontend_dev" {
   service    = "pose-est-frontend" # wrangler.jsonc の "name" と一致させる
   hostname   = "dev.kenken-pose-est.online"
 }
+
+# -----------------------------------------------------------------------------
+# セキュリティモジュール (WAF)
+# -----------------------------------------------------------------------------
+# マネージド WAF ルールセットとカスタムファイアウォールルールを適用します。
+# Free プランの制限内で設定を行います。
+
+module "security" {
+  source = "../../modules/security"
+
+  zone_id     = var.cloudflare_zone_id
+  environment = var.environment
+  enable_waf  = true
+}

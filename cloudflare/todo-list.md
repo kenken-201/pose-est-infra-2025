@@ -236,33 +236,32 @@
 
 ### 🔒 **フェーズ 5: セキュリティ設定**
 
-#### ⬜ タスク 13: WAF とセキュリティルール設定
+#### ✅ タスク 13: WAF とセキュリティルール設定
 
 **目的**: Web アプリケーションファイアウォール (WAF) を導入し、悪意のあるトラフィックやボットからアプリケーションを保護する
 
 **サブタスク**:
 
-- [ ] **13-1: セキュリティモジュール作成 (`modules/security`)**
+- [x] **13-1: セキュリティモジュール作成 (`modules/security`)**
 
-  - [ ] `cloudflare_ruleset` リソースを使用した WAF 設定のモジュール化
-  - [ ] 変数定義: `zone_id`, `environment`
-  - [ ] 出力定義
+  - [x] `cloudflare_ruleset` リソースを使用した WAF 設定のモジュール化
+  - [x] 変数定義: `zone_id`, `environment`
+  - [x] 出力定義
 
-- [ ] **13-2: マネージド WAF ルールセット (Managed Rules)**
+- [x] **13-2: マネージド WAF ルールセット (Managed Rules)**
 
-  - [ ] **Cloudflare Managed Ruleset**: 一般的な脆弱性対策 (有効化)
-  - [ ] **OWASP Core Ruleset**: OWASP Top 10 対策 (感度調整: Low/Medium)
-  - [ ] **Free プラン制限**: Free プランで使用可能な範囲で設定
+  - [x] **Cloudflare Managed Ruleset**: Terraform での有効化はスキップ (Free プラン制限)
+  - [ ] **OWASP Core Ruleset**: Dashboard から手動有効化を推奨 (Free プラン)
 
-- [ ] **13-3: カスタムファイアウォールルール (Custom Rules)**
+- [x] **13-3: カスタムファイアウォールルール (Custom Rules)**
 
-  - [ ] **API 保護**: `/api/*` への不審なリクエストブロック
-  - [ ] **国別制限 (Geo-blocking)**: 許可国以外からの攻撃的なアクセスをチャレンジ
-  - [ ] **脅威スコア制限**: Threat Score が高い IP のブロック
+  - [x] **API 保護**: `/api/*` (`contains` operator) への不審なリクエストブロック
+  - [x] **国別制限 (Geo-blocking)**: 日本国外からのボット以外を Challenge (初期無効)
+  - [x] **脅威スコア制限**: Threat Score > 40 ブロック
 
-- [ ] **13-4: ボット対策 (Bot Fight Mode)**
-  - [ ] Terraform または Dashboard で Bot Fight Mode を有効化
-  - [ ] 自動化されたボットアクセスの軽減
+- [x] **13-4: ボット対策 (Bot Fight Mode)**
+  - [x] Dashboard で [Security] > [Bots] から "Bot Fight Mode" を ON にする (Terraform 非対応)
+  - [x] 自動化されたボットアクセスの軽減
 
 #### ⬜ タスク 14: R2 セキュリティ強化
 
