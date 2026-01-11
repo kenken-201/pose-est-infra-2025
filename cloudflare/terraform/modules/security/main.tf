@@ -87,3 +87,38 @@ resource "cloudflare_ruleset" "zone_level_rate_limit" {
     }
   ]
 }
+
+# -----------------------------------------------------------------------------
+# Security Headers (Transform Rules)
+# -----------------------------------------------------------------------------
+# Defense in Depth: インフラ層でセキュリティヘッダーを強制付与します。
+# アプリケーション側での設定漏れや、Cloudflare エラーページ等も含めて保護します。
+
+resource "cloudflare_ruleset" "zone_level_security_headers" {
+  zone_id     = var.zone_id
+  name        = "Security Headers"
+  description = "Set baseline security headers for all responses"
+  kind        = "zone"
+  phase       = "http_response_headers_transform"
+
+  rules = [
+    {
+      action = "rewrite"
+      action_parameters = {
+        headers = {
+          # HSTS: 1年間の強制HTTPS + サブドメイン + Preload推奨
+          "Strict-Transport-Security" = { operation = "set", value = "max-age=63072000; includeSubDomains; preload" }
+          # MIME Sniffing 防止
+          "X-Content-Type-Options"    = { operation = "set", value = "nosniff" }
+          # Clickjacking 防止 (SameOrigin)
+          "X-Frame-Options"           = { operation = "set", value = "DENY" }
+          # Referrer Policy
+          "Referrer-Policy"           = { operation = "set", value = "strict-origin-when-cross-origin" }
+        }
+      }
+      expression  = "true" # 全てのレスポンスに適用
+      description = "Set Security Headers"
+      enabled     = true
+    }
+  ]
+}

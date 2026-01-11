@@ -24,12 +24,6 @@ provider "cloudflare" {
 # 共通設定のためのローカル値
 locals {
   project_name = "pose-est"
-
-  common_tags = {
-    project     = local.project_name
-    environment = var.environment
-    managed_by  = "terraform"
-  }
 }
 
 # -----------------------------------------------------------------------------
