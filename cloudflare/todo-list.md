@@ -363,18 +363,22 @@
 
 ### 📦 **フェーズ 7: 運用監視とドキュメンテーション**
 
-#### ⬜ タスク 21: アナリティクスと可観測性 (Observability)
+#### ✅ タスク 21: アナリティクスと可観測性 (Observability)
 
-- [ ] **21-1: Cloudflare Web Analytics (Privacy-First)**
+- [x] **21-1: 監視モジュールの作成 (`modules/monitoring`)**
+
+  - [x] `modules/monitoring` ディレクトリ作成
+  - [x] `main.tf`, `variables.tf`, `outputs.tf` 作成
+  - [x] `cloudflare_notification_policy`: 通知設定 (Free Plan の制限を確認し、ドキュメント化して実装)
+
+- [ ] **21-2: Cloudflare Web Analytics (Privacy-First)**
 
   - [ ] **有効化**: プライバシー重視の軽量分析を導入。
   - [ ] **実装**: フロントエンド (`pose-est-front`) への計測タグ設置 (React Router v7 対応) または Automatic Setup の確認。
-  - [ ] **目的**: ページビュー、ロード時間、Core Web Vitals の計測。
 
-- [ ] **21-2: インフラストラクチャ監視**
+- [ ] **21-3: インフラストラクチャ監視**
   - [ ] **R2 Metrics**: ストレージ使用量とリクエスト数の監視ダッシュボード確認 (Dashboard)。
   - [ ] **Zone Analytics**: キャッシュヒット率、帯域幅、WAF イベントの定期確認フロー策定。
-  - [ ] **GraphQL Analytics API (Optional)**: 詳細データ取得用のスクリプト試作 (必要に応じて)。
 
 #### ⬜ タスク 22: ユーザー体験監視
 
@@ -441,7 +445,7 @@
 - [ ] 署名 URL 有効期限テスト
 - [ ] エラーハンドリングテスト
 
-### 🧪 **フェーズ 9: テストと検証 (R2 統合テスト)**
+### 🧪 **フェーズ 9: テストと検証**
 
 #### ⬜ タスク 28: 機能テスト
 

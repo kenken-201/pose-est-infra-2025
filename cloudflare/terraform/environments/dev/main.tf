@@ -77,3 +77,14 @@ module "security" {
   zone_id     = var.cloudflare_zone_id
   environment = var.environment
 }
+
+# -----------------------------------------------------------------------------
+# 監視設定モジュール
+# -----------------------------------------------------------------------------
+# アナリティクスと監視設定を管理します (Free Plan 制限あり)
+module "monitoring" {
+  source = "../../modules/monitoring"
+
+  account_id = var.cloudflare_account_id
+  zone_id    = var.cloudflare_zone_id
+}
