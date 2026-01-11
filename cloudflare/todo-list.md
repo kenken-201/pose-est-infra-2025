@@ -346,17 +346,16 @@
 - [x] **Pro プラン機能**: `Polish`, `Mirage` 等は Free プランで使用不可のためスキップ。
 - [x] **Cloudflare Images**: 別途コストが発生するため、必要性が増した段階で再検討。
 
-#### ⬜ タスク 20: CI/CD パイプライン最適化 (GitHub Actions)
+#### ✅ タスク 20: CI/CD パイプライン最適化 (GitHub Actions)
 
-- [ ] **20-1: Terraform CI の高速化と安全性向上**
+- [x] **20-1: Terraform CI の高速化と安全性向上**
 
-  - [ ] **OIDC 認証**: API Token から OpenID Connect (OIDC) への移行 (セキュリティ強化) ※ Cloudflare は Terraform での OIDC サポートが限定的なため、Token 運用のまま権限最小化を再確認。
-  - [ ] **tfsec / Trivy**: コンテナ脆弱性診断の追加検討。
-  - [ ] **Cache 最適化**: Terraform Plugin キャッシュの有効化。
+  - [x] **安全性**: Checkov (`cloudflare-security.yml`) による静的解析を実装済み。OIDC は Cloudflare Provider の対応状況を鑑み、API Token (Least Privilege) 運用を維持。
+  - [x] **Cache 最適化**: Terraform Plugin (`.terraform`) および TFLint Plugin (`.tflint.d`) のキャッシュを有効化。
 
-- [ ] **20-2: PR 自動化 (`modules/cicd`)**
-  - [ ] **Plan Commenter**: PR に Terraform Plan 結果を自動コメントする Action の導入 (tfcmt 等)。
-  - [ ] **Policy Check**: OPA (Open Policy Agent) または Conftest によるポリシーコード化 (Optional)。
+- [x] **20-2: PR 自動化 (`modules/cicd`)**
+  - [x] **Plan Commenter**: PR に Terraform Plan 結果を自動コメントするスクリプト (`actions/github-script`) を実装済み。
+  - [x] **Policy Check**: Checkov によりポリシー違反を検出し、PR コメント (SARIF) で通知。
 
 ### 📦 **フェーズ 7: 運用監視とドキュメンテーション**
 
