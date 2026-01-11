@@ -30,9 +30,15 @@ resource "cloudflare_r2_bucket_lifecycle" "retention" {
         }
       }
 
-      # Optional attributes must be omitted or handled if required by object structure
-      abort_multipart_uploads_transition = null
-      storage_class_transitions          = []
+      # 不完全なマルチパートアップロードを7日後に削除 (コスト/整合性対策)
+      abort_multipart_uploads_transition = {
+        condition = {
+          type    = "Age"
+          max_age = 7 * 86400 # 7日
+        }
+      }
+
+      storage_class_transitions = []
     }
   ]
 }
