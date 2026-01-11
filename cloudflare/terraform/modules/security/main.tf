@@ -60,6 +60,10 @@ resource "cloudflare_ruleset" "zone_level_custom_firewall" {
 # -----------------------------------------------------------------------------
 # Free プランは 1 つのルールのみ作成可能です。
 # API エンドポイント全体を保護する汎用的なルールを設定します。
+#
+# Reference: 
+# - https://developers.cloudflare.com/waf/rate-limiting-rules/
+# - Free Plan Limits: Period=10s, Action=Block/Legacy Captcha only, Count=per-colo
 
 resource "cloudflare_ruleset" "zone_level_rate_limit" {
   zone_id     = var.zone_id
@@ -70,7 +74,7 @@ resource "cloudflare_ruleset" "zone_level_rate_limit" {
 
   rules = [
     {
-      action = "block"
+      action = "block" # Free plan: managed_challenge is NOT supported
       ratelimit = {
         characteristics     = ["ip.src", "cf.colo.id"] # Free plan requires per-colo counting
         period              = 10  # 10秒 (Free plan limit)
