@@ -318,6 +318,8 @@
   - [x] **HTTP/3 (QUIC)**: 通信速度と信頼性の向上
   - [x] **0-RTT Connection Resumption**: 再接続時のレイテンシ短縮
   - [x] **IPv6**: 有効化確認
+  - [x] **Early Hints**: サーバープッシュの代替としてリソース事前読み込みを促進
+  - [x] **Opportunistic Encryption**: HTTP/2 の恩恵を非 HTTPS にも適用
 
 - [x] **17-2: キャッシュと配信の最適化**
 
@@ -325,6 +327,8 @@
   - [x] **Brotli**: 圧縮有効化 (Gzip より高効率)
   - [x] **Rocket Loader**: **無効化 (OFF)** (React アプリとの競合回避・ハイドレーション保護)
   - [x] **Auto Minify**: **無効化 (OFF)** (ビルドツール側での最適化を優先 - Terraform エラー回避のため手動確認またはデフォルト維持)
+  - [x] **Automatic HTTPS Rewrites**: 混在コンテンツの防止とセキュリティ向上
+  - [x] **Always Online**: オリジンダウン時にキャッシュを提供し可用性を維持
 
 - [x] **17-3: Cache Rules (Optional)**
   - [x] 必要に応じて `cloudflare_ruleset` (`http_request_cache_settings`) を検討 (現状は Workers 制御を優先)

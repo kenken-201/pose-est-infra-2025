@@ -126,6 +126,46 @@ resource "cloudflare_zone_setting" "rocket_loader" {
   }
 }
 
+resource "cloudflare_zone_setting" "early_hints" {
+  zone_id    = var.zone_id
+  setting_id = "early_hints"
+  value      = "on" # 103 Early Hints (Server Push 代替)
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
+resource "cloudflare_zone_setting" "automatic_https_rewrites" {
+  zone_id    = var.zone_id
+  setting_id = "automatic_https_rewrites"
+  value      = "on" # 混在コンテンツの防止
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
+resource "cloudflare_zone_setting" "opportunistic_encryption" {
+  zone_id    = var.zone_id
+  setting_id = "opportunistic_encryption"
+  value      = "on" # HTTP/2 のメリットを非 HTTPS にも適用
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
+resource "cloudflare_zone_setting" "always_online" {
+  zone_id    = var.zone_id
+  setting_id = "always_online"
+  value      = "on" # オリジンダウン時にキャッシュを提供
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
 
 # -----------------------------------------------------------------------------
 # DNSSEC
