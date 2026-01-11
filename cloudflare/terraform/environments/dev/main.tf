@@ -21,17 +21,6 @@ provider "cloudflare" {
   # API トークンは CLOUDFLARE_API_TOKEN 環境変数経由で提供されます
 }
 
-# 共通設定のためのローカル値
-locals {
-  project_name = "pose-est"
-
-  common_tags = {
-    project     = local.project_name
-    environment = var.environment
-    managed_by  = "terraform"
-  }
-}
-
 # -----------------------------------------------------------------------------
 # R2 バケットモジュール (動画保存用)
 # -----------------------------------------------------------------------------
@@ -74,4 +63,17 @@ resource "cloudflare_workers_custom_domain" "frontend_dev" {
   zone_id    = var.cloudflare_zone_id
   service    = "pose-est-frontend" # wrangler.jsonc の "name" と一致させる
   hostname   = "dev.kenken-pose-est.online"
+}
+
+# -----------------------------------------------------------------------------
+# セキュリティモジュール (WAF)
+# -----------------------------------------------------------------------------
+# カスタムファイアウォールルールを適用します。
+# Note: Managed WAF は Free プラン制限のため Dashboard で設定
+
+module "security" {
+  source = "../../modules/security"
+
+  zone_id     = var.cloudflare_zone_id
+  environment = var.environment
 }

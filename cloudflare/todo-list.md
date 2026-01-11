@@ -236,41 +236,78 @@
 
 ### 🔒 **フェーズ 5: セキュリティ設定**
 
-#### ⬜ タスク 13: WAF 設定
+#### ✅ タスク 13: WAF とセキュリティルール設定
 
-- [ ] Terraform モジュール: `modules/security`
-- [ ] マネージド WAF ルールセットの有効化:
-  - Cloudflare Managed Ruleset
-  - OWASP Core Ruleset
-- [ ] カスタムファイアウォールルール:
-  - API エンドポイント保護
-  - 管理者パス保護
-- [ ] ボット対策: ボットファイトモード有効化
+**目的**: Web アプリケーションファイアウォール (WAF) を導入し、悪意のあるトラフィックやボットからアプリケーションを保護する
 
-#### ⬜ タスク 14: R2 セキュリティ強化
+**サブタスク**:
 
-- [ ] R2 バケットポリシー: 最小権限原則に基づく設定
-- [ ] 署名 URL ポリシー: 有効期限、IP 制限オプション追加
-- [ ] 監査ログ: すべての R2 操作のログ記録
-- [ ] アクセスキー管理: 定期的なローテーション計画
+- [x] **13-1: セキュリティモジュール作成 (`modules/security`)**
 
-#### ⬜ タスク 15: レート制限設定
+  - [x] `cloudflare_ruleset` リソースを使用した WAF 設定のモジュール化
+  - [x] 変数定義: `zone_id`, `environment`
+  - [x] 出力定義
 
-- [ ] API エンドポイントのレート制限:
-  - `api.kenken-pose-est.online/*` への制限
-  - IP ベースの制限設定
-  - 異常トラフィックのブロック
-- [ ] ブルートフォース対策: ログイン試行回数制限
+- [x] **13-2: マネージド WAF ルールセット (Managed Rules)**
 
-#### ⬜ タスク 16: セキュリティヘッダーと暗号化
+  - [x] **Cloudflare Managed Ruleset**: Terraform での有効化はスキップ (Free プラン制限)
+  - [ ] **OWASP Core Ruleset**: Dashboard から手動有効化を推奨 (Free プラン)
 
-- [ ] セキュリティヘッダー設定:
-  - HSTS (HTTP Strict Transport Security)
-  - X-Content-Type-Options
-  - X-Frame-Options
-  - CSP (Content Security Policy) - 慎重に設定
-- [ ] 暗号化設定: TLS 1.3 の強制
-- [ ] R2 転送中の暗号化: 自動 TLS 暗号化確認
+- [x] **13-3: カスタムファイアウォールルール (Custom Rules)**
+
+  - [x] **API 保護**: `/api/*` (`contains` operator) への不審なリクエストブロック
+  - [x] **国別制限 (Geo-blocking)**: 日本国外からのボット以外を Challenge (初期無効)
+  - [x] **脅威スコア制限**: Threat Score > 40 ブロック
+
+- [x] **13-4: ボット対策 (Bot Fight Mode)**
+  - [x] Dashboard で [Security] > [Bots] から "Bot Fight Mode" を ON にする (Terraform 非対応)
+  - [x] 自動化されたボットアクセスの軽減
+
+#### ✅ タスク 14: R2 セキュリティ強化
+
+# (R2 セキュリティとアクセス制御の最適化)
+
+- [x] **14-1: Public Access の無効化確認**
+
+  - [x] Public Domain (r2.dev) が Terraform で構成されていないことを確認 (Verified in `modules/r2`)
+  - [x] バケットへのアクセスを Worker Binding または署名付き URL 経由に限定するアーキテクチャの維持
+
+- [x] **14-2: CORS ポリシーの環境別厳格化**
+
+  - [x] Dev 環境: 開発効率のため `*` を許可 (現状維持)
+  - [x] Prod 環境: `https://www.kenken-pose-est.online` のみに制限する変数の準備 (`tfvars.example` に記載)
+
+- [x] **14-3: 許可メソッドの最小化**
+  - [x] 現在の設定 (`GET`, `PUT`, `HEAD`, `POST`) がアプリケーション要件と合致しているか再確認 (署名付き UPLOAD 対応)
+  - [x] 不要なメソッド (`DELETE` 等) が許可されていないことを維持 (Verified)
+
+#### ✅ タスク 15: レート制限設定 (Free Plan Strategy)
+
+- [x] **15-1: Security モジュール拡張 (`http_ratelimit`)**
+
+  - [x] `cloudflare_ruleset` に `http_ratelimit` フェーズを追加定義
+  - [x] Free プラン制限 (10s period, block action, colo-based) を考慮した設計
+
+- [x] **15-2: API レート制限ルールの実装**
+- [x] **対象**: `/api/*` (contains `/api/`)
+  - [x] **ポリシー**: 20 requests / 10s (approx 120 req/min)
+  - [x] **アクション**: `block` (Free プラン制限により managed_challenge 利用不可)
+  - [x] **特性**: `ip.src` + `cf.colo.id` (PoP 単位でのカウント)
+
+#### ✅ タスク 16: セキュリティヘッダー設定 (Defense in Depth)
+
+**方針**: フロントエンド実装に加え、インフラ層 (Cloudflare) でもヘッダーを強制付与し、多層防御を実現する。(エラーページや予期せぬレスポンス漏れを防ぐため)
+
+- [x] **16-1: Security モジュール拡張 (`http_response_headers_transform`)**
+
+  - [x] `cloudflare_ruleset` (Transform Rules) を使用してレスポンスヘッダ変更フェーズを定義
+
+- [x] **16-2: ベースラインセキュリティヘッダーの実装**
+  - [x] `Strict-Transport-Security`: `max-age=63072000; includeSubDomains; preload`
+  - [x] `X-Content-Type-Options`: `nosniff`
+  - [x] `X-Frame-Options`: `DENY`
+  - [x] `Referrer-Policy`: `strict-origin-when-cross-origin`
+  - [x] **注意**: アプリ側と値が競合しないよう、`set` (上書き) または `set_if_missing` (不足時のみ) の戦略を選択 (現在は `set` で強制)
 
 ### ⚡ **フェーズ 6: パフォーマンス最適化**
 
