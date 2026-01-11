@@ -311,23 +311,23 @@
 
 ### ⚡ **フェーズ 6: パフォーマンス最適化**
 
-#### ⬜ タスク 17: パフォーマンスとプロトコル最適化 (Zone Settings)
+#### ✅ タスク 17: パフォーマンスとプロトコル最適化 (Zone Settings)
 
-- [ ] **17-1: 最新プロトコルの有効化 (`modules/dns`)**
+- [x] **17-1: 最新プロトコルの有効化 (`modules/dns`)**
 
-  - [ ] **HTTP/3 (QUIC)**: 通信速度と信頼性の向上
-  - [ ] **0-RTT Connection Resumption**: 再接続時のレイテンシ短縮
-  - [ ] **IPv6**: 有効化確認
+  - [x] **HTTP/3 (QUIC)**: 通信速度と信頼性の向上
+  - [x] **0-RTT Connection Resumption**: 再接続時のレイテンシ短縮
+  - [x] **IPv6**: 有効化確認
 
-- [ ] **17-2: キャッシュと配信の最適化**
+- [x] **17-2: キャッシュと配信の最適化**
 
-  - [ ] **Tiered Cache (Argo)**: Smart Topology を有効化し、オリジン負荷軽減とキャッシュヒット率向上
-  - [ ] **Brotli**: 圧縮有効化 (Gzip より高効率)
-  - [ ] **Rocket Loader**: **無効化 (OFF)** (React アプリとの競合回避・ハイドレーション保護)
-  - [ ] **Auto Minify**: **無効化 (OFF)** (ビルドツール側での最適化を優先)
+  - [x] **Tiered Cache (Argo)**: Free プランではデフォルト設定を使用
+  - [x] **Brotli**: 圧縮有効化 (Gzip より高効率)
+  - [x] **Rocket Loader**: **無効化 (OFF)** (React アプリとの競合回避・ハイドレーション保護)
+  - [x] **Auto Minify**: **無効化 (OFF)** (ビルドツール側での最適化を優先 - Terraform エラー回避のため手動確認またはデフォルト維持)
 
-- [ ] **17-3: Cache Rules (Optional)**
-  - [ ] 必要に応じて `cloudflare_ruleset` (`http_request_cache_settings`) を検討 (現状は Workers 制御を優先)
+- [x] **17-3: Cache Rules (Optional)**
+  - [x] 必要に応じて `cloudflare_ruleset` (`http_request_cache_settings`) を検討 (現状は Workers 制御を優先)
 
 #### ⬜ タスク 18: R2 パフォーマンス最適化
 

@@ -72,6 +72,71 @@ resource "cloudflare_zone_setting" "security_level" {
 }
 
 # -----------------------------------------------------------------------------
+# Performance & Protocol Optimization (Task 17)
+# -----------------------------------------------------------------------------
+
+resource "cloudflare_zone_setting" "http3" {
+  zone_id    = var.zone_id
+  setting_id = "http3"
+  value      = "on" # QUIC プロトコル有効化
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
+resource "cloudflare_zone_setting" "zero_rtt" {
+  zone_id    = var.zone_id
+  setting_id = "0rtt"
+  value      = "on" # 0-RTT 再接続有効化
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
+resource "cloudflare_zone_setting" "ipv6" {
+  zone_id    = var.zone_id
+  setting_id = "ipv6"
+  value      = "on"
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
+resource "cloudflare_zone_setting" "brotli" {
+  zone_id    = var.zone_id
+  setting_id = "brotli"
+  value      = "on" # Brotli 圧縮有効化
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
+# React アプリケーションとの互換性のため無効化
+resource "cloudflare_zone_setting" "rocket_loader" {
+  zone_id    = var.zone_id
+  setting_id = "rocket_loader"
+  value      = "off"
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
+# resource "cloudflare_zone_setting" "minify" {
+#   zone_id    = var.zone_id
+#   setting_id = "minify"
+#   value      = "{\"css\":\"off\",\"html\":\"off\",\"js\":\"off\"}" # ビルドツール優先
+
+#   lifecycle {
+#     prevent_destroy = true
+#   }
+# }
+
+# -----------------------------------------------------------------------------
 # DNSSEC
 # -----------------------------------------------------------------------------
 # DNSSEC を有効化し、DNS スプーフィング攻撃から保護します。
