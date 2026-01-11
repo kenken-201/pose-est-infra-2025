@@ -363,13 +363,18 @@
 
 ### 📦 **フェーズ 7: 運用監視とドキュメンテーション**
 
-#### ⬜ タスク 21: アナリティクス設定
+#### ⬜ タスク 21: アナリティクスと可観測性 (Observability)
 
-- [ ] Terraform モジュール: `modules/monitoring`
-- [ ] Web Analytics 有効化: プライバシー重視の分析
-- [ ] カスタムメトリクス: ビジネス KPI の追跡
-- [ ] R2 Analytics 連携: ストレージ使用量監視
-- [ ] トラフィック分析ダッシュボードの設定
+- [ ] **21-1: Cloudflare Web Analytics (Privacy-First)**
+
+  - [ ] **有効化**: プライバシー重視の軽量分析を導入。
+  - [ ] **実装**: フロントエンド (`pose-est-front`) への計測タグ設置 (React Router v7 対応) または Automatic Setup の確認。
+  - [ ] **目的**: ページビュー、ロード時間、Core Web Vitals の計測。
+
+- [ ] **21-2: インフラストラクチャ監視**
+  - [ ] **R2 Metrics**: ストレージ使用量とリクエスト数の監視ダッシュボード確認 (Dashboard)。
+  - [ ] **Zone Analytics**: キャッシュヒット率、帯域幅、WAF イベントの定期確認フロー策定。
+  - [ ] **GraphQL Analytics API (Optional)**: 詳細データ取得用のスクリプト試作 (必要に応じて)。
 
 #### ⬜ タスク 22: ユーザー体験監視
 
