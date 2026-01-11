@@ -294,15 +294,20 @@
   - [x] **アクション**: `block` (Free プラン制限により managed_challenge 利用不可)
   - [x] **特性**: `ip.src` + `cf.colo.id` (PoP 単位でのカウント)
 
-#### ⬜ タスク 16: セキュリティヘッダーと暗号化
+#### ⬜ タスク 16: セキュリティヘッダー設定 (Defense in Depth)
 
-- [ ] セキュリティヘッダー設定:
-  - HSTS (HTTP Strict Transport Security)
-  - X-Content-Type-Options
-  - X-Frame-Options
-  - CSP (Content Security Policy) - 慎重に設定
-- [ ] 暗号化設定: TLS 1.3 の強制
-- [ ] R2 転送中の暗号化: 自動 TLS 暗号化確認
+**方針**: フロントエンド実装に加え、インフラ層 (Cloudflare) でもヘッダーを強制付与し、多層防御を実現する。(エラーページや予期せぬレスポンス漏れを防ぐため)
+
+- [ ] **16-1: Security モジュール拡張 (`http_response_headers_transform`)**
+
+  - [ ] `cloudflare_ruleset` (Transform Rules) を使用してレスポンスヘッダ変更フェーズを定義
+
+- [ ] **16-2: ベースラインセキュリティヘッダーの実装**
+  - [ ] `Strict-Transport-Security`: `max-age=63072000; includeSubDomains; preload`
+  - [ ] `X-Content-Type-Options`: `nosniff`
+  - [ ] `X-Frame-Options`: `DENY`
+  - [ ] `Referrer-Policy`: `strict-origin-when-cross-origin`
+  - [ ] **注意**: アプリ側と値が競合しないよう、`set` (上書き) または `set_if_missing` (不足時のみ) の戦略を選択
 
 ### ⚡ **フェーズ 6: パフォーマンス最適化**
 
