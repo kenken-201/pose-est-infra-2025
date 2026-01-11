@@ -126,15 +126,6 @@ resource "cloudflare_zone_setting" "rocket_loader" {
   }
 }
 
-# resource "cloudflare_zone_setting" "minify" {
-#   zone_id    = var.zone_id
-#   setting_id = "minify"
-#   value      = "{\"css\":\"off\",\"html\":\"off\",\"js\":\"off\"}" # ビルドツール優先
-
-#   lifecycle {
-#     prevent_destroy = true
-#   }
-# }
 
 # -----------------------------------------------------------------------------
 # DNSSEC
