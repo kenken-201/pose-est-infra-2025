@@ -340,21 +340,25 @@
   - [x] **設計ドキュメント作成**: 大容量動画のマルチパートアップロード、並列処理、レジューム機能を実現するためのアーキテクチャガイドを作成 (`docs/r2_scalability_guide.md`)。
   - [x] **目的**: アプリケーション実装時の指針（Signed URL vs Worker）を明確化。
 
-#### ⬜ タスク 19: 画像とアセット最適化
+#### ➖ タスク 19: 画像とアセット最適化 (Skipped)
 
-- [ ] 画像最適化: Polish の有効化
-- [ ] WebP 変換: 自動的な次世代フォーマット配信
-- [ ] ミニファイケーション: CSS/JS の自動圧縮
-- [ ] 早期ヒンティング: 重要なリソースの事前読み込み
+- [x] **方針**: 主要機能が動画分析であり、静的画像は少ないため、現状は Cloudflare の標準キャッシュ機能で十分と判断。
+- [x] **Pro プラン機能**: `Polish`, `Mirage` 等は Free プランで使用不可のためスキップ。
+- [x] **Cloudflare Images**: 別途コストが発生するため、必要性が増した段階で再検討。
 
-#### ⬜ タスク 20: ネットワーク最適化
+#### ⬜ タスク 20: CI/CD パイプライン最適化 (GitHub Actions)
 
-- [ ] HTTP/2 と HTTP/3 の有効化
-- [ ] 0-RTT 接続リサム: QUIC プロトコルの活用
-- [ ] Argo Smart Routing: 最適なネットワーク経路の選択
-- [ ] WebSocket 最適化: リアルタイム通信の効率化
+- [ ] **20-1: Terraform CI の高速化と安全性向上**
 
-### 📊 **フェーズ 7: 監視と分析**
+  - [ ] **OIDC 認証**: API Token から OpenID Connect (OIDC) への移行 (セキュリティ強化) ※ Cloudflare は Terraform での OIDC サポートが限定的なため、Token 運用のまま権限最小化を再確認。
+  - [ ] **tfsec / Trivy**: コンテナ脆弱性診断の追加検討。
+  - [ ] **Cache 最適化**: Terraform Plugin キャッシュの有効化。
+
+- [ ] **20-2: PR 自動化 (`modules/cicd`)**
+  - [ ] **Plan Commenter**: PR に Terraform Plan 結果を自動コメントする Action の導入 (tfcmt 等)。
+  - [ ] **Policy Check**: OPA (Open Policy Agent) または Conftest によるポリシーコード化 (Optional)。
+
+### 📦 **フェーズ 7: 運用監視とドキュメンテーション**
 
 #### ⬜ タスク 21: アナリティクス設定
 
