@@ -281,18 +281,18 @@
   - [x] 現在の設定 (`GET`, `PUT`, `HEAD`, `POST`) がアプリケーション要件と合致しているか再確認 (署名付き UPLOAD 対応)
   - [x] 不要なメソッド (`DELETE` 等) が許可されていないことを維持 (Verified)
 
-#### ⬜ タスク 15: レート制限設定 (Free Plan Strategy)
+#### ✅ タスク 15: レート制限設定 (Free Plan Strategy)
 
-- [ ] **15-1: Security モジュール拡張 (`http_ratelimit`)**
+- [x] **15-1: Security モジュール拡張 (`http_ratelimit`)**
 
-  - [ ] `cloudflare_ruleset` に `http_ratelimit` フェーズを追加定義
-  - [ ] Free プラン制限 (通常 1 ルール) を考慮した設計
+  - [x] `cloudflare_ruleset` に `http_ratelimit` フェーズを追加定義
+  - [x] Free プラン制限 (10s period, block action, colo-based) を考慮した設計
 
-- [ ] **15-2: API レート制限ルールの実装**
-  - [ ] **対象**: API エンドポイント (`/api/*` または `api` サブドメイン)
-  - [ ] **ポリシー**: 同一 IP からの過剰なリクエスト (例: 100 req/min) を制限
-  - [ ] **アクション**: `managed_challenge` または `block`
-  - [ ] (Login エンドポイントなどの特定保護は、アプリ側の実装またはこの 1 ルールでカバーするか検討)
+- [x] **15-2: API レート制限ルールの実装**
+  - [x] **対象**: `/api/*` (contains `/api/`)
+  - [x] **ポリシー**: 20 requests / 10s (approx 120 req/min)
+  - [x] **アクション**: `block` (Free プラン制限により managed_challenge 利用不可)
+  - [x] **特性**: `ip.src` + `cf.colo.id` (PoP 単位でのカウント)
 
 #### ⬜ タスク 16: セキュリティヘッダーと暗号化
 

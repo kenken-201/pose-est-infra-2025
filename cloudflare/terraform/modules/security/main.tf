@@ -54,3 +54,32 @@ resource "cloudflare_ruleset" "zone_level_custom_firewall" {
     }
   ]
 }
+
+# -----------------------------------------------------------------------------
+# Rate Limiting Rules (レート制限)
+# -----------------------------------------------------------------------------
+# Free プランは 1 つのルールのみ作成可能です。
+# API エンドポイント全体を保護する汎用的なルールを設定します。
+
+resource "cloudflare_ruleset" "zone_level_rate_limit" {
+  zone_id     = var.zone_id
+  name        = "Rate Limiting Rules"
+  description = "Rate limiting for API protection"
+  kind        = "zone"
+  phase       = "http_ratelimit"
+
+  rules = [
+    {
+      action = "block"
+      ratelimit = {
+        characteristics     = ["ip.src", "cf.colo.id"] # Free plan requires per-colo counting
+        period              = 10  # 10秒 (Free plan limit)
+        requests_per_period = 20  # 10秒あたり20リクエスト (~120 req/min)
+        mitigation_timeout  = 10  # 制限時間 10秒 (Free plan limit)
+      }
+      expression  = "(http.request.uri.path contains \"/api/\")"
+      description = "Rate limit API requests (20 req/10s per IP)"
+      enabled     = true
+    }
+  ]
+}
