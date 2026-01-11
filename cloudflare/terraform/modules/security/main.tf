@@ -93,6 +93,8 @@ resource "cloudflare_ruleset" "zone_level_rate_limit" {
 # -----------------------------------------------------------------------------
 # Defense in Depth: インフラ層でセキュリティヘッダーを強制付与します。
 # アプリケーション側での設定漏れや、Cloudflare エラーページ等も含めて保護します。
+#
+# Reference: https://developers.cloudflare.com/rules/transform/response-header-modification/
 
 resource "cloudflare_ruleset" "zone_level_security_headers" {
   zone_id     = var.zone_id
