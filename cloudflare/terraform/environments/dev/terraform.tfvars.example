@@ -24,6 +24,10 @@ cloudflare_zone_id    = "YOUR_ZONE_ID"     # 32-character hex string
 # -----------------------------------------------------------------------------
 # Specify allowed origins for R2 bucket CORS policy.
 # Include your Workers custom domain and development server.
+#
+# [SECURITY NOTE]
+# For Production, restrict this list to exact domains only (e.g., ["https://www.kenken-pose-est.online"]).
+# Do NOT use "*" or localhost in production.
 
 cors_origins = [
   "http://localhost:3000",

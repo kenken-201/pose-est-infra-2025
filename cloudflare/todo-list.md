@@ -263,21 +263,23 @@
   - [x] Dashboard で [Security] > [Bots] から "Bot Fight Mode" を ON にする (Terraform 非対応)
   - [x] 自動化されたボットアクセスの軽減
 
-#### ⬜ タスク 14: R2 セキュリティ強化
+#### ✅ タスク 14: R2 セキュリティ強化
 
-- [ ] **14-1: Public Access の無効化確認**
+# (R2 セキュリティとアクセス制御の最適化)
 
-  - [ ] Public Domain (r2.dev) が Terraform で構成されていないことを確認
-  - [ ] バケットへのアクセスを Worker Binding または署名付き URL 経由に限定するアーキテクチャの維持
+- [x] **14-1: Public Access の無効化確認**
 
-- [ ] **14-2: CORS ポリシーの環境別厳格化**
+  - [x] Public Domain (r2.dev) が Terraform で構成されていないことを確認 (Verified in `modules/r2`)
+  - [x] バケットへのアクセスを Worker Binding または署名付き URL 経由に限定するアーキテクチャの維持
 
-  - [ ] Dev 環境: 開発効率のため `*` を許可 (現状維持)
-  - [ ] Prod 環境: `https://www.kenken-pose-est.online` のみに制限する変数の準備
+- [x] **14-2: CORS ポリシーの環境別厳格化**
 
-- [ ] **14-3: 許可メソッドの最小化**
-  - [ ] 現在の設定 (`GET`, `PUT`, `HEAD`, `POST`) がアプリケーション要件と合致しているか再確認
-  - [ ] 不要なメソッド (`DELETE` 等) が許可されていないことを維持
+  - [x] Dev 環境: 開発効率のため `*` を許可 (現状維持)
+  - [x] Prod 環境: `https://www.kenken-pose-est.online` のみに制限する変数の準備 (`tfvars.example` に記載)
+
+- [x] **14-3: 許可メソッドの最小化**
+  - [x] 現在の設定 (`GET`, `PUT`, `HEAD`, `POST`) がアプリケーション要件と合致しているか再確認 (署名付き UPLOAD 対応)
+  - [x] 不要なメソッド (`DELETE` 等) が許可されていないことを維持 (Verified)
 
 #### ⬜ タスク 15: レート制限設定
 
