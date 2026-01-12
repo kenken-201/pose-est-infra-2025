@@ -371,21 +371,23 @@
   - [x] `main.tf`, `variables.tf`, `outputs.tf` 作成
   - [x] `cloudflare_notification_policy`: 通知設定 (Free Plan の制限を確認し、ドキュメント化して実装)
 
-- [ ] **21-2: Cloudflare Web Analytics (Privacy-First)**
+- [x] **21-2: Cloudflare Web Analytics (Privacy-First)**
 
-  - [ ] **有効化**: プライバシー重視の軽量分析を導入。
-  - [ ] **実装**: フロントエンド (`pose-est-front`) への計測タグ設置 (React Router v7 対応) または Automatic Setup の確認。
+  - [x] **有効化**: プライバシー重視の軽量分析を導入。
+  - [x] **実装**: フロントエンド (`pose-est-front`) での実装完了 (別チャットにて実施)。
 
-- [ ] **21-3: インフラストラクチャ監視**
-  - [ ] **R2 Metrics**: ストレージ使用量とリクエスト数の監視ダッシュボード確認 (Dashboard)。
-  - [ ] **Zone Analytics**: キャッシュヒット率、帯域幅、WAF イベントの定期確認フロー策定。
+- [x] **21-3: インフラストラクチャ監視**
+  - [x] **R2 Metrics**: Dashboard > R2 > Overview で標準提供されるため、追加実装不要。
+  - [x] **Zone Analytics**: Dashboard > Analytics > Traffic で標準提供されるため、追加実装不要。
 
-#### ⬜ タスク 22: ユーザー体験監視
+#### ⬜ タスク 22: 可用性と外形監視 (Availability & Synthetic)
 
-- [ ] Browser Insights 有効化: 実際のユーザーメトリクス
-- [ ] コアウェブバイタル監視: LCP, FID, CLS
-- [ ] 合成モニタリング: 定期的なページ読み込みテスト
-- [ ] リアルユーザーモニタリング (RUM): 詳細なパフォーマンスデータ
+- [ ] **22-1: 外形監視 (Synthetic Monitoring) の導入**
+  - [ ] **方針**: Cloudflare Health Checks (Pro+) の代替として、**GitHub Actions (Scheduled)** または外部無料サービスを利用。
+  - [ ] **実装**: デプロイ済みエンドポイント (`dev.kenken-pose-est.online`) への定期的な HTTP ステータスチェック (200 OK) を自動化。
+  - [ ] **目的**: ユーザー視点での可用性担保 (Uptime Monitoring)。
+- [ ] **22-2: ユーザー体験 (RUM) の深掘り (Optional)**
+  - [ ] **統合**: Browser Insights / RUM は **Task 21-2 (Web Analytics)** に統合済みのため、本項目では Dashboard での「Core Web Vitals 詳細分析」の手順確認のみを行う。
 
 #### ⬜ タスク 23: アラート設定
 
