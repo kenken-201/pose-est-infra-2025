@@ -380,14 +380,14 @@
   - [x] **R2 Metrics**: Dashboard > R2 > Overview で標準提供されるため、追加実装不要。
   - [x] **Zone Analytics**: Dashboard > Analytics > Traffic で標準提供されるため、追加実装不要。
 
-#### ⬜ タスク 22: 可用性と外形監視 (Availability & Synthetic)
+#### ✅ タスク 22: 可用性と外形監視 (Availability & Synthetic)
 
-- [ ] **22-1: 外形監視 (Synthetic Monitoring) の導入**
-  - [ ] **方針**: Cloudflare Health Checks (Pro+) の代替として、**GitHub Actions (Scheduled)** または外部無料サービスを利用。
-  - [ ] **実装**: デプロイ済みエンドポイント (`dev.kenken-pose-est.online`) への定期的な HTTP ステータスチェック (200 OK) を自動化。
-  - [ ] **目的**: ユーザー視点での可用性担保 (Uptime Monitoring)。
-- [ ] **22-2: ユーザー体験 (RUM) の深掘り (Optional)**
-  - [ ] **統合**: Browser Insights / RUM は **Task 21-2 (Web Analytics)** に統合済みのため、本項目では Dashboard での「Core Web Vitals 詳細分析」の手順確認のみを行う。
+- [x] **22-1: 外形監視 (Synthetic Monitoring) の導入**
+  - [x] **方針**: Cloudflare Health Checks (Pro+) の代替として、**GitHub Actions (Scheduled)** を採用 (`.github/workflows/monitor-uptime.yml`)。
+  - [x] **実装**: デプロイ済みエンドポイント (`dev.kenken-pose-est.online`) への定期的な HTTP ステータスチェック (200 OK) を自動化。
+  - [x] **目的**: ユーザー視点での可用性担保 (Uptime Monitoring)。
+- [x] **22-2: ユーザー体験 (RUM) の深掘り (Optional)**
+  - [x] **統合**: Browser Insights / RUM は **Task 21-2 (Web Analytics)** に統合済み。Dashboard での分析手順を確認。
 
 #### ⬜ タスク 23: アラート設定
 
