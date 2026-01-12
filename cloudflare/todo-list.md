@@ -389,14 +389,20 @@
 - [x] **22-2: ユーザー体験 (RUM) の深掘り (Optional)**
   - [x] **統合**: Browser Insights / RUM は **Task 21-2 (Web Analytics)** に統合済み。Dashboard での分析手順を確認。
 
-#### ⬜ タスク 23: アラート設定
+#### ⬜ タスク 23: アラートと通知設定
 
-- [ ] 帯域幅アラート: 異常なトラフィック増加
-- [ ] セキュリティアラート: WAF ブロック数の急増
-- [ ] パフォーマンスアラート: ページ読み込み時間の悪化
-- [ ] **R2 ストレージアラート: 使用量が無料枠の 80%超**
-- [ ] **R2 操作回数アラート: 無料枠の 80%超**
-- [ ] 通知チャンネル設定: Slack/Email 通知
+- [ ] **23-1: コスト監視アラート (Billing)**
+
+  - [ ] **方針**: R2 の無料枠 (10GB ストレージ, 100 万回操作) 超過による課金を防ぐため、Cloudflare Dashboard (Billing) での使用量アラート設定手順を確立。
+  - [ ] **Terraform**: Free プランでは API 経由の Billing Alert 作成が制限されているため、マニュアル設定 (IaD) とする。
+
+- [ ] **23-2: 外形監視アラートの確認**
+
+  - [ ] **Task 22 連携**: `monitor-uptime.yml` 失敗時の GitHub Actions 通知 (Email) が適切に届くか確認。
+  - [ ] **Slack 通知 (Optional)**: 必要であれば GitHub Actions の通知先を Slack に拡張。
+
+- [ ] **23-3: セキュリティ通知 (Dashboard)**
+  - [ ] **方針**: DDoS 攻撃や WAF イベントの通知設定 (Notifications) を Dashboard で確認。
 
 ### 🔄 **フェーズ 8: CI/CD パイプライン完成 **
 
