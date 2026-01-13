@@ -389,69 +389,69 @@
 - [x] **22-2: ユーザー体験 (RUM) の深掘り (Optional)**
   - [x] **統合**: Browser Insights / RUM は **Task 21-2 (Web Analytics)** に統合済み。Dashboard での分析手順を確認。
 
-#### ⬜ タスク 23: アラートと通知設定
+#### ✅ タスク 23: アラートと通知設定
 
-- [ ] **23-1: コスト監視アラート (Billing)**
+- [x] **23-1: コスト監視アラート (Billing)**
 
-  - [ ] **方針**: R2 の無料枠 (10GB ストレージ, 100 万回操作) 超過による課金を防ぐため、Cloudflare Dashboard (Billing) での使用量アラート設定手順を確立。
-  - [ ] **Terraform**: Free プランでは API 経由の Billing Alert 作成が制限されているため、マニュアル設定 (IaD) とする。
+  - [x] **方針**: `docs/alert_setup_guide.md` で Dashboard 設定手順を標準化。
+  - [x] **Terraform**: Free プラン API 制限のため IaD (ドキュメント駆動) で完了。
 
-- [ ] **23-2: 外形監視アラートの確認**
+- [x] **23-2: 外形監視アラートの確認**
 
-  - [ ] **Task 22 連携**: `monitor-uptime.yml` 失敗時の GitHub Actions 通知 (Email) が適切に届くか確認。
-  - [ ] **Slack 通知 (Optional)**: 必要であれば GitHub Actions の通知先を Slack に拡張。
+  - [x] **Task 22 連携**: GitHub Actions 標準の Failure Notification で対応。
 
-- [ ] **23-3: セキュリティ通知 (Dashboard)**
-  - [ ] **方針**: DDoS 攻撃や WAF イベントの通知設定 (Notifications) を Dashboard で確認。
+- [x] **23-3: セキュリティ通知 (Dashboard)**
+  - [x] **方針**: `docs/alert_setup_guide.md` で設定手順を記載済み。
 
-### 🔄 **フェーズ 8: CI/CD パイプライン完成 **
+### 🔄 **フェーズ 8: CI/CD パイプライン完成 (本番環境対応)**
 
-#### ⬜ タスク 24: フロントエンド CI/CD パイプライン
+> [!IMPORTANT] > **本番環境 (`kenken-pose-est.online`) のデプロイ**を Phase 8 の主目標に据えます。
+> Workers ベースのアーキテクチャ (React Router v7 SSR) に対応した設計です。
 
-- [ ] GitHub Actions ワークフロー: `frontend-deploy.yml`
-- [ ] ビルドステージ:
-  - 依存関係インストール
-  - テスト実行（Vitest）
-  - ビルド最適化
-- [ ] デプロイステージ:
-  - Cloudflare Pages デプロイ
-  - 環境別設定注入
-- [ ] 検証ステージ:
-  - 本番環境 E2E テスト
-  - パフォーマンステスト
+#### ⬜ タスク 24: 本番環境インフラ設定
 
-#### ⬜ タスク 25: インフラ CI/CD パイプライン
+- [ ] **24-1: Production Terraform 環境作成 (`environments/prod`)**
 
-- [ ] GitHub Actions ワークフロー: `terraform-apply.yml`
-- [ ] Plan ステージ:
-  - Terraform 初期化
-  - 計画実行と出力
-  - セキュリティスキャン（Checkov）
-- [ ] Apply ステージ（承認ベース）:
-  - 環境別 Terraform 適用
-  - 状態ファイル管理
-- [ ] R2 テストステージ:
-  - バケット作成確認
-  - ライフサイクルポリシー検証
-  - 署名 URL 生成テスト
-- [ ] 検証ステージ:
-  - DNS 設定確認
-  - SSL 証明書検証
-  - R2 アクセス検証
+  - [ ] `environments/prod/main.tf`, `terraform.tfvars` 作成
+  - [ ] Workers Custom Domain: `kenken-pose-est.online` → `pose-est-frontend`
+  - [ ] R2 バケット: `pose-est-videos-prod` (CORS 本番ドメイン限定)
 
-#### ⬜ タスク 26: プレビュー環境自動化
+- [ ] **24-2: www リダイレクト設定**
 
-- [ ] ブランチベースのプレビュー環境自動作成
-- [ ] PR ごとの一時的なドメイン割り当て
+  - [ ] `www.kenken-pose-est.online` → `kenken-pose-est.online` (CNAME or Redirect Rule)
+
+- [ ] **24-3: モニタリング拡張**
+  - [ ] `monitor-uptime.yml` に Prod エンドポイントを追加 (Matrix のコメント解除)
+
+#### ⬜ タスク 25: フロントエンド本番デプロイ対応
+
+**📍 実装場所: `pose-est-front` (別チャットでの実施を推奨)**
+
+- [ ] **25-1: wrangler.toml 環境設定**
+
+  - [ ] `[env.production]` セクションを追加し、本番用環境変数を設定
+  - [ ] `VITE_API_URL` を本番 API エンドポイントに設定
+
+- [ ] **25-2: GitHub Actions ワークフロー (Wrangler Deploy)**
+
+  - [ ] `main` ブランチマージ時: 本番デプロイ (`wrangler deploy --env production`)
+  - [ ] `develop` ブランチ: 開発環境デプロイ
+
+- [ ] **25-3: シークレット設定 (GitHub Secrets)**
+  - [ ] `CLOUDFLARE_API_TOKEN` (Workers 書き込み権限)
+  - [ ] `CLOUDFLARE_ACCOUNT_ID`
+
+#### ⬜ タスク 26: プレビュー環境自動化 (Optional)
+
+- [ ] PR ごとの一時的な Workers Script Namespace 作成
 - [ ] プレビュー環境の自動クリーンアップ
-- [ ] プレビュー環境のセキュリティ設定
+- [ ] ⚠️ 複雑性が高いため、優先度を下げて Phase 9 以降で検討
 
-#### ⬜ タスク 27: 署名 URL 統合テスト
+#### ⬜ タスク 27: 署名 URL 統合テスト (GCP 連携)
 
 - [ ] GCP バックエンドとの署名 URL 生成連携テスト
 - [ ] クライアントからの直接 R2 アクセステスト
-- [ ] 署名 URL 有効期限テスト
-- [ ] エラーハンドリングテスト
+- [ ] ⚠️ GCP IaC 完了後に実施
 
 ### 🧪 **フェーズ 9: テストと検証**
 
