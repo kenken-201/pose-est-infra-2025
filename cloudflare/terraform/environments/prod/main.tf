@@ -71,15 +71,18 @@ resource "cloudflare_dns_record" "www" {
   comment = "Redirect to Root"
 }
 
-# 2. Redirect Rule
-# NOTE: API Token 権限不足 (403 Forbidden) または Free Plan 制限により
-# Terraform 経由での Ruleset 作成が失敗するため、Dashboard で手動設定してください。
-# 設定: Rules > Redirect Rules > Create Rule
-# - Name: WWW Redirect
-# - Field: Hostname, Operator: equals, Value: www.kenken-pose-est.online
-# - Type: Dynamic
-# - Expression: concat("https://kenken-pose-est.online", http.request.uri.path)
-# - Status Code: 301
+# 2. Redirect Rule (IaD - Infrastructure as Documentation)
+# NOTE: API Token 権限不足 (403 Forbidden) により Terraform 経由での作成が失敗するため、
+# Dashboard で手動設定してください。設定済み (2026-01-13)。
+#
+# 設定手順: Rules > Redirect Rules > Create new Single Redirect
+# - Rule name: WWW Redirect
+# - If incoming requests match: Wildcard pattern
+# - Request URL: https://www.kenken-pose-est.online/*
+# - Target URL: Dynamic - https://kenken-pose-est.online/$1
+# - Status code: 301
+# - Preserve query string: ✅
+
 #
 # resource "cloudflare_ruleset" "www_redirect" {
 #   zone_id     = var.cloudflare_zone_id

@@ -29,11 +29,12 @@ variable "environment" {
   }
 }
 
-variable "domain_name" {
-  description = "プライマリドメイン名"
-  type        = string
-  default     = "kenken-pose-est.online"
-}
+# module.dns が無効化されているため未使用
+# variable "domain_name" {
+#   description = "プライマリドメイン名"
+#   type        = string
+#   default     = "kenken-pose-est.online"
+# }
 
 variable "cors_origins" {
   description = "CORS 許可オリジンリスト"
@@ -41,15 +42,16 @@ variable "cors_origins" {
   default     = ["https://kenken-pose-est.online", "https://www.kenken-pose-est.online"]
 }
 
-variable "additional_records" {
-  description = "追加の DNS レコードリスト"
-  type = list(object({
-    name    = string
-    type    = string
-    value   = string
-    proxied = bool
-    ttl     = number
-    comment = optional(string)
-  }))
-  default = []
-}
+# module.dns が無効化されているため未使用
+# variable "additional_records" {
+#   description = "追加の DNS レコードリスト"
+#   type = list(object({
+#     name    = string
+#     type    = string
+#     value   = string
+#     proxied = bool
+#     ttl     = number
+#     comment = optional(string)
+#   }))
+#   default = []
+# }
