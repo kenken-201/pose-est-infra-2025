@@ -171,3 +171,13 @@ module "monitoring" {
   service_name           = module.cloud_run.service_name
   gcp_notification_email = var.gcp_notification_email != "" ? var.gcp_notification_email : ""
 }
+
+# -----------------------------------------------------------------------------
+# Logging (ログ管理)
+# -----------------------------------------------------------------------------
+module "logging" {
+  source = "../../modules/logging"
+
+  project_id  = var.project_id
+  environment = var.environment
+}
