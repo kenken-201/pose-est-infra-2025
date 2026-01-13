@@ -138,8 +138,8 @@ resource "cloudflare_dns_record" "backend_api_prod" {
 
   zone_id = var.cloudflare_zone_id
   name    = "api"
-  # Cloud Run URL から *.run.app ホスト名を抽出
-  content = replace(var.cloud_run_url, "https://", "")
+  # Cloud Run URL から *.run.app ホスト名を抽出 (https:// と 末尾の / を削除)
+  content = replace(replace(var.cloud_run_url, "https://", ""), "/", "")
   type    = "CNAME"
   proxied = true
   ttl     = 1 # Auto
