@@ -1,0 +1,9 @@
+# Production Environment Variables
+environment     = "production"
+domain_name     = "kenken-pose-est.online"
+
+# CORS: 本番ドメインのみ許可
+cors_origins    = ["https://kenken-pose-est.online", "https://www.kenken-pose-est.online"]
+
+# Additional Records
+additional_records = []

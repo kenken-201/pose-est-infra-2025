@@ -1,5 +1,5 @@
 /*
-  Terraform バックエンド設定
+  Terraform バックエンド設定 (Dev 環境)
   -----------------------------------------------------------------------------
   State の保存先として Cloudflare R2 (S3 互換) を使用します。
   
@@ -19,7 +19,7 @@ terraform {
     # バケットは手動作成、またはブートストラップスクリプトで事前に作成する必要があります
     # 参照: scripts/init-backend.sh
     bucket                      = "pose-est-terraform-state"
-    key                         = "cloudflare/terraform.tfstate"
+    key                         = "cloudflare/dev/terraform.tfstate"
     region                      = "auto"
     skip_credentials_validation = true
     skip_metadata_api_check     = true

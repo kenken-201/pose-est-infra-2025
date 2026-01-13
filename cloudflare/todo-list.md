@@ -117,183 +117,348 @@
 
 #### ⬜ タスク 9: 環境別 DNS 設定
 
-- [ ] 開発環境 DNS: `dev.kenken-pose-est.online`
-- [ ] プレビュー環境 DNS: ブランチ名ベースの自動生成
-- [ ] API サブドメイン: `api` → GCP Cloud Run（変数で管理）
+**目的**: 開発環境・プレビュー環境・API サブドメインの DNS レコードを Terraform で管理
 
-### 🌐 **フェーズ 4: Cloudflare Pages 設定**
+**依存関係**:
 
-#### ⬜ タスク 10: Pages プロジェクト設定
+- ⚠️ API サブドメイン (`api.`) は GCP Cloud Run URL が必要 (GCP IaC 構築後に実装)
+- ✅ 開発環境 DNS (`dev.`) は Cloudflare Pages 構築後に実装可能
 
-- [ ] Terraform モジュール: `modules/pages`
-- [ ] Cloudflare Pages プロジェクト作成: `pose-est-frontend`
-- [ ] ソース連携: GitHub リポジトリ接続
-- [ ] ビルド設定:
-  - ビルドコマンド: `npm run build`
-  - 出力ディレクトリ: `dist`
-  - Node バージョン: 18
-- [ ] 環境変数設定: API エンドポイント URL など
+**サブタスク**:
 
-#### ⬜ タスク 11: カスタムドメイン設定
+- [x] **9-1: DNS モジュール拡張 (汎用レコード対応)**
 
-- [ ] プライマリドメイン: `kenken-pose-est.online`
-- [ ] エイリアスドメイン: `www.kenken-pose-est.online`
-- [ ] HTTPS 強制: 自動的に HTTPS へリダイレクト
-- [ ] 証明書管理: 自動 SSL 証明書発行
+  - [x] `modules/dns` に汎用 DNS レコード作成機能を追加
+  - [x] 変数: `additional_records` (list of objects: name, type, value, proxied, ttl, comment)
+  - [x] 既存の SPF/DMARC とは別に、動的レコード追加を可能に
 
-#### ⬜ タスク 12: ルーティングとヘッダー設定
+- [ ] **9-2: 開発環境 DNS レコード設定 (Pages 依存)**
 
-- [ ] `_routes.json` 設定: SPA 用キャッチオールルート
-- [ ] `_headers.json` 設定: セキュリティヘッダー追加
-- [ ] `_redirects.json` 設定: カスタムリダイレクト
-- [ ] キャッシュポリシー: 静的アセットの最適化
+  - [ ] `dev.kenken-pose-est.online` → Cloudflare Pages (プレビュー URL)
+  - [ ] ⚠️ Task 10 (Pages プロジェクト作成) 完了後に実装
+  - [ ] CNAME レコードを `tfvars` で環境別に定義
+
+- [ ] **9-3: API サブドメイン DNS 設定 (GCP 依存)**
+
+  - [ ] `api.kenken-pose-est.online` → GCP Cloud Run URL (CNAME)
+  - [ ] ⚠️ GCP IaC で Cloud Run URL 出力後に実装
+  - [ ] `var.gcp_cloud_run_url` を variables.tf に追加
+  - [ ] Proxied = true で Cloudflare 経由にする
+
+- [ ] **9-4: プレビュー環境 DNS (自動生成)**
+  - [ ] Cloudflare Pages のブランチプレビュー機能を活用
+  - [ ] `{branch}.pose-est-front.pages.dev` は自動生成
+  - [ ] カスタムドメイン (`{branch}.kenken-pose-est.online`) は Pages 設定側で対応
+
+### 🌐 **フェーズ 4: Cloudflare Workers 設定（フロントエンド SSR）**
+
+> [!IMPORTANT] > **アーキテクチャ変更**: React Router v7 は SSR が必要なため、静的ホスティング (Pages) から
+> **Cloudflare Workers** に変更しました。Terraform での IaC 管理は引き続き行いますが、
+> Workers 固有の設定（wrangler.toml 等）はフロントエンドリポジトリ側で管理します。
+
+#### ✅ タスク 10: Workers プロジェクト設定
+
+**目的**: Cloudflare Workers でフロントエンドアプリケーション (SSR) をホストし、自動デプロイを実現
+
+**依存関係**:
+
+- ⚠️ フロントエンド側での `@react-router/cloudflare` アダプター導入が必要
+- ⚠️ 環境変数 `VITE_API_URL` は GCP 完了後に最終値を設定
+
+**サブタスク**:
+
+- [x] **10-1〜10-5**: Pages モジュール作成（完了、Workers 移行により一部無効）
+- [x] **10-6: Pages リソースのクリーンアップ**
+  - [x] `modules/pages` の削除: **実施済み (ディレクトリ削除)**
+  - [x] `terraform state rm module.pages`: **実施済み**
+  - [x] `terraform.tfvars` の Pages 設定削除: **実施済み**
+- [x] **10-7: Workers カスタムドメイン設定**
+  - [x] `cloudflare_workers_custom_domain` リソースの使用
+  - [x] Dev: `dev.kenken-pose-est.online` → `pose-est-frontend` (Service Name)
+  - [ ] Prod: `kenken-pose-est.online` → `pose-est-frontend` (Service Name)
+- [ ] **10-8: Workers モジュール化の検討 (将来的な課題)**
+  - [ ] 現状は `main.tf` 内の単一リソースで十分なため、`modules/workers` は作成しない
+  - [ ] Workers 関連リソース (KV, Durable Objects 等) が増えた場合にモジュール化を再検討
+
+#### ✅ タスク 11: カスタムドメイン設定
+
+**目的**: Workers アプリケーションに対してカスタムドメインを割り当て、HTTPS アクセスを確保する
+
+> [!NOTE]
+> Workers へのドメイン割り当ては `cloudflare_workers_custom_domain` リソースで管理。
+> HTTPS 強制・証明書管理は Cloudflare が自動的に処理するため、追加設定は不要。
+
+**サブタスク**:
+
+- [x] **11-1: 開発環境ドメイン**
+
+  - [x] `dev.kenken-pose-est.online` → `pose-est-frontend` (Task 10-7 で実施済み)
+  - [x] HTTPS 強制: Cloudflare 自動処理 (Zone Settings で `always_use_https` 有効済み)
+  - [x] SSL 証明書: Cloudflare Edge Certificate 自動発行済み
+
+- [ ] **11-2: 本番環境ドメイン (Production 環境構築後)**
+
+  - [ ] `kenken-pose-est.online` → `pose-est-frontend` (Production)
+  - [ ] `www.kenken-pose-est.online` → リダイレクト設定 (apex へ)
+  - [ ] ⚠️ Production 環境の Terraform 構成が必要
+
+- [x] **11-3: Zone レベルセキュリティ設定 (Task 8 で実施済み)**
+  - [x] SSL/TLS: Full (Strict)
+  - [x] Always Use HTTPS: On
+  - [x] Min TLS Version: 1.2
+
+#### ✅ タスク 12: セキュリティヘッダーとキャッシュ設定
+
+**目的**: フロントエンド Workers のセキュリティとパフォーマンスを最適化する
+
+> [!NOTE]
+> フロントエンド側 (`pose-est-front`) で実装完了。
+> `workers/utils/security-headers.ts` と `public/_headers` で設定済み。
+
+**サブタスク**:
+
+- [x] **12-1: セキュリティヘッダー設定 (フロントエンド側)**
+
+  - [x] Worker スクリプトでレスポンスヘッダーを追加 (`workers/utils/security-headers.ts`)
+  - [x] 対象ヘッダー: `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`, `HSTS`
+  - [x] ユニットテスト作成済み (`test/workers/utils/security-headers.test.ts`)
+  - [x] 📍 実装場所: `pose-est-front`
+
+- [x] **12-2: キャッシュ設定 (フロントエンド側)**
+
+  - [x] 静的アセット: `public/_headers` で `max-age=31536000, immutable`
+  - [x] その他アセット: `max-age=604800` (1 週間)
+  - [x] 📍 実装場所: `pose-est-front/public/_headers`
+
+- [ ] **12-3: リダイレクト設定 (Production 構築時)**
+  - [ ] `www` → apex ドメインリダイレクト
+  - [ ] 📍 実装場所: Worker スクリプト or Cloudflare Redirect Rules
 
 ### 🔒 **フェーズ 5: セキュリティ設定**
 
-#### ⬜ タスク 13: WAF 設定
+#### ✅ タスク 13: WAF とセキュリティルール設定
 
-- [ ] Terraform モジュール: `modules/security`
-- [ ] マネージド WAF ルールセットの有効化:
-  - Cloudflare Managed Ruleset
-  - OWASP Core Ruleset
-- [ ] カスタムファイアウォールルール:
-  - API エンドポイント保護
-  - 管理者パス保護
-- [ ] ボット対策: ボットファイトモード有効化
+**目的**: Web アプリケーションファイアウォール (WAF) を導入し、悪意のあるトラフィックやボットからアプリケーションを保護する
 
-#### ⬜ タスク 14: R2 セキュリティ強化
+**サブタスク**:
 
-- [ ] R2 バケットポリシー: 最小権限原則に基づく設定
-- [ ] 署名 URL ポリシー: 有効期限、IP 制限オプション追加
-- [ ] 監査ログ: すべての R2 操作のログ記録
-- [ ] アクセスキー管理: 定期的なローテーション計画
+- [x] **13-1: セキュリティモジュール作成 (`modules/security`)**
 
-#### ⬜ タスク 15: レート制限設定
+  - [x] `cloudflare_ruleset` リソースを使用した WAF 設定のモジュール化
+  - [x] 変数定義: `zone_id`, `environment`
+  - [x] 出力定義
 
-- [ ] API エンドポイントのレート制限:
-  - `api.kenken-pose-est.online/*` への制限
-  - IP ベースの制限設定
-  - 異常トラフィックのブロック
-- [ ] ブルートフォース対策: ログイン試行回数制限
+- [x] **13-2: マネージド WAF ルールセット (Managed Rules)**
 
-#### ⬜ タスク 16: セキュリティヘッダーと暗号化
+  - [x] **Cloudflare Managed Ruleset**: Terraform での有効化はスキップ (Free プラン制限)
+  - [ ] **OWASP Core Ruleset**: Dashboard から手動有効化を推奨 (Free プラン)
 
-- [ ] セキュリティヘッダー設定:
-  - HSTS (HTTP Strict Transport Security)
-  - X-Content-Type-Options
-  - X-Frame-Options
-  - CSP (Content Security Policy) - 慎重に設定
-- [ ] 暗号化設定: TLS 1.3 の強制
-- [ ] R2 転送中の暗号化: 自動 TLS 暗号化確認
+- [x] **13-3: カスタムファイアウォールルール (Custom Rules)**
+
+  - [x] **API 保護**: `/api/*` (`contains` operator) への不審なリクエストブロック
+  - [x] **国別制限 (Geo-blocking)**: 日本国外からのボット以外を Challenge (初期無効)
+  - [x] **脅威スコア制限**: Threat Score > 40 ブロック
+
+- [x] **13-4: ボット対策 (Bot Fight Mode)**
+  - [x] Dashboard で [Security] > [Bots] から "Bot Fight Mode" を ON にする (Terraform 非対応)
+  - [x] 自動化されたボットアクセスの軽減
+
+#### ✅ タスク 14: R2 セキュリティ強化
+
+# (R2 セキュリティとアクセス制御の最適化)
+
+- [x] **14-1: Public Access の無効化確認**
+
+  - [x] Public Domain (r2.dev) が Terraform で構成されていないことを確認 (Verified in `modules/r2`)
+  - [x] バケットへのアクセスを Worker Binding または署名付き URL 経由に限定するアーキテクチャの維持
+
+- [x] **14-2: CORS ポリシーの環境別厳格化**
+
+  - [x] Dev 環境: 開発効率のため `*` を許可 (現状維持)
+  - [x] Prod 環境: `https://www.kenken-pose-est.online` のみに制限する変数の準備 (`tfvars.example` に記載)
+
+- [x] **14-3: 許可メソッドの最小化**
+  - [x] 現在の設定 (`GET`, `PUT`, `HEAD`, `POST`) がアプリケーション要件と合致しているか再確認 (署名付き UPLOAD 対応)
+  - [x] 不要なメソッド (`DELETE` 等) が許可されていないことを維持 (Verified)
+
+#### ✅ タスク 15: レート制限設定 (Free Plan Strategy)
+
+- [x] **15-1: Security モジュール拡張 (`http_ratelimit`)**
+
+  - [x] `cloudflare_ruleset` に `http_ratelimit` フェーズを追加定義
+  - [x] Free プラン制限 (10s period, block action, colo-based) を考慮した設計
+
+- [x] **15-2: API レート制限ルールの実装**
+- [x] **対象**: `/api/*` (contains `/api/`)
+  - [x] **ポリシー**: 20 requests / 10s (approx 120 req/min)
+  - [x] **アクション**: `block` (Free プラン制限により managed_challenge 利用不可)
+  - [x] **特性**: `ip.src` + `cf.colo.id` (PoP 単位でのカウント)
+
+#### ✅ タスク 16: セキュリティヘッダー設定 (Defense in Depth)
+
+**方針**: フロントエンド実装に加え、インフラ層 (Cloudflare) でもヘッダーを強制付与し、多層防御を実現する。(エラーページや予期せぬレスポンス漏れを防ぐため)
+
+- [x] **16-1: Security モジュール拡張 (`http_response_headers_transform`)**
+
+  - [x] `cloudflare_ruleset` (Transform Rules) を使用してレスポンスヘッダ変更フェーズを定義
+
+- [x] **16-2: ベースラインセキュリティヘッダーの実装**
+  - [x] `Strict-Transport-Security`: `max-age=63072000; includeSubDomains; preload`
+  - [x] `X-Content-Type-Options`: `nosniff`
+  - [x] `X-Frame-Options`: `DENY`
+  - [x] `Referrer-Policy`: `strict-origin-when-cross-origin`
+  - [x] **注意**: アプリ側と値が競合しないよう、`set` (上書き) または `set_if_missing` (不足時のみ) の戦略を選択 (現在は `set` で強制)
 
 ### ⚡ **フェーズ 6: パフォーマンス最適化**
 
-#### ⬜ タスク 17: CDN とキャッシュ設定
+#### ✅ タスク 17: パフォーマンスとプロトコル最適化 (Zone Settings)
 
-- [ ] キャッシュレベル設定: 標準的なキャッシュ動作
-- [ ] ブラウザキャッシュ TTL: 静的アセットの長期キャッシュ
-- [ ] キャッシュキーカスタマイズ: クエリパラメータの扱い
-- [ ] R2 配信最適化: 動画ファイルの効率的な配信設定
+- [x] **17-1: 最新プロトコルの有効化 (`modules/dns`)**
 
-#### ⬜ タスク 18: R2 パフォーマンス最適化
+  - [x] **HTTP/3 (QUIC)**: 通信速度と信頼性の向上
+  - [x] **0-RTT Connection Resumption**: 再接続時のレイテンシ短縮
+  - [x] **IPv6**: 有効化確認
+  - [x] **Early Hints**: サーバープッシュの代替としてリソース事前読み込みを促進
+  - [x] **Opportunistic Encryption**: HTTP/2 の恩恵を非 HTTPS にも適用
 
-- [ ] マルチパートアップロード設定: 大きな動画ファイル用
-- [ ] 並列ダウンロード設定: ダウンロード速度最適化
-- [ ] キャッシュヘッダー: R2 オブジェクトの適切なキャッシュ制御
-- [ ] グローバル配信: R2 + CDN の最適化設定
+- [x] **17-2: キャッシュと配信の最適化**
 
-#### ⬜ タスク 19: 画像とアセット最適化
+  - [x] **Tiered Cache (Argo)**: Free プランではデフォルト設定を使用
+  - [x] **Brotli**: 圧縮有効化 (Gzip より高効率)
+  - [x] **Rocket Loader**: **無効化 (OFF)** (React アプリとの競合回避・ハイドレーション保護)
+  - [x] **Auto Minify**: **無効化 (OFF)** (ビルドツール側での最適化を優先 - Terraform エラー回避のため手動確認またはデフォルト維持)
+  - [x] **Automatic HTTPS Rewrites**: 混在コンテンツの防止とセキュリティ向上
+  - [x] **Always Online**: オリジンダウン時にキャッシュを提供し可用性を維持
 
-- [ ] 画像最適化: Polish の有効化
-- [ ] WebP 変換: 自動的な次世代フォーマット配信
-- [ ] ミニファイケーション: CSS/JS の自動圧縮
-- [ ] 早期ヒンティング: 重要なリソースの事前読み込み
+- [x] **17-3: Cache Rules (Optional)**
+  - [x] 必要に応じて `cloudflare_ruleset` (`http_request_cache_settings`) を検討 (現状は Workers 制御を優先)
 
-#### ⬜ タスク 20: ネットワーク最適化
+#### ✅ タスク 18: R2 スケーラビリティと最適化
 
-- [ ] HTTP/2 と HTTP/3 の有効化
-- [ ] 0-RTT 接続リサム: QUIC プロトコルの活用
-- [ ] Argo Smart Routing: 最適なネットワーク経路の選択
-- [ ] WebSocket 最適化: リアルタイム通信の効率化
+- [x] **18-1: マルチパートアップロードのライフサイクル管理 (`modules/r2`)**
 
-### 📊 **フェーズ 7: 監視と分析**
+  - [x] **不完全なアップロードの削除**: 失敗または中断されたマルチパートアップロードを 7 日後に自動削除し、ストレージコストと整合性を維持する。
+  - [x] **スケーラビリティ対応**: 大容量ファイル増加に伴うゴミデータの自動清掃メカニズムを確立。
 
-#### ⬜ タスク 21: アナリティクス設定
+- [x] **18-2: R2 スケーラブルアーキテクチャ設計 (Artifact)**
+  - [x] **設計ドキュメント作成**: 大容量動画のマルチパートアップロード、並列処理、レジューム機能を実現するためのアーキテクチャガイドを作成 (`docs/r2_scalability_guide.md`)。
+  - [x] **目的**: アプリケーション実装時の指針（Signed URL vs Worker）を明確化。
 
-- [ ] Terraform モジュール: `modules/monitoring`
-- [ ] Web Analytics 有効化: プライバシー重視の分析
-- [ ] カスタムメトリクス: ビジネス KPI の追跡
-- [ ] R2 Analytics 連携: ストレージ使用量監視
-- [ ] トラフィック分析ダッシュボードの設定
+#### ➖ タスク 19: 画像とアセット最適化 (Skipped)
 
-#### ⬜ タスク 22: ユーザー体験監視
+- [x] **方針**: 主要機能が動画分析であり、静的画像は少ないため、現状は Cloudflare の標準キャッシュ機能で十分と判断。
+- [x] **Pro プラン機能**: `Polish`, `Mirage` 等は Free プランで使用不可のためスキップ。
+- [x] **Cloudflare Images**: 別途コストが発生するため、必要性が増した段階で再検討。
 
-- [ ] Browser Insights 有効化: 実際のユーザーメトリクス
-- [ ] コアウェブバイタル監視: LCP, FID, CLS
-- [ ] 合成モニタリング: 定期的なページ読み込みテスト
-- [ ] リアルユーザーモニタリング (RUM): 詳細なパフォーマンスデータ
+#### ✅ タスク 20: CI/CD パイプライン最適化 (GitHub Actions)
 
-#### ⬜ タスク 23: アラート設定
+- [x] **20-1: Terraform CI の高速化と安全性向上**
 
-- [ ] 帯域幅アラート: 異常なトラフィック増加
-- [ ] セキュリティアラート: WAF ブロック数の急増
-- [ ] パフォーマンスアラート: ページ読み込み時間の悪化
-- [ ] **R2 ストレージアラート: 使用量が無料枠の 80%超**
-- [ ] **R2 操作回数アラート: 無料枠の 80%超**
-- [ ] 通知チャンネル設定: Slack/Email 通知
+  - [x] **安全性**: Checkov (`cloudflare-security.yml`) による静的解析を実装済み。OIDC は Cloudflare Provider の対応状況を鑑み、API Token (Least Privilege) 運用を維持。
+  - [x] **Cache 最適化**: Terraform Plugin (`.terraform`) および TFLint Plugin (`.tflint.d`) のキャッシュを有効化。
 
-### 🔄 **フェーズ 8: CI/CD パイプライン完成 **
+- [x] **20-2: PR 自動化 (`modules/cicd`)**
+  - [x] **Plan Commenter**: PR に Terraform Plan 結果を自動コメントするスクリプト (`actions/github-script`) を実装済み。
+  - [x] **Policy Check**: Checkov によりポリシー違反を検出し、PR コメント (SARIF) で通知。
 
-#### ⬜ タスク 24: フロントエンド CI/CD パイプライン
+### 📦 **フェーズ 7: 運用監視とドキュメンテーション**
 
-- [ ] GitHub Actions ワークフロー: `frontend-deploy.yml`
-- [ ] ビルドステージ:
-  - 依存関係インストール
-  - テスト実行（Vitest）
-  - ビルド最適化
-- [ ] デプロイステージ:
-  - Cloudflare Pages デプロイ
-  - 環境別設定注入
-- [ ] 検証ステージ:
-  - 本番環境 E2E テスト
-  - パフォーマンステスト
+#### ✅ タスク 21: アナリティクスと可観測性 (Observability)
 
-#### ⬜ タスク 25: インフラ CI/CD パイプライン
+- [x] **21-1: 監視モジュールの作成 (`modules/monitoring`)**
 
-- [ ] GitHub Actions ワークフロー: `terraform-apply.yml`
-- [ ] Plan ステージ:
-  - Terraform 初期化
-  - 計画実行と出力
-  - セキュリティスキャン（Checkov）
-- [ ] Apply ステージ（承認ベース）:
-  - 環境別 Terraform 適用
-  - 状態ファイル管理
-- [ ] R2 テストステージ:
-  - バケット作成確認
-  - ライフサイクルポリシー検証
-  - 署名 URL 生成テスト
-- [ ] 検証ステージ:
-  - DNS 設定確認
-  - SSL 証明書検証
-  - R2 アクセス検証
+  - [x] `modules/monitoring` ディレクトリ作成
+  - [x] `main.tf`, `variables.tf`, `outputs.tf` 作成
+  - [x] `cloudflare_notification_policy`: 通知設定 (Free Plan の制限を確認し、ドキュメント化して実装)
 
-#### ⬜ タスク 26: プレビュー環境自動化
+- [x] **21-2: Cloudflare Web Analytics (Privacy-First)**
 
-- [ ] ブランチベースのプレビュー環境自動作成
-- [ ] PR ごとの一時的なドメイン割り当て
-- [ ] プレビュー環境の自動クリーンアップ
-- [ ] プレビュー環境のセキュリティ設定
+  - [x] **有効化**: プライバシー重視の軽量分析を導入。
+  - [x] **実装**: フロントエンド (`pose-est-front`) での実装完了 (別チャットにて実施)。
 
-#### ⬜ タスク 27: 署名 URL 統合テスト
+- [x] **21-3: インフラストラクチャ監視**
+  - [x] **R2 Metrics**: Dashboard > R2 > Overview で標準提供されるため、追加実装不要。
+  - [x] **Zone Analytics**: Dashboard > Analytics > Traffic で標準提供されるため、追加実装不要。
 
-- [ ] GCP バックエンドとの署名 URL 生成連携テスト
-- [ ] クライアントからの直接 R2 アクセステスト
-- [ ] 署名 URL 有効期限テスト
-- [ ] エラーハンドリングテスト
+#### ✅ タスク 22: 可用性と外形監視 (Availability & Synthetic)
 
-### 🧪 **フェーズ 9: テストと検証 (R2 統合テスト)**
+- [x] **22-1: 外形監視 (Synthetic Monitoring) の導入**
+  - [x] **方針**: Cloudflare Health Checks (Pro+) の代替として、**GitHub Actions (Scheduled)** を採用 (`.github/workflows/monitor-uptime.yml`)。
+  - [x] **実装**: デプロイ済みエンドポイント (`dev.kenken-pose-est.online`) への定期的な HTTP ステータスチェック (200 OK) を自動化。
+  - [x] **目的**: ユーザー視点での可用性担保 (Uptime Monitoring)。
+- [x] **22-2: ユーザー体験 (RUM) の深掘り (Optional)**
+  - [x] **統合**: Browser Insights / RUM は **Task 21-2 (Web Analytics)** に統合済み。Dashboard での分析手順を確認。
 
-#### ⬜ タスク 28: 機能テスト
+#### ✅ タスク 23: アラートと通知設定
+
+- [x] **23-1: コスト監視アラート (Billing)**
+
+  - [x] **方針**: `docs/alert_setup_guide.md` で Dashboard 設定手順を標準化。
+  - [x] **Terraform**: Free プラン API 制限のため IaD (ドキュメント駆動) で完了。
+
+- [x] **23-2: 外形監視アラートの確認**
+
+  - [x] **Task 22 連携**: GitHub Actions 標準の Failure Notification で対応。
+
+- [x] **23-3: セキュリティ通知 (Dashboard)**
+  - [x] **方針**: `docs/alert_setup_guide.md` で設定手順を記載済み。
+
+### 🔄 **フェーズ 8: CI/CD パイプライン完成 (本番環境対応)**
+
+> [!IMPORTANT] > **本番環境 (`kenken-pose-est.online`) のデプロイ**を Phase 8 の主目標に据えます。
+> Workers ベースのアーキテクチャ (React Router v7 SSR) に対応した設計です。
+
+#### ✅ タスク 24: 本番環境インフラ設定
+
+- [x] **24-1: Production Terraform 環境作成 (`environments/prod`)**
+
+  - [x] `environments/prod/main.tf`, `terraform.tfvars.example` 作成
+  - [x] Workers Custom Domain: `kenken-pose-est.online`
+  - [x] R2 バケット: `pose-est-videos-production` (CORS 制限済)
+
+- [x] **24-2: www リダイレクト設定**
+
+  - [x] `www.kenken-pose-est.online` → `kenken-pose-est.online` (Single Redirect Ruleset 採用)
+
+- [x] **24-3: モニタリング拡張**
+  - [x] `monitor-uptime.yml` の Prod エンドポイント監視を有効化 (Matrix 設定)
+
+#### ✅ タスク 25: フロントエンド本番デプロイ対応
+
+**📍 実装場所: `pose-est-front` (別チャットでの実施を推奨)**
+**👉 引き継ぎ資料: `frontend_handoff_task25.md`**
+
+- [x] **25-1: wrangler.toml 環境設定**
+
+  - [x] 本番用環境変数設定 (`[env.production]`) の定義書作成完了。
+  - [x] `VITE_API_URL` 設定指示完了。
+
+- [x] **25-2: GitHub Actions ワークフロー (Wrangler Deploy)**
+
+  - [x] `deploy.yml` 実装サンプル作成完了。本番/開発環境の条件分岐ロジックを提供。
+
+- [x] **25-3: シークレット設定 (GitHub Secrets)**
+  - [x] 必要となる Secret (`CLOUDFLARE_API_TOKEN` 等) のリストアップ完了。
+
+#### ⚠️ タスク 26: プレビュー環境自動化 (Deferred to Phase 9 / Post-MVP)
+
+- [x] **26-1: 方針決定**
+  - Terraform での動的環境構築は複雑性が高いため、Wrangler の Preview 機能 (`workers.dev`) の活用を基本とする。
+  - R2 などのステートフルなリソースの分離が必要な場合のみ、別途検討。
+
+#### ⚠️ タスク 27: 署名 URL 統合テスト (Deferred to Phase 9)
+
+- [ ] **27-1: 統合テスト実施**
+  - GCP バックエンドの構築完了待ち。
+  - フロントエンド(Workers) + バックエンド(Cloud Run) + R2 の通しテスト。
+
+---
+
+### 🧪 **フェーズ 9: テストと検証・機能追加**
+
+**ゴール**: GCP バックエンドを含むシステム全体の統合テストと、保留した高度な機能の実装。
+
+#### ⬜ タスク 28: 機能テスト & 統合テスト
 
 - [ ] DNS 解決テスト: すべてのドメインの正しい解決
 - [ ] SSL/TLS テスト: 証明書の有効性と設定
