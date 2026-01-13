@@ -408,20 +408,20 @@
 > [!IMPORTANT] > **本番環境 (`kenken-pose-est.online`) のデプロイ**を Phase 8 の主目標に据えます。
 > Workers ベースのアーキテクチャ (React Router v7 SSR) に対応した設計です。
 
-#### ⬜ タスク 24: 本番環境インフラ設定
+#### ✅ タスク 24: 本番環境インフラ設定
 
-- [ ] **24-1: Production Terraform 環境作成 (`environments/prod`)**
+- [x] **24-1: Production Terraform 環境作成 (`environments/prod`)**
 
-  - [ ] `environments/prod/main.tf`, `terraform.tfvars` 作成
-  - [ ] Workers Custom Domain: `kenken-pose-est.online` → `pose-est-frontend`
-  - [ ] R2 バケット: `pose-est-videos-prod` (CORS 本番ドメイン限定)
+  - [x] `environments/prod/main.tf`, `terraform.tfvars.example` 作成
+  - [x] Workers Custom Domain: `kenken-pose-est.online`
+  - [x] R2 バケット: `pose-est-videos-production` (CORS 制限済)
 
-- [ ] **24-2: www リダイレクト設定**
+- [x] **24-2: www リダイレクト設定**
 
-  - [ ] `www.kenken-pose-est.online` → `kenken-pose-est.online` (CNAME or Redirect Rule)
+  - [x] `www.kenken-pose-est.online` → `kenken-pose-est.online` (Single Redirect Ruleset 採用)
 
-- [ ] **24-3: モニタリング拡張**
-  - [ ] `monitor-uptime.yml` に Prod エンドポイントを追加 (Matrix のコメント解除)
+- [x] **24-3: モニタリング拡張**
+  - [x] `monitor-uptime.yml` の Prod エンドポイント監視を有効化 (Matrix 設定)
 
 #### ⬜ タスク 25: フロントエンド本番デプロイ対応
 

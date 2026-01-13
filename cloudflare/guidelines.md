@@ -170,7 +170,7 @@ pose-est-infra/cloudflare/
 │   │   │   ├── variables.tf
 │   │   │   └── terraform.tfvars
 │   │   │
-│   │   └── production/              # 本番環境
+│   │   └── prod/              # 本番環境
 │   │
 │   └── scripts/                     # Terraform補助スクリプト
 │       ├── init-backend.sh          # バックエンド初期化
@@ -344,7 +344,7 @@ resource "cloudflare_r2_bucket_lifecycle_rule" "video_retention" {
 
 - フロントエンドビルド時に注入する環境変数:
   - `VITE_API_URL`: GCP Cloud Run の API エンドポイント
-  - `VITE_ENVIRONMENT`: 環境名 (dev/production)
+  - `VITE_ENVIRONMENT`: 環境名 (dev/prod)
 - **バックエンド設定用シークレット (Secret Manager 経由):**
   - `R2_ACCESS_KEY_ID`: R2 アクセスキー
   - `R2_SECRET_ACCESS_KEY`: R2 シークレットキー
