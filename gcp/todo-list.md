@@ -390,7 +390,7 @@
 > [!NOTE] > `INFRA_HANDOVER.md.resolved` に基づく統合タスク。
 > Cloudflare チームからの引き継ぎ事項を実装します。
 
-- [ ] **17.5-1: Prod Cloud Run デプロイと URL 確定**
+- [x] **17.5-1: Prod 用 Cloud Run サービスのデプロイ**と URL 確定\*\*
   - Prod 環境の Cloud Run インフラを構築し、URL (`*.run.app`) を取得。
 - [ ] **17.5-2: Cloudflare DNS レコード追加 (Prod)**
   - Cloudflare Infra チーム (Terraform) に Prod URL を共有し `api` レコード作成を依頼 (または実施)。
