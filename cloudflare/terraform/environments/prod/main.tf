@@ -37,13 +37,15 @@ module "r2_bucket" {
 # -----------------------------------------------------------------------------
 # DNS / ゾーン設定モジュール
 # -----------------------------------------------------------------------------
-module "dns" {
-  source = "../../modules/dns"
+# Shared Zone (dev state) で管理済みのためスキップ
+# module "dns" {
+#   source = "../../modules/dns"
+#   zone_id            = var.cloudflare_zone_id
+#   domain_name        = var.domain_name
+#   additional_records = var.additional_records
+# }
 
-  zone_id            = var.cloudflare_zone_id
-  domain_name        = var.domain_name
-  additional_records = var.additional_records
-}
+# ... (Shared Zone DNS module commented out) ...
 
 # -----------------------------------------------------------------------------
 # Workers カスタムドメイン設定 (Root Domain)
@@ -58,7 +60,6 @@ resource "cloudflare_workers_custom_domain" "frontend_prod" {
 # -----------------------------------------------------------------------------
 # WWW リダイレクト設定 (Task 24-2)
 # -----------------------------------------------------------------------------
-# 1. WWW CNAME Record
 # 1. WWW CNAME Record (Provider v5: cloudflare_dns_record)
 resource "cloudflare_dns_record" "www" {
   zone_id = var.cloudflare_zone_id
@@ -70,41 +71,51 @@ resource "cloudflare_dns_record" "www" {
   comment = "Redirect to Root"
 }
 
-resource "cloudflare_ruleset" "www_redirect" {
-  zone_id     = var.cloudflare_zone_id
-  name        = "WWW Redirect to Root"
-  description = "Redirect www to root domain"
-  kind        = "zone"
-  phase       = "http_request_dynamic_redirect"
-
-  rules = [
-    {
-      action = "redirect"
-      action_parameters = {
-        from_value = {
-          status_code = 301
-          target_url = {
-            expression = "concat(\"https://kenken-pose-est.online\", http.request.uri.path)"
-          }
-          preserve_query_string = true
-        }
-      }
-      expression  = "(http.host eq \"www.kenken-pose-est.online\")"
-      description = "Redirect www requests"
-      enabled     = true
-    }
-  ]
-}
+# 2. Redirect Rule
+# NOTE: API Token 権限不足 (403 Forbidden) または Free Plan 制限により
+# Terraform 経由での Ruleset 作成が失敗するため、Dashboard で手動設定してください。
+# 設定: Rules > Redirect Rules > Create Rule
+# - Name: WWW Redirect
+# - Field: Hostname, Operator: equals, Value: www.kenken-pose-est.online
+# - Type: Dynamic
+# - Expression: concat("https://kenken-pose-est.online", http.request.uri.path)
+# - Status Code: 301
+#
+# resource "cloudflare_ruleset" "www_redirect" {
+#   zone_id     = var.cloudflare_zone_id
+#   name        = "WWW Redirect to Root"
+#   description = "Redirect www to root domain"
+#   kind        = "zone"
+#   phase       = "http_request_dynamic_redirect"
+#
+#   rules = [
+#     {
+#       action = "redirect"
+#       action_parameters = {
+#         from_value = {
+#           status_code = 301
+#           target_url = {
+#             expression = "concat(\"https://kenken-pose-est.online\", http.request.uri.path)"
+#           }
+#           preserve_query_string = true
+#         }
+#       }
+#       expression  = "(http.host eq \"www.kenken-pose-est.online\")"
+#       description = "Redirect www requests"
+#       enabled     = true
+#     }
+#   ]
+# }
 
 # -----------------------------------------------------------------------------
 # セキュリティモジュール (WAF)
 # -----------------------------------------------------------------------------
-module "security" {
-  source = "../../modules/security"
-
-  zone_id     = var.cloudflare_zone_id
-  environment = var.environment
-}
+# Shared Zone (dev state) で管理済みのためスキップ
+# module "security" {
+#   source = "../../modules/security"
+#   zone_id     = var.cloudflare_zone_id
+#   environment = var.environment
+# }
 
 # -----------------------------------------------------------------------------
 # 監視設定モジュール

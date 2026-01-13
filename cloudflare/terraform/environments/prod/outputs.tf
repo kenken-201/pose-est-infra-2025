@@ -14,11 +14,12 @@ output "r2_retention_days" {
   value       = module.r2_bucket.retention_days
 }
 
-output "dnssec_ds_record" {
-  description = "DNSSEC DS Record (Registrar 設定用)"
-  value       = module.dns.dnssec_ds_record
-  sensitive   = true
-}
+# Dev 環境で管理されているため出力不要
+# output "dnssec_ds_record" {
+#   description = "DNSSEC DS Record (Registrar 設定用)"
+#   value       = module.dns.dnssec_ds_record
+#   sensitive   = true
+# }
 
 output "r2_bucket_domain" {
   description = "R2 バケットのドメイン"
