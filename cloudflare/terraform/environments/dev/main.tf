@@ -53,6 +53,20 @@ module "dns" {
 }
 
 # -----------------------------------------------------------------------------
+# Backend API DNS Record (Dev)
+# -----------------------------------------------------------------------------
+# Cloud Run (Dev) への CNAME (Proxy 有効)
+resource "cloudflare_dns_record" "backend_api_dev" {
+  zone_id = var.cloudflare_zone_id
+  name    = "api.dev"
+  content = "pose-est-backend-dev-776417398860.asia-northeast1.run.app"
+  type    = "CNAME"
+  proxied = true
+  ttl     = 1
+  comment = "Backend API (Dev) - Cloud Run Integration"
+}
+
+# -----------------------------------------------------------------------------
 # Workers カスタムドメイン設定
 # -----------------------------------------------------------------------------
 # フロントエンド (Workers) 用の DNS レコードとルート設定

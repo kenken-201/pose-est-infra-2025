@@ -385,6 +385,19 @@
   - ヘルスチェックエンドポイント監視（100 件/月無料）
   - GCP コンソールで手動設定推奨
 
+#### ⬜ タスク 17.5: Cloudflare 連携ハンドオーバー (Integration Prep)
+
+> [!NOTE] > `INFRA_HANDOVER.md.resolved` に基づく統合タスク。
+> Cloudflare チームからの引き継ぎ事項を実装します。
+
+- [ ] **17.5-1: Prod Cloud Run デプロイと URL 確定**
+  - Prod 環境の Cloud Run インフラを構築し、URL (`*.run.app`) を取得。
+- [ ] **17.5-2: Cloudflare DNS レコード追加 (Prod)**
+  - Cloudflare Infra チーム (Terraform) に Prod URL を共有し `api` レコード作成を依頼 (または実施)。
+  - Dev 環境は `api.dev.kenken-pose-est.online` 設定済み。
+- [ ] **17.5-3: Backend CORS 設定更新**
+  - Prod/Dev 共にフロントエンドオリジン (`https://kenken-pose-est.online` 等) のみを許可。
+
 ### 🔄 **フェーズ 7: 完全な CI/CD パイプライン構築**
 
 #### ⬜ タスク 18: バックエンド CI/CD パイプライン
