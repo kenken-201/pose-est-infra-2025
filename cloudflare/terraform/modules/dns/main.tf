@@ -72,6 +72,102 @@ resource "cloudflare_zone_setting" "security_level" {
 }
 
 # -----------------------------------------------------------------------------
+# Performance & Protocol Optimization (Task 17)
+# -----------------------------------------------------------------------------
+
+resource "cloudflare_zone_setting" "http3" {
+  zone_id    = var.zone_id
+  setting_id = "http3"
+  value      = "on" # QUIC プロトコル有効化
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
+resource "cloudflare_zone_setting" "zero_rtt" {
+  zone_id    = var.zone_id
+  setting_id = "0rtt"
+  value      = "on" # 0-RTT 再接続有効化
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
+resource "cloudflare_zone_setting" "ipv6" {
+  zone_id    = var.zone_id
+  setting_id = "ipv6"
+  value      = "on"
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
+resource "cloudflare_zone_setting" "brotli" {
+  zone_id    = var.zone_id
+  setting_id = "brotli"
+  value      = "on" # Brotli 圧縮有効化
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
+# React アプリケーションとの互換性のため無効化
+resource "cloudflare_zone_setting" "rocket_loader" {
+  zone_id    = var.zone_id
+  setting_id = "rocket_loader"
+  value      = "off"
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
+resource "cloudflare_zone_setting" "early_hints" {
+  zone_id    = var.zone_id
+  setting_id = "early_hints"
+  value      = "on" # 103 Early Hints (Server Push 代替)
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
+resource "cloudflare_zone_setting" "automatic_https_rewrites" {
+  zone_id    = var.zone_id
+  setting_id = "automatic_https_rewrites"
+  value      = "on" # 混在コンテンツの防止
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
+resource "cloudflare_zone_setting" "opportunistic_encryption" {
+  zone_id    = var.zone_id
+  setting_id = "opportunistic_encryption"
+  value      = "on" # HTTP/2 のメリットを非 HTTPS にも適用
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
+resource "cloudflare_zone_setting" "always_online" {
+  zone_id    = var.zone_id
+  setting_id = "always_online"
+  value      = "on" # オリジンダウン時にキャッシュを提供
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
+
+# -----------------------------------------------------------------------------
 # DNSSEC
 # -----------------------------------------------------------------------------
 # DNSSEC を有効化し、DNS スプーフィング攻撃から保護します。
@@ -107,4 +203,22 @@ resource "cloudflare_dns_record" "dmarc" {
   content = "v=DMARC1; p=reject; sp=reject; adkim=s; aspf=s;" # 厳格な拒否ポリシー
   ttl     = 3600
   comment = "Email Security: DMARC - Reject all unauthenticated mail"
+}
+
+# -----------------------------------------------------------------------------
+# Additional DNS Records (Dynamic)
+# -----------------------------------------------------------------------------
+# variables で渡されたリストに基づいて、汎用的な DNS レコードを作成します。
+# 主に開発環境や API サブドメインの CNAME レコードなどに使用します。
+
+resource "cloudflare_dns_record" "additional" {
+  for_each = { for idx, record in var.additional_records : "${record.name}-${record.type}" => record }
+
+  zone_id = var.zone_id
+  name    = each.value.name
+  type    = each.value.type
+  content = each.value.value
+  proxied = each.value.proxied
+  ttl     = each.value.ttl
+  comment = each.value.comment
 }

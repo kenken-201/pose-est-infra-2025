@@ -1,0 +1,38 @@
+name: Synthetic Uptime Monitor
+
+on:
+  schedule:
+    # 2時間30分ごとの実行を近似 (Approximate 2.5h interval)
+    # 00:00, 02:30, 05:00, 07:30, 10:00, 12:30, 15:00, 17:30, 20:00, 22:30
+    - cron: '0 0,5,10,15,20 * * *'
+    - cron: '30 2,7,12,17,22 * * *'
+  workflow_dispatch:
+
+jobs:
+  uptime-check:
+    name: Check Availability
+    runs-on: ubuntu-latest
+    timeout-minutes: 5 # ハング防止
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - env_name: Dev
+            url: https://dev.kenken-pose-est.online
+          - env_name: Prod
+            url: https://kenken-pose-est.online
+
+    steps:
+      - name: Check ${{ matrix.env_name }} Endpoint
+        run: |
+          echo "Checking ${{ matrix.url }} ..."
+          # --retry 3: 一時的なネットワークエラーでの誤検知防止
+          # --max-time 10: タイムアウト設定
+          CODE=$(curl -s -L --retry 3 --max-time 10 -o /dev/null -w "%{http_code}" -A "GitHubActions/SyntheticMonitor" ${{ matrix.url }})
+          
+          if [ "$CODE" -ne 200 ]; then
+            echo "::error::${{ matrix.env_name }} is DOWN! Status: $CODE"
+            exit 1
+          fi
+          echo "✅ ${{ matrix.env_name }} is UP (Status: $CODE)"

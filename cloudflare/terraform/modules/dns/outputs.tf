@@ -26,3 +26,10 @@ output "email_security_records" {
     dmarc_record_id = cloudflare_dns_record.dmarc.id
   }
 }
+
+output "additional_records" {
+  description = "追加作成された DNS レコード"
+  value = {
+    for k, v in cloudflare_dns_record.additional : k => v.id
+  }
+}
