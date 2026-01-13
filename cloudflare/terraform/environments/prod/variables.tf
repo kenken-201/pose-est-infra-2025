@@ -55,3 +55,9 @@ variable "cors_origins" {
 #   }))
 #   default = []
 # }
+
+variable "cloud_run_url" {
+  description = "GCP Cloud Run サービスの URL (Prod)"
+  type        = string
+  default     = ""
+}

@@ -129,3 +129,19 @@ module "monitoring" {
   account_id = var.cloudflare_account_id
   zone_id    = var.cloudflare_zone_id
 }
+
+# -----------------------------------------------------------------------------
+# Backend API DNS レコード (Cloud Run)
+# -----------------------------------------------------------------------------
+resource "cloudflare_dns_record" "backend_api_prod" {
+  count = var.cloud_run_url != "" ? 1 : 0
+
+  zone_id = var.cloudflare_zone_id
+  name    = "api"
+  # Cloud Run URL から *.run.app ホスト名を抽出
+  content = replace(var.cloud_run_url, "https://", "")
+  type    = "CNAME"
+  proxied = true
+  ttl     = 1 # Auto
+  comment = "Backend API (Prod Cloud Run)"
+}
