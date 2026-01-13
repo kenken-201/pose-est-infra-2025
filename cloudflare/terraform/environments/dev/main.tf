@@ -59,7 +59,7 @@ module "dns" {
 resource "cloudflare_dns_record" "backend_api_dev" {
   zone_id = var.cloudflare_zone_id
   name    = "api.dev"
-  content = "pose-est-backend-dev-776417398860.asia-northeast1.run.app"
+  content = replace(replace(var.cloud_run_url, "https://", ""), "/", "")
   type    = "CNAME"
   proxied = true
   ttl     = 1

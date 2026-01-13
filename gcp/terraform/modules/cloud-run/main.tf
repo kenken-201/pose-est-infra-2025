@@ -49,7 +49,7 @@ resource "google_cloud_run_v2_service" "service" {
 
       # R2 クレデンシャル (Secret Manager から注入)
       env {
-        name = "AWS_ACCESS_KEY_ID"
+        name = "R2_ACCESS_KEY"
         value_source {
           secret_key_ref {
             secret  = var.r2_access_key_id_secret_id
@@ -58,7 +58,7 @@ resource "google_cloud_run_v2_service" "service" {
         }
       }
       env {
-        name = "AWS_SECRET_ACCESS_KEY"
+        name = "R2_SECRET_KEY"
         value_source {
           secret_key_ref {
             secret  = var.r2_secret_access_key_secret_id
@@ -112,9 +112,9 @@ resource "google_cloud_run_v2_service" "service" {
           path = "/api/v1/health"
           port = 8080
         }
-        initial_delay_seconds = 5
-        timeout_seconds       = 3
-        failure_threshold     = 3
+        initial_delay_seconds = 30
+        timeout_seconds       = 5
+        failure_threshold     = 10
         period_seconds        = 10
       }
 

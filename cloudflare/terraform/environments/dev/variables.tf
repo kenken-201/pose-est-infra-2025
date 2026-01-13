@@ -65,3 +65,9 @@ variable "additional_records" {
   }
 }
 
+variable "cloud_run_url" {
+  description = "Cloud Run Service URL (e.g. https://service-xxx.a.run.app)"
+  type        = string
+  default     = "" # Optional for initial apply if not ready, but required for DNS
+}
+

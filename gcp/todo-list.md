@@ -398,6 +398,12 @@
 - [ ] **17.5-3: Backend CORS 設定更新**
   - Prod/Dev 共にフロントエンドオリジン (`https://kenken-pose-est.online` 等) のみを許可。
 
+#### ⬜ タスク 17.6: インフラリファクタリング (将来対応)
+
+- [ ] **17.6-1: Prod 用 Artifact Registry の分離**
+  - 現状は Dev 用イメージ (`pose-est-backend-dev`) を Prod でも参照している。
+  - Prod 用のリポジトリ (`pose-est-backend-prod`) を作成し、CI/CD でそこに Push/Deploy するフローに修正する。
+
 ### 🔄 **フェーズ 7: 完全な CI/CD パイプライン構築**
 
 #### ⬜ タスク 18: バックエンド CI/CD パイプライン

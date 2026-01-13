@@ -22,10 +22,10 @@ variable "cloudflare_zone_id" {
 variable "environment" {
   description = "環境名 (dev, production)"
   type        = string
-  default     = "production"
+  default     = "prod"
   validation {
-    condition     = var.environment == "production"
-    error_message = "この環境は 'production' である必要があります。"
+    condition     = var.environment == "prod"
+    error_message = "この環境は 'prod' である必要があります。"
   }
 }
 

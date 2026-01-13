@@ -17,11 +17,24 @@ if [ -f "$ENV_FILE" ]; then
   set +a
 fi
 
+# GCP .env ファイルの読み込み (Shared Variables like Cloud Run URL)
+GCP_ENV_FILE="$SCRIPT_DIR/../../gcp/.env"
+if [ -f "$GCP_ENV_FILE" ]; then
+  set -a
+  source "$GCP_ENV_FILE"
+  set +a
+fi
+
 # Zone ID
 if [ -n "$CLOUDFLARE_ZONE_ID" ]; then
   export TF_VAR_cloudflare_zone_id="$CLOUDFLARE_ZONE_ID"
 fi
 export TF_VAR_cloudflare_account_id="$CLOUDFLARE_ACCOUNT_ID"
+
+# Map Environment Specific Variable
+if [ -n "$TF_VAR_prod_cloud_run_url" ]; then
+  export TF_VAR_cloud_run_url="$TF_VAR_prod_cloud_run_url"
+fi
 
 cd "$TF_DIR"
 
