@@ -30,3 +30,9 @@ variable "r2_account_id" {
   description = "Cloudflare Account ID (R2 エンドポイント構築用)"
   type        = string
 }
+
+variable "gcp_notification_email" {
+  description = "アラート通知先メールアドレス"
+  type        = string
+  default     = "" # 必須だが、Apply時に環境変数またはtfvarsで上書き推奨
+}

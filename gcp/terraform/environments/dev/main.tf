@@ -159,3 +159,15 @@ module "cloud_run" {
     module.iam
   ]
 }
+
+# -----------------------------------------------------------------------------
+# Monitoring (監視)
+# -----------------------------------------------------------------------------
+module "monitoring" {
+  source = "../../modules/monitoring"
+
+  project_id             = var.project_id
+  environment            = var.environment
+  service_name           = module.cloud_run.service_name
+  gcp_notification_email = var.gcp_notification_email != "" ? var.gcp_notification_email : ""
+}

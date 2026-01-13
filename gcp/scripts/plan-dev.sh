@@ -9,25 +9,14 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ENV_FILE="$SCRIPT_DIR/../.env"
 TF_DIR="$SCRIPT_DIR/../terraform/environments/dev"
 
-# .env 読み込み
-if [ -f "$ENV_FILE" ]; then
-  set -a
-  source "$ENV_FILE"
-  set +a
-else
-  echo "❌ .env ファイルが見つかりません。"
-  echo "まず scripts/setup-secrets.sh を実行してセットアップしてください。"
-  exit 1
-fi
+# 環境変数のインポート
+source "$SCRIPT_DIR/import-vars.sh"
 
-# 変数チェック
+# 必須変数のチェック
 if [ -z "$CLOUDFLARE_ACCOUNT_ID" ] || [ -z "$R2_ACCESS_KEY_ID" ] || [ -z "$R2_SECRET_ACCESS_KEY" ]; then
-  echo "❌ 必要な環境変数が不足しています。scripts/setup-secrets.sh を再実行してください。"
+  echo "❌ 必要な環境変数が不足しています。"
   exit 1
 fi
-
-# Terraform 用変数エクスポート
-export TF_VAR_r2_account_id="$CLOUDFLARE_ACCOUNT_ID"
 
 cd "$TF_DIR"
 
