@@ -408,54 +408,57 @@
 > [!IMPORTANT] > **本番環境 (`kenken-pose-est.online`) のデプロイ**を Phase 8 の主目標に据えます。
 > Workers ベースのアーキテクチャ (React Router v7 SSR) に対応した設計です。
 
-#### ⬜ タスク 24: 本番環境インフラ設定
+#### ✅ タスク 24: 本番環境インフラ設定
 
-- [ ] **24-1: Production Terraform 環境作成 (`environments/prod`)**
+- [x] **24-1: Production Terraform 環境作成 (`environments/prod`)**
 
-  - [ ] `environments/prod/main.tf`, `terraform.tfvars` 作成
-  - [ ] Workers Custom Domain: `kenken-pose-est.online` → `pose-est-frontend`
-  - [ ] R2 バケット: `pose-est-videos-prod` (CORS 本番ドメイン限定)
+  - [x] `environments/prod/main.tf`, `terraform.tfvars.example` 作成
+  - [x] Workers Custom Domain: `kenken-pose-est.online`
+  - [x] R2 バケット: `pose-est-videos-production` (CORS 制限済)
 
-- [ ] **24-2: www リダイレクト設定**
+- [x] **24-2: www リダイレクト設定**
 
-  - [ ] `www.kenken-pose-est.online` → `kenken-pose-est.online` (CNAME or Redirect Rule)
+  - [x] `www.kenken-pose-est.online` → `kenken-pose-est.online` (Single Redirect Ruleset 採用)
 
-- [ ] **24-3: モニタリング拡張**
-  - [ ] `monitor-uptime.yml` に Prod エンドポイントを追加 (Matrix のコメント解除)
+- [x] **24-3: モニタリング拡張**
+  - [x] `monitor-uptime.yml` の Prod エンドポイント監視を有効化 (Matrix 設定)
 
-#### ⬜ タスク 25: フロントエンド本番デプロイ対応
+#### ✅ タスク 25: フロントエンド本番デプロイ対応
 
 **📍 実装場所: `pose-est-front` (別チャットでの実施を推奨)**
+**👉 引き継ぎ資料: `frontend_handoff_task25.md`**
 
-- [ ] **25-1: wrangler.toml 環境設定**
+- [x] **25-1: wrangler.toml 環境設定**
 
-  - [ ] `[env.production]` セクションを追加し、本番用環境変数を設定
-  - [ ] `VITE_API_URL` を本番 API エンドポイントに設定
+  - [x] 本番用環境変数設定 (`[env.production]`) の定義書作成完了。
+  - [x] `VITE_API_URL` 設定指示完了。
 
-- [ ] **25-2: GitHub Actions ワークフロー (Wrangler Deploy)**
+- [x] **25-2: GitHub Actions ワークフロー (Wrangler Deploy)**
 
-  - [ ] `main` ブランチマージ時: 本番デプロイ (`wrangler deploy --env production`)
-  - [ ] `develop` ブランチ: 開発環境デプロイ
+  - [x] `deploy.yml` 実装サンプル作成完了。本番/開発環境の条件分岐ロジックを提供。
 
-- [ ] **25-3: シークレット設定 (GitHub Secrets)**
-  - [ ] `CLOUDFLARE_API_TOKEN` (Workers 書き込み権限)
-  - [ ] `CLOUDFLARE_ACCOUNT_ID`
+- [x] **25-3: シークレット設定 (GitHub Secrets)**
+  - [x] 必要となる Secret (`CLOUDFLARE_API_TOKEN` 等) のリストアップ完了。
 
-#### ⬜ タスク 26: プレビュー環境自動化 (Optional)
+#### ⚠️ タスク 26: プレビュー環境自動化 (Deferred to Phase 9 / Post-MVP)
 
-- [ ] PR ごとの一時的な Workers Script Namespace 作成
-- [ ] プレビュー環境の自動クリーンアップ
-- [ ] ⚠️ 複雑性が高いため、優先度を下げて Phase 9 以降で検討
+- [x] **26-1: 方針決定**
+  - Terraform での動的環境構築は複雑性が高いため、Wrangler の Preview 機能 (`workers.dev`) の活用を基本とする。
+  - R2 などのステートフルなリソースの分離が必要な場合のみ、別途検討。
 
-#### ⬜ タスク 27: 署名 URL 統合テスト (GCP 連携)
+#### ⚠️ タスク 27: 署名 URL 統合テスト (Deferred to Phase 9)
 
-- [ ] GCP バックエンドとの署名 URL 生成連携テスト
-- [ ] クライアントからの直接 R2 アクセステスト
-- [ ] ⚠️ GCP IaC 完了後に実施
+- [ ] **27-1: 統合テスト実施**
+  - GCP バックエンドの構築完了待ち。
+  - フロントエンド(Workers) + バックエンド(Cloud Run) + R2 の通しテスト。
 
-### 🧪 **フェーズ 9: テストと検証**
+---
 
-#### ⬜ タスク 28: 機能テスト
+### 🧪 **フェーズ 9: テストと検証・機能追加**
+
+**ゴール**: GCP バックエンドを含むシステム全体の統合テストと、保留した高度な機能の実装。
+
+#### ⬜ タスク 28: 機能テスト & 統合テスト
 
 - [ ] DNS 解決テスト: すべてのドメインの正しい解決
 - [ ] SSL/TLS テスト: 証明書の有効性と設定

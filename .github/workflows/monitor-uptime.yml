@@ -20,8 +20,8 @@ jobs:
         include:
           - env_name: Dev
             url: https://dev.kenken-pose-est.online
-          # - env_name: Prod
-          #   url: https://kenken-pose-est.online
+          - env_name: Prod
+            url: https://kenken-pose-est.online
 
     steps:
       - name: Check ${{ matrix.env_name }} Endpoint
