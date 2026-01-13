@@ -55,38 +55,61 @@ module "dns" {
 # -----------------------------------------------------------------------------
 # Workaround: Worker Proxy for Host Override (Free Plan Support)
 # -----------------------------------------------------------------------------
-# Cloud Run はカスタムドメインの Host ヘッダーを 404 で拒否するため、
-# 本来は Origin Rules (Pro Plan) で Host Header Rewrite が必要です。
-# Free Plan で実現するため、Worker をリバースプロキシとして使用します。
+# 【背景・目的】
+# Cloud Run をカスタムドメイン (api-dev.kenken-pose-est.online) で公開する際、
+# Cloud Run 側は本来のドメイン (*.run.app) の Host ヘッダーを要求します (デフォルト仕様)。
+#
+# 通常、Cloudflare Pro プラン以上であれば "Origin Rules" 機能で Host ヘッダーを書き換えられますが、
+# Free プランではその機能が制限されています。
+#
+# そのため、Cloudflare Workers をリバースプロキシとして間に挟み、
+# Worker 内でプログラム的に Host ヘッダーを `*.run.app` に書き換えてから
+# Cloud Run へリクエストを転送する構成を採用しています。
+# -----------------------------------------------------------------------------
 
 resource "cloudflare_workers_script" "api_proxy_dev" {
   account_id  = var.cloudflare_account_id
   script_name = "pose-est-api-proxy-dev"
+  
+  # Worker Script 定義 (Inline)
+  # 1. すべてのリクエスト ('fetch' event) を捕捉
+  # 2. handleRequest 関数でリクエスト内容 (URL, Header) を加工
+  # 3. Cloud Run へ転送
   content     = <<EOT
 addEventListener('fetch', event => {
   event.respondWith(handleRequest(event.request))
 })
 
 async function handleRequest(request) {
+  // 元のリクエストURLをパース
   const url = new URL(request.url);
+  
+  // 転送先 (Backend Cloud Run) のホスト名を環境変数から構築
+  // var.cloud_run_url (https://...run.app) からプロトコルとパスを除去してホスト名のみ抽出
   const targetHostname = "${replace(replace(var.cloud_run_url, "https://", ""), "/", "")}";
   
-  // Create new URL
+  // リクエストURLのホスト名を Cloud Run のものに書き換え
   url.hostname = targetHostname;
   
-  // Create new request with overridden Host header
+  // 新しいリクエストオブジェクトを作成 (元のリクエストを複製)
+  // ここで Host ヘッダーを明示的に Cloud Run のホスト名に上書きします
+  // ※ これを行わないと Cloud Run は 404 Not Found を返します
   const newRequest = new Request(url.toString(), request);
   newRequest.headers.set("Host", targetHostname);
   
+  // 書き換えたリクエストを Cloud Run へ送信 (Fetch)
   return fetch(newRequest);
 }
 EOT
 }
 
+# Worker を特定のカスタムドメインに紐付ける設定
+# これにより https://api-dev.kenken-pose-est.online へのアクセスが
+# 上記の Worker スクリプトによって処理されるようになります。
 resource "cloudflare_workers_custom_domain" "api_proxy_dev" {
   account_id = var.cloudflare_account_id
   zone_id    = var.cloudflare_zone_id
-  service    = "pose-est-api-proxy-dev" # Must match script_name
+  service    = "pose-est-api-proxy-dev" # 上記の script_name と一致させる必要があります
   hostname   = "api-dev.kenken-pose-est.online"
 }
 
