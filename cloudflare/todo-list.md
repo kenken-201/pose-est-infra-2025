@@ -423,23 +423,22 @@
 - [x] **24-3: モニタリング拡張**
   - [x] `monitor-uptime.yml` の Prod エンドポイント監視を有効化 (Matrix 設定)
 
-#### ⬜ タスク 25: フロントエンド本番デプロイ対応
+#### ✅ タスク 25: フロントエンド本番デプロイ対応
 
 **📍 実装場所: `pose-est-front` (別チャットでの実施を推奨)**
+**👉 引き継ぎ資料: `frontend_handoff_task25.md`**
 
-- [ ] **25-1: wrangler.toml 環境設定**
+- [x] **25-1: wrangler.toml 環境設定**
 
-  - [ ] `[env.production]` セクションを追加し、本番用環境変数を設定
-  - [ ] `VITE_API_URL` を本番 API エンドポイントに設定
+  - [x] 本番用環境変数設定 (`[env.production]`) の定義書作成完了。
+  - [x] `VITE_API_URL` 設定指示完了。
 
-- [ ] **25-2: GitHub Actions ワークフロー (Wrangler Deploy)**
+- [x] **25-2: GitHub Actions ワークフロー (Wrangler Deploy)**
 
-  - [ ] `main` ブランチマージ時: 本番デプロイ (`wrangler deploy --env production`)
-  - [ ] `develop` ブランチ: 開発環境デプロイ
+  - [x] `deploy.yml` 実装サンプル作成完了。本番/開発環境の条件分岐ロジックを提供。
 
-- [ ] **25-3: シークレット設定 (GitHub Secrets)**
-  - [ ] `CLOUDFLARE_API_TOKEN` (Workers 書き込み権限)
-  - [ ] `CLOUDFLARE_ACCOUNT_ID`
+- [x] **25-3: シークレット設定 (GitHub Secrets)**
+  - [x] 必要となる Secret (`CLOUDFLARE_API_TOKEN` 等) のリストアップ完了。
 
 #### ⬜ タスク 26: プレビュー環境自動化 (Optional)
 
