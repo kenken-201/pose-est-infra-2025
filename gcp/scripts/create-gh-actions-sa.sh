@@ -38,6 +38,7 @@ ROLES=(
   "roles/iam.serviceAccountUser"        # Cloud Run 実行用 SA を利用する権限
   "roles/storage.admin"                 # ソースコードアップロード (Cloud Build)
   "roles/serviceusage.serviceUsageConsumer" # API 利用権限
+  "roles/logging.viewer"                # Cloud Build ログ閲覧権限 (必須)
 )
 
 SA_EMAIL="${SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com"
