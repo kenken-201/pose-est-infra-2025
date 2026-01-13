@@ -133,15 +133,38 @@ module "monitoring" {
 # -----------------------------------------------------------------------------
 # Backend API DNS レコード (Cloud Run)
 # -----------------------------------------------------------------------------
-resource "cloudflare_dns_record" "backend_api_prod" {
-  count = var.cloud_run_url != "" ? 1 : 0
+# -----------------------------------------------------------------------------
+# Workaround: Worker Proxy for Host Override (Free Plan Support)
+# -----------------------------------------------------------------------------
+resource "cloudflare_workers_script" "api_proxy_prod" {
+  count       = var.cloud_run_url != "" ? 1 : 0
+  account_id  = var.cloudflare_account_id
+  script_name = "pose-est-api-proxy-prod"
+  content     = <<EOT
+addEventListener('fetch', event => {
+  event.respondWith(handleRequest(event.request))
+})
 
-  zone_id = var.cloudflare_zone_id
-  name    = "api"
-  # Cloud Run URL から *.run.app ホスト名を抽出 (https:// と 末尾の / を削除)
-  content = replace(replace(var.cloud_run_url, "https://", ""), "/", "")
-  type    = "CNAME"
-  proxied = true
-  ttl     = 1 # Auto
-  comment = "Backend API (Prod Cloud Run)"
+async function handleRequest(request) {
+  const url = new URL(request.url);
+  const targetHostname = "${replace(replace(var.cloud_run_url, "https://", ""), "/", "")}";
+  
+  // Create new URL
+  url.hostname = targetHostname;
+  
+  // Create new request with overridden Host header
+  const newRequest = new Request(url.toString(), request);
+  newRequest.headers.set("Host", targetHostname);
+  
+  return fetch(newRequest);
+}
+EOT
+}
+
+resource "cloudflare_workers_custom_domain" "api_proxy_prod" {
+  count      = var.cloud_run_url != "" ? 1 : 0
+  account_id = var.cloudflare_account_id
+  zone_id    = var.cloudflare_zone_id
+  service    = "pose-est-api-proxy-prod" # Must match script_name
+  hostname   = "api.kenken-pose-est.online"
 }

@@ -53,17 +53,41 @@ module "dns" {
 }
 
 # -----------------------------------------------------------------------------
-# Backend API DNS Record (Dev)
+# Workaround: Worker Proxy for Host Override (Free Plan Support)
 # -----------------------------------------------------------------------------
-# Cloud Run (Dev) への CNAME (Proxy 有効)
-resource "cloudflare_dns_record" "backend_api_dev" {
-  zone_id = var.cloudflare_zone_id
-  name    = "api.dev"
-  content = replace(replace(var.cloud_run_url, "https://", ""), "/", "")
-  type    = "CNAME"
-  proxied = true
-  ttl     = 1
-  comment = "Backend API (Dev) - Cloud Run Integration"
+# Cloud Run はカスタムドメインの Host ヘッダーを 404 で拒否するため、
+# 本来は Origin Rules (Pro Plan) で Host Header Rewrite が必要です。
+# Free Plan で実現するため、Worker をリバースプロキシとして使用します。
+
+resource "cloudflare_workers_script" "api_proxy_dev" {
+  account_id  = var.cloudflare_account_id
+  script_name = "pose-est-api-proxy-dev"
+  content     = <<EOT
+addEventListener('fetch', event => {
+  event.respondWith(handleRequest(event.request))
+})
+
+async function handleRequest(request) {
+  const url = new URL(request.url);
+  const targetHostname = "${replace(replace(var.cloud_run_url, "https://", ""), "/", "")}";
+  
+  // Create new URL
+  url.hostname = targetHostname;
+  
+  // Create new request with overridden Host header
+  const newRequest = new Request(url.toString(), request);
+  newRequest.headers.set("Host", targetHostname);
+  
+  return fetch(newRequest);
+}
+EOT
+}
+
+resource "cloudflare_workers_custom_domain" "api_proxy_dev" {
+  account_id = var.cloudflare_account_id
+  zone_id    = var.cloudflare_zone_id
+  service    = "pose-est-api-proxy-dev" # Must match script_name
+  hostname   = "api-dev.kenken-pose-est.online"
 }
 
 # -----------------------------------------------------------------------------
