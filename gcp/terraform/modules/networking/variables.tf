@@ -33,3 +33,9 @@ variable "subnet_cidr" {
     error_message = "subnet_cidr は有効な CIDR ブロックである必要があります。"
   }
 }
+
+variable "enable_nat" {
+  description = "Cloud NAT を作成するかどうか (Cloud Run 等が VPC 内から外部アクセスする場合に必要)"
+  type        = bool
+  default     = false
+}
