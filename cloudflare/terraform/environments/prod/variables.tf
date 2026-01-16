@@ -61,3 +61,10 @@ variable "cloud_run_url" {
   type        = string
   default     = ""
 }
+
+variable "backend_access_token" {
+  description = "Backend Access Token (Shared Secret)"
+  type        = string
+  sensitive   = true
+  default     = ""
+}

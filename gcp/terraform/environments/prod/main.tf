@@ -97,8 +97,10 @@ module "artifact_registry" {
 module "secret_manager" {
   source = "../../modules/secret-manager"
 
-  project_id  = var.project_id
-  environment = var.environment
+  project_id           = var.project_id
+  r2_secret_access_key = var.r2_secret_access_key
+  backend_access_token = var.backend_access_token
+  environment          = var.environment
 
   # IAM モジュールの出力 (member 形式) を使用
   cloud_run_sa_member = module.iam.cloud_run_sa_member
@@ -120,9 +122,8 @@ module "cloud_run" {
   environment = var.environment
 
   # コンテナイメージ (Artifact Registry)
-  # [Infrastructure Refactoring] Task 17.6: Temporary use Dev image for Prod
-  # image_url = "${module.artifact_registry.repository_url}/pose-est-backend:latest"
-  image_url = "asia-northeast1-docker.pkg.dev/kenken-pose-est/pose-est-backend-dev/pose-est-backend:latest"
+  # Task 17.6: Prod 用 Artifact Registry を使用
+  image_url = "${module.artifact_registry.repository_url}/pose-est-backend:latest"
 
   # サービスアカウント
   service_account_email = module.iam.cloud_run_sa_email
@@ -131,6 +132,7 @@ module "cloud_run" {
   # modules/secret-manager の output を使用
   r2_access_key_id_secret_id     = module.secret_manager.r2_access_key_id_secret_id
   r2_secret_access_key_secret_id = module.secret_manager.r2_secret_access_key_secret_id
+  backend_access_token_secret_id = module.secret_manager.backend_access_token_secret_id
 
   # R2 環境設定 (変数から取得)
   r2_account_id  = var.r2_account_id

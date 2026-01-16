@@ -36,3 +36,15 @@ variable "gcp_notification_email" {
   type        = string
   default     = "" # 必須だが、Apply時に環境変数またはtfvarsで上書き推奨
 }
+
+variable "r2_secret_access_key" {
+  description = "Cloudflare R2 Secret Access Key"
+  type        = string
+  sensitive   = true
+}
+
+variable "backend_access_token" {
+  description = "Cloudflare Workers との認証用シークレットトークン"
+  type        = string
+  sensitive   = true
+}

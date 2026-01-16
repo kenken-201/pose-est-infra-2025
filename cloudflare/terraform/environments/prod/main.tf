@@ -140,7 +140,15 @@ resource "cloudflare_workers_script" "api_proxy_prod" {
   count       = var.cloud_run_url != "" ? 1 : 0
   account_id  = var.cloudflare_account_id
   script_name = "pose-est-api-proxy-prod"
-  content     = <<EOT
+
+  # Secret Binding (認証トークン)
+  bindings = [{
+    name = "BACKEND_ACCESS_TOKEN"
+    type = "secret_text"
+    text = var.backend_access_token
+  }]
+
+  content = <<EOT
 addEventListener('fetch', event => {
   event.respondWith(handleRequest(event.request))
 })
@@ -155,6 +163,10 @@ async function handleRequest(request) {
   // Create new request with overridden Host header
   const newRequest = new Request(url.toString(), request);
   newRequest.headers.set("Host", targetHostname);
+
+  // 認証トークンをヘッダーに付与
+  // BACKEND_ACCESS_TOKEN は secret_text binding で注入されたグローバル変数
+  newRequest.headers.set("X-CF-Access-Token", BACKEND_ACCESS_TOKEN);
   
   return fetch(newRequest);
 }
