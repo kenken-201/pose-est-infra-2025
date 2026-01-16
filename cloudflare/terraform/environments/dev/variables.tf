@@ -75,10 +75,3 @@ variable "additional_records" {
     error_message = "DNS レコードタイプは A, AAAA, CNAME, TXT, MX, NS, SPF, SRV のいずれかである必要があります。"
   }
 }
-
-variable "cloud_run_url" {
-  description = "Cloud Run Service URL (e.g. https://service-xxx.a.run.app)"
-  type        = string
-  default     = "" # Optional for initial apply if not ready, but required for DNS
-}
-
