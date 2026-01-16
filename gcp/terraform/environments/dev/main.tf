@@ -135,7 +135,7 @@ module "cloud_run" {
 
   # R2 環境設定 (変数から取得)
   r2_account_id  = var.r2_account_id
-  r2_bucket_name = "pose-est-media-${var.environment}"
+  r2_bucket_name = "pose-est-videos-${var.environment}"
 
   # 公開アクセス設定 (Dev環境は許可)
   allow_unauthenticated = true
