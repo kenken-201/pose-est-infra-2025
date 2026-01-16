@@ -1,3 +1,7 @@
+# =============================================================================
+# Monitoring Module - 入力変数
+# =============================================================================
+
 variable "project_id" {
   description = "GCP プロジェクト ID"
   type        = string
@@ -6,7 +10,7 @@ variable "project_id" {
 variable "gcp_notification_email" {
   description = "アラート通知先メールアドレス"
   type        = string
-  sensitive   = true # ログ出力抑制
+  sensitive   = true
 
   validation {
     condition     = can(regex("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", var.gcp_notification_email))
@@ -17,10 +21,24 @@ variable "gcp_notification_email" {
 variable "environment" {
   description = "環境名 (dev, prod)"
   type        = string
+
+  validation {
+    condition     = contains(["dev", "prod"], var.environment)
+    error_message = "環境名は 'dev' または 'prod' である必要があります。"
+  }
 }
 
+variable "service_name" {
+  description = "監視対象の Cloud Run サービス名"
+  type        = string
+}
+
+# -----------------------------------------------------------------------------
+# アラート閾値設定
+# -----------------------------------------------------------------------------
+
 variable "error_rate_threshold" {
-  description = "アラートを発報するエラー率の閾値（0.0〜1.0）。例: 0.05 = 5%"
+  description = "エラー率アラートの閾値 (0.0〜1.0)。例: 0.05 = 5%"
   type        = number
   default     = 0.05
 
@@ -31,7 +49,7 @@ variable "error_rate_threshold" {
 }
 
 variable "latency_threshold_ms" {
-  description = "アラートを発報するレスポンス遅延の閾値（ミリ秒）。例: 5000 = 5秒"
+  description = "レイテンシアラートの閾値（ミリ秒）。例: 5000 = 5秒"
   type        = number
   default     = 5000
 
@@ -41,7 +59,29 @@ variable "latency_threshold_ms" {
   }
 }
 
-variable "service_name" {
-  description = "監視対象の Cloud Run サービス名"
-  type        = string
+variable "memory_threshold_percent" {
+  description = "メモリ使用率アラートの閾値（%）。例: 85 = 85%"
+  type        = number
+  default     = 85
+
+  validation {
+    condition     = var.memory_threshold_percent > 0 && var.memory_threshold_percent <= 100
+    error_message = "メモリ閾値は 0 より大きく 100 以下である必要があります。"
+  }
+}
+
+# -----------------------------------------------------------------------------
+# 機能フラグ
+# -----------------------------------------------------------------------------
+
+variable "enable_alerts" {
+  description = "アラートを有効化するか。メンテナンス時に false にすることでノイズを抑制可能"
+  type        = bool
+  default     = true
+}
+
+variable "enable_resource_alerts" {
+  description = "リソース監視アラート（メモリ/CPU）を有効化するか"
+  type        = bool
+  default     = true
 }
