@@ -70,7 +70,7 @@ module "dns" {
 resource "cloudflare_workers_script" "api_proxy_dev" {
   account_id  = var.cloudflare_account_id
   script_name = "pose-est-api-proxy-dev"
-  
+
   # Secret Binding (認証トークン)
   bindings = [{
     name = "BACKEND_ACCESS_TOKEN"
@@ -82,7 +82,7 @@ resource "cloudflare_workers_script" "api_proxy_dev" {
   # 1. すべてのリクエスト ('fetch' event) を捕捉
   # 2. handleRequest 関数でリクエスト内容 (URL, Header) を加工
   # 3. Cloud Run へ転送
-  content     = <<EOT
+  content = <<EOT
 addEventListener('fetch', event => {
   event.respondWith(handleRequest(event.request))
 })
@@ -143,14 +143,13 @@ resource "cloudflare_workers_custom_domain" "frontend_dev" {
 # カスタムファイアウォールルールを適用します。
 # Note: Managed WAF は Free プラン制限のため Dashboard で設定
 
-/*
 module "security" {
   source = "../../modules/security"
 
-  zone_id     = var.cloudflare_zone_id
-  environment = var.environment
+  zone_id                 = var.cloudflare_zone_id
+  environment             = var.environment
+  enable_security_headers = var.enable_security_headers
 }
-*/
 
 # -----------------------------------------------------------------------------
 # 監視設定モジュール

@@ -66,7 +66,7 @@ resource "google_cloud_run_v2_service" "service" {
           }
         }
       }
-      
+
       # Cloudflare Access Token (Backend Auth)
       env {
         name = "CLOUDFLARE_ACCESS_TOKEN"

@@ -97,10 +97,10 @@ module "artifact_registry" {
 module "secret_manager" {
   source = "../../modules/secret-manager"
 
-  project_id  = var.project_id
+  project_id           = var.project_id
   r2_secret_access_key = var.r2_secret_access_key
   backend_access_token = var.backend_access_token
-  environment = var.environment
+  environment          = var.environment
 
   # IAM モジュールの出力 (member 形式) を使用
   cloud_run_sa_member = module.iam.cloud_run_sa_member
