@@ -19,23 +19,34 @@ else
   echo "⚠️  .env ファイルが見つかりません: $ENV_FILE"
 fi
 
-# GCP_NOTIFICATION_EMAIL -> TF_VAR_gcp_notification_email マッピング
+# -----------------------------------------------------------------------------
+# 環境変数 -> Terraform 入力変数 マッピング
+# -----------------------------------------------------------------------------
+
+# GCP 通知用メールアドレス (モニタリングアラート送信先)
 if [ -n "$GCP_NOTIFICATION_EMAIL" ]; then
   export TF_VAR_gcp_notification_email="$GCP_NOTIFICATION_EMAIL"
-  # echo "📧 Notification Email set from environment."
 fi
 
-# R2 Account ID -> TF_VAR_r2_account_id
+# Cloudflare Account ID -> R2 Account ID (同一値)
 if [ -n "$CLOUDFLARE_ACCOUNT_ID" ]; then
   export TF_VAR_r2_account_id="$CLOUDFLARE_ACCOUNT_ID"
 fi
 
-# R2 Secret Key -> TF_VAR_r2_secret_access_key
+# -----------------------------------------------------------------------------
+# シークレット変数 (センシティブ情報)
+# -----------------------------------------------------------------------------
+
+# R2 Secret Access Key (Cloudflare R2 ストレージ認証用)
 if [ -n "$R2_SECRET_ACCESS_KEY" ]; then
   export TF_VAR_r2_secret_access_key="$R2_SECRET_ACCESS_KEY"
+else
+  echo "⚠️  R2_SECRET_ACCESS_KEY が未設定です (R2 接続に失敗する可能性があります)"
 fi
 
-# Backend Access Token -> TF_VAR_backend_access_token
+# Backend Access Token (Cloudflare Workers <-> Cloud Run 認証用共有シークレット)
 if [ -n "$BACKEND_ACCESS_TOKEN" ]; then
   export TF_VAR_backend_access_token="$BACKEND_ACCESS_TOKEN"
+else
+  echo "⚠️  BACKEND_ACCESS_TOKEN が未設定です (認証が機能しません)"
 fi

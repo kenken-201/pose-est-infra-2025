@@ -70,7 +70,11 @@ variable "backend_access_token" {
 }
 
 variable "enable_security_headers" {
-  description = "セキュリティヘッダーを有効化するか"
+  description = <<-EOT
+    セキュリティヘッダー (HSTS, X-Frame-Options, etc.) の Cloudflare Transform Rules を有効化するか。
+    Prod 環境では true を推奨（ブラウザセキュリティ強化）。
+    Cloudflare API トークンに "Zone: Transform Rules: Edit" 権限が必要です。
+  EOT
   type        = bool
   default     = true
 }

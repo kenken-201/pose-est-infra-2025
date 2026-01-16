@@ -31,13 +31,23 @@ if [ -n "$CLOUDFLARE_ZONE_ID" ]; then
 fi
 export TF_VAR_cloudflare_account_id="$CLOUDFLARE_ACCOUNT_ID"
 
-# Map Environment Specific Variable
+# -----------------------------------------------------------------------------
+# 環境固有変数のマッピング
+# -----------------------------------------------------------------------------
+# Cloud Run URL (Prod 環境用)
 if [ -n "$TF_VAR_prod_cloud_run_url" ]; then
+  echo "✅ Cloud Run URL (Prod): ${TF_VAR_prod_cloud_run_url:0:50}..."
   export TF_VAR_cloud_run_url="$TF_VAR_prod_cloud_run_url"
+else
+  echo "⚠️  TF_VAR_prod_cloud_run_url が未設定です (Worker Proxy がデプロイされない可能性があります)"
 fi
 
+# Backend Access Token (Shared Secret for CF <-> GCP auth)
 if [ -n "$BACKEND_ACCESS_TOKEN" ]; then
+  echo "✅ Backend Access Token: [REDACTED] (${#BACKEND_ACCESS_TOKEN} chars)"
   export TF_VAR_backend_access_token="$BACKEND_ACCESS_TOKEN"
+else
+  echo "⚠️  BACKEND_ACCESS_TOKEN が未設定です (Worker から Cloud Run への認証が機能しません)"
 fi
 
 cd "$TF_DIR"

@@ -77,7 +77,11 @@ variable "additional_records" {
 }
 
 variable "enable_security_headers" {
-  description = "セキュリティヘッダー (HSTS, etc.) を有効化するか (Dev 環境では権限不足のため false 推奨)"
+  description = <<-EOT
+    セキュリティヘッダー (HSTS, X-Frame-Options, etc.) の Cloudflare Transform Rules を有効化するか。
+    Dev 環境では Cloudflare API トークンに Transform Rules の編集権限がない場合 false を推奨。
+    Prod 環境では true を推奨。
+  EOT
   type        = bool
   default     = false
 }
