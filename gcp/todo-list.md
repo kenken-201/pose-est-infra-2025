@@ -404,18 +404,18 @@
   - 現状は Dev 用イメージ (`pose-est-backend-dev`) を Prod でも参照している。
   - Prod 用のリポジトリ (`pose-est-backend-prod`) を作成し、CI/CD でそこに Push/Deploy するフローに修正する。
 
-#### 🛡️ タスク 17.7: Cloudflare アクセス制限実装（共有シークレット）
+#### ✅ タスク 17.7: Cloudflare アクセス制限実装（共有シークレット）
 
 > [!NOTE]
 > Cloudflare 以外からの直接アクセスを防ぐため、共有シークレットによる簡易認証を実装します。
 
-- [ ] **17.7-1: シークレット管理 (GCP)**
+- [x] **17.7-1: シークレット管理 (GCP)**
   - Secret Manager に `backend-access-token` を作成
   - Cloud Run に環境変数として注入
-- [ ] **17.7-2: バックエンド実装 (FastAPI)**
+- [x] **17.7-2: バックエンド実装 (FastAPI)**
   - ミドルウェアで認証ヘッダー (`X-CF-Access-Token`) を検証
   - 不正なリクエストを 403 Forbidden で拒否
-- [ ] **17-B: Cloud-3: フロントエンド実装 (Cloudflare Workers)**
+- [x] **17-B: Cloud-3: フロントエンド実装 (Cloudflare Workers)**
   - Worker Secret にトークンを設定
   - リクエスト転送時に認証ヘッダーを付与
 
