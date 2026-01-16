@@ -72,10 +72,10 @@ resource "cloudflare_workers_script" "api_proxy_dev" {
   script_name = "pose-est-api-proxy-dev"
   
   # Secret Binding (認証トークン)
-  secret_text_binding {
+  secret_text_binding = [{
     name = "BACKEND_ACCESS_TOKEN"
     text = var.backend_access_token
-  }
+  }]
 
   # Worker Script 定義 (Inline)
   # 1. すべてのリクエスト ('fetch' event) を捕捉
