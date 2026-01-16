@@ -71,6 +71,12 @@ resource "cloudflare_workers_script" "api_proxy_dev" {
   account_id  = var.cloudflare_account_id
   script_name = "pose-est-api-proxy-dev"
   
+  # Secret Binding (認証トークン)
+  secret_text_binding {
+    name = "BACKEND_ACCESS_TOKEN"
+    text = var.backend_access_token
+  }
+
   # Worker Script 定義 (Inline)
   # 1. すべてのリクエスト ('fetch' event) を捕捉
   # 2. handleRequest 関数でリクエスト内容 (URL, Header) を加工
@@ -96,6 +102,10 @@ async function handleRequest(request) {
   // ※ これを行わないと Cloud Run は 404 Not Found を返します
   const newRequest = new Request(url.toString(), request);
   newRequest.headers.set("Host", targetHostname);
+
+  // 認証トークンをヘッダーに付与
+  // BACKEND_ACCESS_TOKEN は secret_text_binding で注入されたグローバル変数
+  newRequest.headers.set("X-CF-Access-Token", BACKEND_ACCESS_TOKEN);
   
   // 書き換えたリクエストを Cloud Run へ送信 (Fetch)
   return fetch(newRequest);

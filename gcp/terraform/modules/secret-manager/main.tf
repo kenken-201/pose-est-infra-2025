@@ -7,7 +7,7 @@
 */
 
 # -----------------------------------------------------------------------------
-# シークレットリソース定義 (箱のみ)
+# シークレットリソース定義
 # -----------------------------------------------------------------------------
 
 # R2 Access Key ID
@@ -17,7 +17,6 @@ resource "google_secret_manager_secret" "r2_access_key_id" {
 
   replication {
     # 自動レプリケーション (Google 管理キーで暗号化)
-    # コンプライアンス要件や高可用性要件が厳しい場合は user_managed ブロックでリージョン指定を検討してください
     auto {}
   }
 }
@@ -30,6 +29,22 @@ resource "google_secret_manager_secret" "r2_secret_access_key" {
   replication {
     auto {}
   }
+}
+
+# Backend Access Token (Cloudflare <-> Cloud Run 認証用)
+resource "google_secret_manager_secret" "backend_access_token" {
+  secret_id = "backend-access-token-${var.environment}"
+  project   = var.project_id
+
+  replication {
+    auto {}
+  }
+}
+
+# Backend Access Token Version (値の登録)
+resource "google_secret_manager_secret_version" "backend_access_token_version" {
+  secret      = google_secret_manager_secret.backend_access_token.id
+  secret_data = var.backend_access_token
 }
 
 # -----------------------------------------------------------------------------
@@ -46,6 +61,13 @@ resource "google_secret_manager_secret_iam_member" "r2_access_key_id_accessor" {
 # Cloud Run SA に Secret Access Key へのアクセス権を付与
 resource "google_secret_manager_secret_iam_member" "r2_secret_access_key_accessor" {
   secret_id = google_secret_manager_secret.r2_secret_access_key.id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = var.cloud_run_sa_member
+}
+
+# Cloud Run SA に Backend Access Token へのアクセス権を付与
+resource "google_secret_manager_secret_iam_member" "backend_access_token_accessor" {
+  secret_id = google_secret_manager_secret.backend_access_token.id
   role      = "roles/secretmanager.secretAccessor"
   member    = var.cloud_run_sa_member
 }

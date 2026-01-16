@@ -98,6 +98,8 @@ module "secret_manager" {
   source = "../../modules/secret-manager"
 
   project_id  = var.project_id
+  r2_secret_access_key = var.r2_secret_access_key
+  backend_access_token = var.backend_access_token
   environment = var.environment
 
   # IAM モジュールの出力 (member 形式) を使用
@@ -129,6 +131,7 @@ module "cloud_run" {
   # modules/secret-manager の output を使用
   r2_access_key_id_secret_id     = module.secret_manager.r2_access_key_id_secret_id
   r2_secret_access_key_secret_id = module.secret_manager.r2_secret_access_key_secret_id
+  backend_access_token_secret_id = module.secret_manager.backend_access_token_secret_id
 
   # R2 環境設定 (変数から取得)
   r2_account_id  = var.r2_account_id

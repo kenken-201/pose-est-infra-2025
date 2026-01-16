@@ -9,6 +9,12 @@ variable "project_id" {
   type        = string
 }
 
+variable "backend_access_token" {
+  description = "Cloudflare Workers との認証用シークレットトークン"
+  type        = string
+  sensitive   = true
+}
+
 variable "environment" {
   description = "環境名 (dev, production)"
   type        = string

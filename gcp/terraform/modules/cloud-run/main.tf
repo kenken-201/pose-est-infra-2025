@@ -66,6 +66,17 @@ resource "google_cloud_run_v2_service" "service" {
           }
         }
       }
+      
+      # Cloudflare Access Token (Backend Auth)
+      env {
+        name = "CLOUDFLARE_ACCESS_TOKEN"
+        value_source {
+          secret_key_ref {
+            secret  = var.backend_access_token_secret_id
+            version = "latest"
+          }
+        }
+      }
 
       # R2 環境設定 (プレーンテキスト)
       env {

@@ -385,7 +385,7 @@
   - ヘルスチェックエンドポイント監視（100 件/月無料）
   - GCP コンソールで手動設定推奨
 
-#### ⬜ タスク 17.5: Cloudflare 連携ハンドオーバー (Integration Prep)
+#### ✅ タスク 17.5: Cloudflare 連携ハンドオーバー (Integration Prep)
 
 > [!NOTE] > `INFRA_HANDOVER.md.resolved` に基づく統合タスク。
 > Cloudflare チームからの引き継ぎ事項を実装します。
@@ -395,7 +395,7 @@
 - [x] **17.5-2: Cloudflare DNS レコード追加 (Prod)**
   - Cloudflare Infra チーム (Terraform) に Prod URL を共有し `api` レコード作成を依頼 (または実施)。
   - Dev 環境は `api.dev.kenken-pose-est.online` 設定済み。
-- [ ] **17.5-3: Backend CORS 設定更新**
+- [x] **17.5-3: Backend CORS 設定更新**
   - Prod/Dev 共にフロントエンドオリジン (`https://kenken-pose-est.online` 等) のみを許可。
 
 #### ⬜ タスク 17.6: インフラリファクタリング (将来対応)
@@ -403,6 +403,21 @@
 - [ ] **17.6-1: Prod 用 Artifact Registry の分離**
   - 現状は Dev 用イメージ (`pose-est-backend-dev`) を Prod でも参照している。
   - Prod 用のリポジトリ (`pose-est-backend-prod`) を作成し、CI/CD でそこに Push/Deploy するフローに修正する。
+
+#### 🛡️ タスク 17.7: Cloudflare アクセス制限実装（共有シークレット）
+
+> [!NOTE]
+> Cloudflare 以外からの直接アクセスを防ぐため、共有シークレットによる簡易認証を実装します。
+
+- [ ] **17.7-1: シークレット管理 (GCP)**
+  - Secret Manager に `backend-access-token` を作成
+  - Cloud Run に環境変数として注入
+- [ ] **17.7-2: バックエンド実装 (FastAPI)**
+  - ミドルウェアで認証ヘッダー (`X-CF-Access-Token`) を検証
+  - 不正なリクエストを 403 Forbidden で拒否
+- [ ] **17-B: Cloud-3: フロントエンド実装 (Cloudflare Workers)**
+  - Worker Secret にトークンを設定
+  - リクエスト転送時に認証ヘッダーを付与
 
 ### 🔄 **フェーズ 7: 完全な CI/CD パイプライン構築**
 

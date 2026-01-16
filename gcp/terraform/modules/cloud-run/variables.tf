@@ -52,7 +52,12 @@ variable "r2_access_key_id_secret_id" {
 }
 
 variable "r2_secret_access_key_secret_id" {
-  description = "R2 Secret Access Key の Secret Manager Secret ID"
+  description = "R2 Secret Access Key の Secret ID (Secret Manager)"
+  type        = string
+}
+
+variable "backend_access_token_secret_id" {
+  description = "Backend Access Token の Secret ID (Secret Manager)"
   type        = string
 }
 

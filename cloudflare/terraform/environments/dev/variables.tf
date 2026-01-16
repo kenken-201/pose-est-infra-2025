@@ -39,8 +39,19 @@ variable "domain_name" {
   default     = "kenken-pose-est.online"
 }
 
+variable "cloud_run_url" {
+  description = "Backend Cloud Run Service URL"
+  type        = string
+}
+
+variable "backend_access_token" {
+  description = "Backend Access Token (Shared Secret)"
+  type        = string
+  sensitive   = true
+}
+
 variable "cors_origins" {
-  description = "CORS 許可オリジンリスト"
+  description = "Allowed CORS Origins"
   type        = list(string)
   default     = ["*"]
 }
