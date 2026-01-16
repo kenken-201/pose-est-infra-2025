@@ -63,4 +63,5 @@ terraform init \
   -backend-config="endpoint=https://$CLOUDFLARE_ACCOUNT_ID.r2.cloudflarestorage.com"
 
 echo "📋 Terraform Plan を実行中 (Dev)..."
+echo "DEBUG: CLOUDFLARE_API_TOKEN Length: ${#CLOUDFLARE_API_TOKEN}"
 terraform plan -out=dev.tfplan

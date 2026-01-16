@@ -143,12 +143,14 @@ resource "cloudflare_workers_custom_domain" "frontend_dev" {
 # カスタムファイアウォールルールを適用します。
 # Note: Managed WAF は Free プラン制限のため Dashboard で設定
 
+/*
 module "security" {
   source = "../../modules/security"
 
   zone_id     = var.cloudflare_zone_id
   environment = var.environment
 }
+*/
 
 # -----------------------------------------------------------------------------
 # 監視設定モジュール

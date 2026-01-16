@@ -43,6 +43,7 @@ fi
 cd "$TF_DIR"
 
 echo "🚀 Terraform Apply を実行中 (Dev)..."
+echo "DEBUG: CLOUDFLARE_API_TOKEN Length: ${#CLOUDFLARE_API_TOKEN}"
 if [ -f "dev.tfplan" ]; then
   terraform apply "dev.tfplan"
 else
