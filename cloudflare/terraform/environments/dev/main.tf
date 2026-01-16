@@ -71,11 +71,7 @@ resource "cloudflare_workers_script" "api_proxy_dev" {
   account_id  = var.cloudflare_account_id
   script_name = "pose-est-api-proxy-dev"
   
-  # Secret Binding (認証トークン)
-  secret_text_binding = [{
-    name = "BACKEND_ACCESS_TOKEN"
-    text = var.backend_access_token
-  }]
+  # Secret Binding は別リソース (cloudflare_workers_secret) で定義
 
   # Worker Script 定義 (Inline)
   # 1. すべてのリクエスト ('fetch' event) を捕捉
@@ -158,4 +154,14 @@ module "monitoring" {
 
   account_id = var.cloudflare_account_id
   zone_id    = var.cloudflare_zone_id
+}
+
+# -----------------------------------------------------------------------------
+# Workers Secret (Backend Access Token)
+# -----------------------------------------------------------------------------
+resource "cloudflare_workers_secret" "backend_access_token" {
+  account_id  = var.cloudflare_account_id
+  script_name = cloudflare_workers_script.api_proxy_dev.script_name
+  name        = "BACKEND_ACCESS_TOKEN"
+  secret_text = var.backend_access_token
 }
