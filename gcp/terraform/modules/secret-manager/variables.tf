@@ -15,6 +15,12 @@ variable "backend_access_token" {
   sensitive   = true
 }
 
+variable "r2_secret_access_key" {
+  description = "Cloudflare R2 Secret Access Key"
+  type        = string
+  sensitive   = true
+}
+
 variable "environment" {
   description = "環境名 (dev, production)"
   type        = string

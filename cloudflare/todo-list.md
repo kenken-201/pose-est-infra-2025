@@ -446,6 +446,13 @@
   - Terraform での動的環境構築は複雑性が高いため、Wrangler の Preview 機能 (`workers.dev`) の活用を基本とする。
   - R2 などのステートフルなリソースの分離が必要な場合のみ、別途検討。
 
+#### 🛡️ タスク 26.5: Cloudflare アクセス制限対応 (Frontend/Workers)
+
+- [ ] **26.5-1: Worker シークレット設定**
+  - `BACKEND_ACCESS_TOKEN` の追加
+- [ ] **26.5-2: リクエストヘッダー付与**
+  - Worker Script で `X-CF-Access-Token` を付与
+
 #### ⚠️ タスク 27: 署名 URL 統合テスト (Deferred to Phase 9)
 
 - [ ] **27-1: 統合テスト実施**

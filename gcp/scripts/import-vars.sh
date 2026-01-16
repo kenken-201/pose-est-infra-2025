@@ -29,3 +29,8 @@ fi
 if [ -n "$CLOUDFLARE_ACCOUNT_ID" ]; then
   export TF_VAR_r2_account_id="$CLOUDFLARE_ACCOUNT_ID"
 fi
+
+# R2 Secret Key -> TF_VAR_r2_secret_access_key
+if [ -n "$R2_SECRET_ACCESS_KEY" ]; then
+  export TF_VAR_r2_secret_access_key="$R2_SECRET_ACCESS_KEY"
+fi
