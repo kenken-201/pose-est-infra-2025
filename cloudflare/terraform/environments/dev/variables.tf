@@ -75,3 +75,9 @@ variable "additional_records" {
     error_message = "DNS レコードタイプは A, AAAA, CNAME, TXT, MX, NS, SPF, SRV のいずれかである必要があります。"
   }
 }
+
+variable "enable_security_headers" {
+  description = "セキュリティヘッダー (HSTS, etc.) を有効化するか (Dev 環境では権限不足のため false 推奨)"
+  type        = bool
+  default     = false
+}

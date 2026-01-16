@@ -34,3 +34,8 @@ fi
 if [ -n "$R2_SECRET_ACCESS_KEY" ]; then
   export TF_VAR_r2_secret_access_key="$R2_SECRET_ACCESS_KEY"
 fi
+
+# Backend Access Token -> TF_VAR_backend_access_token
+if [ -n "$BACKEND_ACCESS_TOKEN" ]; then
+  export TF_VAR_backend_access_token="$BACKEND_ACCESS_TOKEN"
+fi

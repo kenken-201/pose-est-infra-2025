@@ -68,3 +68,9 @@ variable "backend_access_token" {
   sensitive   = true
   default     = ""
 }
+
+variable "enable_security_headers" {
+  description = "セキュリティヘッダーを有効化するか"
+  type        = bool
+  default     = true
+}

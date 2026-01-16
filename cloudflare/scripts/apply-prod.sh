@@ -36,6 +36,10 @@ if [ -n "$TF_VAR_prod_cloud_run_url" ]; then
   export TF_VAR_cloud_run_url="$TF_VAR_prod_cloud_run_url"
 fi
 
+if [ -n "$BACKEND_ACCESS_TOKEN" ]; then
+  export TF_VAR_backend_access_token="$BACKEND_ACCESS_TOKEN"
+fi
+
 cd "$TF_DIR"
 
 echo "🚀 Terraform Apply を実行中 (Prod)..."

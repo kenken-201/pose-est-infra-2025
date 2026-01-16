@@ -31,6 +31,12 @@ resource "google_secret_manager_secret" "r2_secret_access_key" {
   }
 }
 
+# R2 Secret Access Key Version (値の登録)
+resource "google_secret_manager_secret_version" "r2_secret_access_key_version" {
+  secret      = google_secret_manager_secret.r2_secret_access_key.id
+  secret_data = var.r2_secret_access_key
+}
+
 # Backend Access Token (Cloudflare <-> Cloud Run 認証用)
 resource "google_secret_manager_secret" "backend_access_token" {
   secret_id = "backend-access-token-${var.environment}"

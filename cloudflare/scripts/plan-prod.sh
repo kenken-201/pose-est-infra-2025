@@ -42,6 +42,11 @@ if [ -n "$TF_VAR_prod_cloud_run_url" ]; then
   export TF_VAR_cloud_run_url="$TF_VAR_prod_cloud_run_url"
 fi
 
+if [ -n "$BACKEND_ACCESS_TOKEN" ]; then
+  echo "✅ Backend Access Token loaded"
+  export TF_VAR_backend_access_token="$BACKEND_ACCESS_TOKEN"
+fi
+
 cd "$TF_DIR"
 
 echo "📦 Terraform Backend を初期化中 (Prod)..."
