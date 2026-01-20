@@ -55,7 +55,42 @@
    R2_SECRET_ACCESS_KEY="your_r2_secret_key"
    ```
 
-## 5. 検証 (Verification)
+## 5. アプリケーション用 R2 アクセスキーの発行 (タスク 6)
+
+アプリケーション（GCP Backend など）から R2 バケットのみへのアクセスに限定した、セキュアなアクセスキーを発行します。
+
+1. **API トークン作成画面へ移動**:
+
+   - Cloudflare Dashboard > R2 > 画面右側の「Manage R2 API Tokens」をクリック。
+   - 「Create API Token」をクリック。
+
+2. **トークン設定**:
+
+   - **Token Name**: `pose-est-backend-app` (任意の識別名)
+   - **Permissions**: `Object Read & Write` を選択。
+   - **Specific Bucket(s)**: `Apply to specific bucket(s) only` を選択し、作成したバケット（例: `pose-est-videos-dev`）のみを選択。**推奨**: セキュリティのため、全バケットへのアクセス権は避けてください。
+   - **TTL**: 必要に応じて設定（`Forever` またはポリシーに従って設定）。
+
+3. **発行と保存**:
+
+   - 「Create API Token」をクリック。
+   - 表示された `Access Key ID` と `Secret Access Key` をコピーします。
+   - **注意**: Secret Key はこの画面でしか確認できません。
+
+4. **ローカル環境への登録**:
+
+   - プロジェクトルートで以下のヘルパースクリプトを実行し、キーを登録します。
+     ```bash
+     ./pose-est-infra/cloudflare/scripts/setup-secrets.sh
+     ```
+
+5. **GitHub Secrets への登録**:
+   - 以下のスクリプトを実行して、CI/CD 用に登録します (gh CLI が必要)。
+     ```bash
+     ./pose-est-infra/cloudflare/scripts/register-gh-secrets.sh
+     ```
+
+## 6. 検証 (Verification)
 
 トークンが機能することを確認するために検証スクリプトを実行します:
 

@@ -1,0 +1,195 @@
+/*
+  Production 環境メイン設定
+  -----------------------------------------------------------------------------
+  本番環境 (production) 用の Cloudflare リソースを定義します。
+  - R2 Bucket: pose-est-videos-production
+  - DNS: kenken-pose-est.online (Root) -> Worker
+  - WWW Redirect: www -> Root
+  - Security: WAF, Rate Limiting
+*/
+
+terraform {
+  required_version = ">= 1.14.3"
+  required_providers {
+    cloudflare = {
+      source  = "cloudflare/cloudflare"
+      version = "~> 5"
+    }
+  }
+}
+
+provider "cloudflare" {
+  # API Token via CLOUDFLARE_API_TOKEN env var
+}
+
+# -----------------------------------------------------------------------------
+# R2 バケットモジュール
+# -----------------------------------------------------------------------------
+module "r2_bucket" {
+  source = "../../modules/r2"
+
+  account_id   = var.cloudflare_account_id
+  bucket_name  = "pose-est-videos-${var.environment}"
+  location     = "apac"
+  cors_origins = var.cors_origins
+}
+
+# -----------------------------------------------------------------------------
+# DNS / ゾーン設定モジュール
+# -----------------------------------------------------------------------------
+# Shared Zone (dev state) で管理済みのためスキップ
+# module "dns" {
+#   source = "../../modules/dns"
+#   zone_id            = var.cloudflare_zone_id
+#   domain_name        = var.domain_name
+#   additional_records = var.additional_records
+# }
+
+# ... (Shared Zone DNS module commented out) ...
+
+# -----------------------------------------------------------------------------
+# Workers カスタムドメイン設定 (Root Domain)
+# -----------------------------------------------------------------------------
+resource "cloudflare_workers_custom_domain" "frontend_prod" {
+  account_id = var.cloudflare_account_id
+  zone_id    = var.cloudflare_zone_id
+  service    = "pose-est-frontend-prod" # wrangler.jsonc [env.production] name と一致が必要
+  hostname   = "kenken-pose-est.online"
+}
+
+# -----------------------------------------------------------------------------
+# WWW リダイレクト設定 (Task 24-2)
+# -----------------------------------------------------------------------------
+# 1. WWW CNAME Record (Provider v5: cloudflare_dns_record)
+resource "cloudflare_dns_record" "www" {
+  zone_id = var.cloudflare_zone_id
+  name    = "www"
+  content = "kenken-pose-est.online"
+  type    = "CNAME"
+  proxied = true
+  ttl     = 1 # Auto
+  comment = "Redirect to Root"
+}
+
+# 2. Redirect Rule (IaD - Infrastructure as Documentation)
+# NOTE: API Token 権限不足 (403 Forbidden) により Terraform 経由での作成が失敗するため、
+# Dashboard で手動設定してください。設定済み (2026-01-13)。
+#
+# 設定手順: Rules > Redirect Rules > Create new Single Redirect
+# - Rule name: WWW Redirect
+# - If incoming requests match: Wildcard pattern
+# - Request URL: https://www.kenken-pose-est.online/*
+# - Target URL: Dynamic - https://kenken-pose-est.online/$1
+# - Status code: 301
+# - Preserve query string: ✅
+
+#
+# resource "cloudflare_ruleset" "www_redirect" {
+#   zone_id     = var.cloudflare_zone_id
+#   name        = "WWW Redirect to Root"
+#   description = "Redirect www to root domain"
+#   kind        = "zone"
+#   phase       = "http_request_dynamic_redirect"
+#
+#   rules = [
+#     {
+#       action = "redirect"
+#       action_parameters = {
+#         from_value = {
+#           status_code = 301
+#           target_url = {
+#             expression = "concat(\"https://kenken-pose-est.online\", http.request.uri.path)"
+#           }
+#           preserve_query_string = true
+#         }
+#       }
+#       expression  = "(http.host eq \"www.kenken-pose-est.online\")"
+#       description = "Redirect www requests"
+#       enabled     = true
+#     }
+#   ]
+# }
+
+# -----------------------------------------------------------------------------
+# セキュリティモジュール (WAF)
+# -----------------------------------------------------------------------------
+# Shared Zone (dev state) で管理済みのためスキップ
+# module "security" {
+#   source = "../../modules/security"
+#   zone_id     = var.cloudflare_zone_id
+#   environment = var.environment
+# }
+
+# -----------------------------------------------------------------------------
+# 監視設定モジュール
+# -----------------------------------------------------------------------------
+module "monitoring" {
+  source = "../../modules/monitoring"
+
+  account_id = var.cloudflare_account_id
+  zone_id    = var.cloudflare_zone_id
+}
+
+# -----------------------------------------------------------------------------
+# Backend API DNS レコード (Cloud Run)
+# -----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+# Workaround: Worker Proxy for Host Override (Free Plan Support)
+# -----------------------------------------------------------------------------
+resource "cloudflare_workers_script" "api_proxy_prod" {
+  count       = var.cloud_run_url != "" ? 1 : 0
+  account_id  = var.cloudflare_account_id
+  script_name = "pose-est-api-proxy-prod"
+
+  # Secret Binding (認証トークン)
+  bindings = [{
+    name = "BACKEND_ACCESS_TOKEN"
+    type = "secret_text"
+    text = var.backend_access_token
+  }]
+
+  content = <<EOT
+addEventListener('fetch', event => {
+  event.respondWith(handleRequest(event.request))
+})
+
+async function handleRequest(request) {
+  // 転送先 (Backend Cloud Run) のホスト名
+  const targetHostname = "${replace(replace(var.cloud_run_url, "https://", ""), "/", "")}";
+  
+  // 元のリクエストURLをパースし、ホスト名を書き換え
+  const url = new URL(request.url);
+  url.hostname = targetHostname;
+  
+  // ヘッダーをコピーして必要な修正を加える
+  const headers = new Headers(request.headers);
+  headers.set("Host", targetHostname);
+  headers.set("X-CF-Access-Token", BACKEND_ACCESS_TOKEN);
+  
+  // リクエストメソッドに応じて body の扱いを変える
+  // GET/HEAD/OPTIONS には body がないため、duplex も不要
+  const hasBody = !['GET', 'HEAD', 'OPTIONS'].includes(request.method);
+  
+  const init = {
+    method: request.method,
+    headers: headers
+  };
+  
+  // POST/PUT/PATCH 等、body があるメソッドのみストリーミング転送
+  if (hasBody) {
+    init.body = request.body;
+    init.duplex = 'half';
+  }
+  
+  return fetch(url.toString(), init);
+}
+EOT
+}
+
+resource "cloudflare_workers_custom_domain" "api_proxy_prod" {
+  count      = var.cloud_run_url != "" ? 1 : 0
+  account_id = var.cloudflare_account_id
+  zone_id    = var.cloudflare_zone_id
+  service    = "pose-est-api-proxy-prod" # Must match script_name
+  hostname   = "api.kenken-pose-est.online"
+}

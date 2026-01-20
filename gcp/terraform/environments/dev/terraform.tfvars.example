@@ -1,0 +1,5 @@
+project_id         = "kenken-pose-est"
+region             = "asia-northeast1"
+environment        = "dev"
+gcp_notification_email = "your-email@example.com"
+r2_account_id      = "your-cloudflare-account-id" # 省略可 (import-vars.sh で自動設定されるため)
