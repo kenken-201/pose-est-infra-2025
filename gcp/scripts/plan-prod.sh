@@ -1,13 +1,13 @@
 #!/bin/bash
 set -e
 
-# Terraform Plan 実行スクリプト (Dev 環境)
+# Terraform Plan 実行スクリプト (Prod 環境)
 # -----------------------------------------------------------------------------
 # .env から環境変数を読み込み、terraform init と plan を実行します。
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ENV_FILE="$SCRIPT_DIR/../.env"
-TF_DIR="$SCRIPT_DIR/../terraform/environments/dev"
+TF_DIR="$SCRIPT_DIR/../terraform/environments/prod"
 
 # 環境変数のインポート
 source "$SCRIPT_DIR/import-vars.sh"
@@ -20,12 +20,12 @@ fi
 
 cd "$TF_DIR"
 
-echo "📦 Terraform Backend を初期化中..."
+echo "📦 Terraform Backend を初期化中 (Prod)..."
 terraform init \
   -reconfigure \
   -backend-config="access_key=$R2_ACCESS_KEY_ID" \
   -backend-config="secret_key=$R2_SECRET_ACCESS_KEY" \
   -backend-config="endpoint=https://$CLOUDFLARE_ACCOUNT_ID.r2.cloudflarestorage.com"
 
-echo "📋 Terraform Plan を実行中 (Dev)..."
-terraform plan -out=dev.tfplan
+echo "📋 Terraform Plan を実行中 (Prod)..."
+terraform plan -out=prod.tfplan

@@ -17,6 +17,15 @@ if [ -f "$ENV_FILE" ]; then
   set +a
 fi
 
+# GCP .env ファイルの読み込み (Shared Variables like Cloud Run URL)
+GCP_ENV_FILE="$SCRIPT_DIR/../../gcp/.env"
+if [ -f "$GCP_ENV_FILE" ]; then
+  set -a
+  source "$GCP_ENV_FILE"
+  set +a
+fi
+echo "DEBUG: TF_VAR_dev_cloud_run_url is '${TF_VAR_dev_cloud_run_url}'"
+
 # Zone ID Check & Normalize
 if [ -n "$CLOUDFLARE_ZONE_ID" ]; then
   export TF_VAR_cloudflare_zone_id="$CLOUDFLARE_ZONE_ID"
@@ -25,9 +34,16 @@ elif [ -n "$TF_VAR_CLOUDFLARE_ZONE_ID" ]; then
 fi
 export TF_VAR_cloudflare_account_id="$CLOUDFLARE_ACCOUNT_ID"
 
+# Map Environment Specific Variable
+if [ -n "$TF_VAR_dev_cloud_run_url" ]; then
+  # plan-dev.sh will also do this, but apply needs it for consistent state if plan runs implicitly
+  export TF_VAR_cloud_run_url="$TF_VAR_dev_cloud_run_url"
+fi
+
 cd "$TF_DIR"
 
 echo "🚀 Terraform Apply を実行中 (Dev)..."
+echo "DEBUG: CLOUDFLARE_API_TOKEN Length: ${#CLOUDFLARE_API_TOKEN}"
 if [ -f "dev.tfplan" ]; then
   terraform apply "dev.tfplan"
 else

@@ -9,18 +9,8 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ENV_FILE="$SCRIPT_DIR/../.env"
 TF_DIR="$SCRIPT_DIR/../terraform/environments/dev"
 
-# .env 読み込み
-if [ -f "$ENV_FILE" ]; then
-  set -a
-  source "$ENV_FILE"
-  set +a
-fi
-
-# Terraform 用変数エクスポート
-# (setup-secrets.sh で設定された CLOUDFLARE_ACCOUNT_ID を使用)
-if [ -n "$CLOUDFLARE_ACCOUNT_ID" ]; then
-  export TF_VAR_r2_account_id="$CLOUDFLARE_ACCOUNT_ID"
-fi
+# 環境変数のインポート
+source "$SCRIPT_DIR/import-vars.sh"
 
 cd "$TF_DIR"
 

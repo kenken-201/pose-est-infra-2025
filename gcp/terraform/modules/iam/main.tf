@@ -72,8 +72,10 @@ resource "google_project_iam_member" "cloud_run_roles" {
 
     # カスタムメトリクスを Cloud Monitoring に送信するために必要 (可観測性の向上)
 
-    "roles/monitoring.metricWriter"
+    "roles/monitoring.metricWriter",
 
+    # Artifact Registry からコンテナイメージをプルするために必要
+    "roles/artifactregistry.reader"
   ])
 
 

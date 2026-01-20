@@ -122,6 +122,7 @@ module "cloud_run" {
   environment = var.environment
 
   # コンテナイメージ (Artifact Registry)
+  # Task 17.6: Prod 用 Artifact Registry を使用
   image_url = "${module.artifact_registry.repository_url}/pose-est-backend:latest"
 
   # サービスアカウント

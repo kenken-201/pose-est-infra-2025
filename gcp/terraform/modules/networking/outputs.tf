@@ -37,5 +37,5 @@ output "subnet_self_link" {
 
 output "nat_ip" {
   description = "Cloud NAT に割り当てられた静的 IP アドレス"
-  value       = google_compute_address.nat.address
+  value       = var.enable_nat ? google_compute_address.nat[0].address : null
 }

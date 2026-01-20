@@ -53,6 +53,84 @@ module "dns" {
 }
 
 # -----------------------------------------------------------------------------
+# Workaround: Worker Proxy for Host Override (Free Plan Support)
+# -----------------------------------------------------------------------------
+# 【背景・目的】
+# Cloud Run をカスタムドメイン (api-dev.kenken-pose-est.online) で公開する際、
+# Cloud Run 側は本来のドメイン (*.run.app) の Host ヘッダーを要求します (デフォルト仕様)。
+#
+# 通常、Cloudflare Pro プラン以上であれば "Origin Rules" 機能で Host ヘッダーを書き換えられますが、
+# Free プランではその機能が制限されています。
+#
+# そのため、Cloudflare Workers をリバースプロキシとして間に挟み、
+# Worker 内でプログラム的に Host ヘッダーを `*.run.app` に書き換えてから
+# Cloud Run へリクエストを転送する構成を採用しています。
+# -----------------------------------------------------------------------------
+
+resource "cloudflare_workers_script" "api_proxy_dev" {
+  account_id  = var.cloudflare_account_id
+  script_name = "pose-est-api-proxy-dev"
+
+  # Secret Binding (認証トークン)
+  bindings = [{
+    name = "BACKEND_ACCESS_TOKEN"
+    type = "secret_text"
+    text = var.backend_access_token
+  }]
+
+  # Worker Script 定義 (Inline)
+  # 1. すべてのリクエスト ('fetch' event) を捕捉
+  # 2. handleRequest 関数でリクエスト内容 (URL, Header) を加工
+  # 3. Cloud Run へ転送
+  content = <<EOT
+addEventListener('fetch', event => {
+  event.respondWith(handleRequest(event.request))
+})
+
+async function handleRequest(request) {
+  // 転送先 (Backend Cloud Run) のホスト名
+  const targetHostname = "${replace(replace(var.cloud_run_url, "https://", ""), "/", "")}";
+  
+  // 元のリクエストURLをパースし、ホスト名を書き換え
+  const url = new URL(request.url);
+  url.hostname = targetHostname;
+  
+  // ヘッダーをコピーして必要な修正を加える
+  const headers = new Headers(request.headers);
+  headers.set("Host", targetHostname);
+  headers.set("X-CF-Access-Token", BACKEND_ACCESS_TOKEN);
+  
+  // リクエストメソッドに応じて body の扱いを変える
+  // GET/HEAD/OPTIONS には body がないため、duplex も不要
+  const hasBody = !['GET', 'HEAD', 'OPTIONS'].includes(request.method);
+  
+  const init = {
+    method: request.method,
+    headers: headers
+  };
+  
+  // POST/PUT/PATCH 等、body があるメソッドのみストリーミング転送
+  if (hasBody) {
+    init.body = request.body;
+    init.duplex = 'half';
+  }
+  
+  return fetch(url.toString(), init);
+}
+EOT
+}
+
+# Worker を特定のカスタムドメインに紐付ける設定
+# これにより https://api-dev.kenken-pose-est.online へのアクセスが
+# 上記の Worker スクリプトによって処理されるようになります。
+resource "cloudflare_workers_custom_domain" "api_proxy_dev" {
+  account_id = var.cloudflare_account_id
+  zone_id    = var.cloudflare_zone_id
+  service    = "pose-est-api-proxy-dev" # 上記の script_name と一致させる必要があります
+  hostname   = "api-dev.kenken-pose-est.online"
+}
+
+# -----------------------------------------------------------------------------
 # Workers カスタムドメイン設定
 # -----------------------------------------------------------------------------
 # フロントエンド (Workers) 用の DNS レコードとルート設定
@@ -61,7 +139,7 @@ module "dns" {
 resource "cloudflare_workers_custom_domain" "frontend_dev" {
   account_id = var.cloudflare_account_id
   zone_id    = var.cloudflare_zone_id
-  service    = "pose-est-frontend" # wrangler.jsonc の "name" と一致させる
+  service    = "pose-est-frontend-dev" # wrangler.jsonc の "name" と一致させる
   hostname   = "dev.kenken-pose-est.online"
 }
 
@@ -74,8 +152,9 @@ resource "cloudflare_workers_custom_domain" "frontend_dev" {
 module "security" {
   source = "../../modules/security"
 
-  zone_id     = var.cloudflare_zone_id
-  environment = var.environment
+  zone_id                 = var.cloudflare_zone_id
+  environment             = var.environment
+  enable_security_headers = var.enable_security_headers
 }
 
 # -----------------------------------------------------------------------------
@@ -88,3 +167,4 @@ module "monitoring" {
   account_id = var.cloudflare_account_id
   zone_id    = var.cloudflare_zone_id
 }
+

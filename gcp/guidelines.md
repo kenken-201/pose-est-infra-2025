@@ -153,7 +153,7 @@ pose-est-infra/gcp/
 │   │   │   ├── main.tf
 │   │   │   ├── variables.tf
 │   │   │   └── terraform.tfvars
-│   │   └── production/              # 本番環境
+│   │   └── prod/              # 本番環境
 │   │       ├── main.tf
 │   │       ├── variables.tf
 │   │       └── terraform.tfvars

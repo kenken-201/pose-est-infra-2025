@@ -22,10 +22,10 @@ variable "cloudflare_zone_id" {
 variable "environment" {
   description = "環境名 (dev, production)"
   type        = string
-  default     = "production"
+  default     = "prod"
   validation {
-    condition     = var.environment == "production"
-    error_message = "この環境は 'production' である必要があります。"
+    condition     = var.environment == "prod"
+    error_message = "この環境は 'prod' である必要があります。"
   }
 }
 
@@ -55,3 +55,26 @@ variable "cors_origins" {
 #   }))
 #   default = []
 # }
+
+variable "cloud_run_url" {
+  description = "GCP Cloud Run サービスの URL (Prod)"
+  type        = string
+  default     = ""
+}
+
+variable "backend_access_token" {
+  description = "Backend Access Token (Shared Secret)"
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
+variable "enable_security_headers" {
+  description = <<-EOT
+    セキュリティヘッダー (HSTS, X-Frame-Options, etc.) の Cloudflare Transform Rules を有効化するか。
+    Prod 環境では true を推奨（ブラウザセキュリティ強化）。
+    Cloudflare API トークンに "Zone: Transform Rules: Edit" 権限が必要です。
+  EOT
+  type        = bool
+  default     = true
+}
