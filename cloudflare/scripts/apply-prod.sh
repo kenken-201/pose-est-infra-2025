@@ -17,11 +17,38 @@ if [ -f "$ENV_FILE" ]; then
   set +a
 fi
 
+# GCP .env ファイルの読み込み (Shared Variables like Cloud Run URL)
+GCP_ENV_FILE="$SCRIPT_DIR/../../gcp/.env"
+if [ -f "$GCP_ENV_FILE" ]; then
+  set -a
+  source "$GCP_ENV_FILE"
+  set +a
+fi
+
 # Zone ID
 if [ -n "$CLOUDFLARE_ZONE_ID" ]; then
   export TF_VAR_cloudflare_zone_id="$CLOUDFLARE_ZONE_ID"
 fi
 export TF_VAR_cloudflare_account_id="$CLOUDFLARE_ACCOUNT_ID"
+
+# -----------------------------------------------------------------------------
+# 環境固有変数のマッピング
+# -----------------------------------------------------------------------------
+# Cloud Run URL (Prod 環境用)
+if [ -n "$TF_VAR_prod_cloud_run_url" ]; then
+  echo "✅ Cloud Run URL (Prod): ${TF_VAR_prod_cloud_run_url:0:50}..."
+  export TF_VAR_cloud_run_url="$TF_VAR_prod_cloud_run_url"
+else
+  echo "⚠️  TF_VAR_prod_cloud_run_url が未設定です (Worker Proxy がデプロイされない可能性があります)"
+fi
+
+# Backend Access Token (Shared Secret for CF <-> GCP auth)
+if [ -n "$BACKEND_ACCESS_TOKEN" ]; then
+  echo "✅ Backend Access Token: [REDACTED] (${#BACKEND_ACCESS_TOKEN} chars)"
+  export TF_VAR_backend_access_token="$BACKEND_ACCESS_TOKEN"
+else
+  echo "⚠️  BACKEND_ACCESS_TOKEN が未設定です (Worker から Cloud Run への認証が機能しません)"
+fi
 
 cd "$TF_DIR"
 

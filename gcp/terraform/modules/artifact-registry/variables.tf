@@ -19,8 +19,8 @@ variable "environment" {
   type        = string
 
   validation {
-    condition     = contains(["dev", "production"], var.environment)
-    error_message = "環境名は 'dev' または 'production' である必要があります。"
+    condition     = contains(["dev", "prod"], var.environment)
+    error_message = "環境名は 'dev' または 'prod' である必要があります。"
   }
 }
 

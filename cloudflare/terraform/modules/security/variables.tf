@@ -17,3 +17,9 @@ variable "environment" {
     error_message = "Environment must be one of: dev, staging, production."
   }
 }
+
+variable "enable_security_headers" {
+  description = "Enable Security Headers (Transform Rules). Requires Zone Transform Rules Edit permission."
+  type        = bool
+  default     = true
+}

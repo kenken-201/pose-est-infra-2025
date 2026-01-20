@@ -53,7 +53,7 @@ module "r2_bucket" {
 resource "cloudflare_workers_custom_domain" "frontend_prod" {
   account_id = var.cloudflare_account_id
   zone_id    = var.cloudflare_zone_id
-  service    = "pose-est-frontend" # wrangler.toml [env.production] name と一致が必要
+  service    = "pose-est-frontend-prod" # wrangler.jsonc [env.production] name と一致が必要
   hostname   = "kenken-pose-est.online"
 }
 
@@ -128,4 +128,68 @@ module "monitoring" {
 
   account_id = var.cloudflare_account_id
   zone_id    = var.cloudflare_zone_id
+}
+
+# -----------------------------------------------------------------------------
+# Backend API DNS レコード (Cloud Run)
+# -----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+# Workaround: Worker Proxy for Host Override (Free Plan Support)
+# -----------------------------------------------------------------------------
+resource "cloudflare_workers_script" "api_proxy_prod" {
+  count       = var.cloud_run_url != "" ? 1 : 0
+  account_id  = var.cloudflare_account_id
+  script_name = "pose-est-api-proxy-prod"
+
+  # Secret Binding (認証トークン)
+  bindings = [{
+    name = "BACKEND_ACCESS_TOKEN"
+    type = "secret_text"
+    text = var.backend_access_token
+  }]
+
+  content = <<EOT
+addEventListener('fetch', event => {
+  event.respondWith(handleRequest(event.request))
+})
+
+async function handleRequest(request) {
+  // 転送先 (Backend Cloud Run) のホスト名
+  const targetHostname = "${replace(replace(var.cloud_run_url, "https://", ""), "/", "")}";
+  
+  // 元のリクエストURLをパースし、ホスト名を書き換え
+  const url = new URL(request.url);
+  url.hostname = targetHostname;
+  
+  // ヘッダーをコピーして必要な修正を加える
+  const headers = new Headers(request.headers);
+  headers.set("Host", targetHostname);
+  headers.set("X-CF-Access-Token", BACKEND_ACCESS_TOKEN);
+  
+  // リクエストメソッドに応じて body の扱いを変える
+  // GET/HEAD/OPTIONS には body がないため、duplex も不要
+  const hasBody = !['GET', 'HEAD', 'OPTIONS'].includes(request.method);
+  
+  const init = {
+    method: request.method,
+    headers: headers
+  };
+  
+  // POST/PUT/PATCH 等、body があるメソッドのみストリーミング転送
+  if (hasBody) {
+    init.body = request.body;
+    init.duplex = 'half';
+  }
+  
+  return fetch(url.toString(), init);
+}
+EOT
+}
+
+resource "cloudflare_workers_custom_domain" "api_proxy_prod" {
+  count      = var.cloud_run_url != "" ? 1 : 0
+  account_id = var.cloudflare_account_id
+  zone_id    = var.cloudflare_zone_id
+  service    = "pose-est-api-proxy-prod" # Must match script_name
+  hostname   = "api.kenken-pose-est.online"
 }

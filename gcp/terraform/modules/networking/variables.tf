@@ -19,8 +19,8 @@ variable "environment" {
   type        = string
 
   validation {
-    condition     = contains(["dev", "production"], var.environment)
-    error_message = "環境名は 'dev' または 'production' である必要があります。"
+    condition     = contains(["dev", "prod"], var.environment)
+    error_message = "環境名は 'dev' または 'prod' である必要があります。"
   }
 }
 
@@ -32,4 +32,10 @@ variable "subnet_cidr" {
     condition     = can(cidrhost(var.subnet_cidr, 0))
     error_message = "subnet_cidr は有効な CIDR ブロックである必要があります。"
   }
+}
+
+variable "enable_nat" {
+  description = "Cloud NAT を作成するかどうか (Cloud Run 等が VPC 内から外部アクセスする場合に必要)"
+  type        = bool
+  default     = false
 }

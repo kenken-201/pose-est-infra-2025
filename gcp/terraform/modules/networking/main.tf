@@ -43,6 +43,7 @@ resource "google_compute_subnetwork" "subnet" {
 # Cloud Router (Cloud NAT 用)
 # -----------------------------------------------------------------------------
 resource "google_compute_router" "router" {
+  count   = var.enable_nat ? 1 : 0
   name    = "pose-est-router-${var.environment}"
   project = var.project_id
   region  = var.region
@@ -53,6 +54,7 @@ resource "google_compute_router" "router" {
 # Cloud NAT 用静的 IP (Static IP)
 # -----------------------------------------------------------------------------
 resource "google_compute_address" "nat" {
+  count   = var.enable_nat ? 1 : 0
   name    = "pose-est-nat-ip-${var.environment}"
   project = var.project_id
   region  = var.region
@@ -62,14 +64,15 @@ resource "google_compute_address" "nat" {
 # Cloud NAT
 # -----------------------------------------------------------------------------
 resource "google_compute_router_nat" "nat" {
+  count   = var.enable_nat ? 1 : 0
   name    = "pose-est-nat-${var.environment}"
   project = var.project_id
   region  = var.region
-  router  = google_compute_router.router.name
+  router  = google_compute_router.router[0].name
 
   # 静的 IP を割り当て (IP ホワイトリスト対応のため)
   nat_ip_allocate_option = "MANUAL_ONLY"
-  nat_ips                = [google_compute_address.nat.self_link]
+  nat_ips                = [google_compute_address.nat[0].self_link]
 
   source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
 

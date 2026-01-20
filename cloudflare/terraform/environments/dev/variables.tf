@@ -39,8 +39,19 @@ variable "domain_name" {
   default     = "kenken-pose-est.online"
 }
 
+variable "cloud_run_url" {
+  description = "Backend Cloud Run Service URL"
+  type        = string
+}
+
+variable "backend_access_token" {
+  description = "Backend Access Token (Shared Secret)"
+  type        = string
+  sensitive   = true
+}
+
 variable "cors_origins" {
-  description = "CORS 許可オリジンリスト"
+  description = "Allowed CORS Origins"
   type        = list(string)
   default     = ["*"]
 }
@@ -65,3 +76,12 @@ variable "additional_records" {
   }
 }
 
+variable "enable_security_headers" {
+  description = <<-EOT
+    セキュリティヘッダー (HSTS, X-Frame-Options, etc.) の Cloudflare Transform Rules を有効化するか。
+    Dev 環境では Cloudflare API トークンに Transform Rules の編集権限がない場合 false を推奨。
+    Prod 環境では true を推奨。
+  EOT
+  type        = bool
+  default     = false
+}

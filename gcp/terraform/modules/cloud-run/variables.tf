@@ -19,8 +19,8 @@ variable "environment" {
   type        = string
 
   validation {
-    condition     = contains(["dev", "production"], var.environment)
-    error_message = "環境名は 'dev' または 'production' である必要があります。"
+    condition     = contains(["dev", "prod"], var.environment)
+    error_message = "環境名は 'dev' または 'prod' である必要があります。"
   }
 }
 
@@ -52,7 +52,12 @@ variable "r2_access_key_id_secret_id" {
 }
 
 variable "r2_secret_access_key_secret_id" {
-  description = "R2 Secret Access Key の Secret Manager Secret ID"
+  description = "R2 Secret Access Key の Secret ID (Secret Manager)"
+  type        = string
+}
+
+variable "backend_access_token_secret_id" {
+  description = "Backend Access Token の Secret ID (Secret Manager)"
   type        = string
 }
 
