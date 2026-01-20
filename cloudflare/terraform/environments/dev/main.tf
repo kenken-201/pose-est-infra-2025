@@ -88,28 +88,34 @@ addEventListener('fetch', event => {
 })
 
 async function handleRequest(request) {
-  // 元のリクエストURLをパース
-  const url = new URL(request.url);
-  
-  // 転送先 (Backend Cloud Run) のホスト名を環境変数から構築
-  // var.cloud_run_url (https://...run.app) からプロトコルとパスを除去してホスト名のみ抽出
+  // 転送先 (Backend Cloud Run) のホスト名
   const targetHostname = "${replace(replace(var.cloud_run_url, "https://", ""), "/", "")}";
   
-  // リクエストURLのホスト名を Cloud Run のものに書き換え
+  // 元のリクエストURLをパースし、ホスト名を書き換え
+  const url = new URL(request.url);
   url.hostname = targetHostname;
   
-  // 新しいリクエストオブジェクトを作成 (元のリクエストを複製)
-  // ここで Host ヘッダーを明示的に Cloud Run のホスト名に上書きします
-  // ※ これを行わないと Cloud Run は 404 Not Found を返します
-  const newRequest = new Request(url.toString(), request);
-  newRequest.headers.set("Host", targetHostname);
-
-  // 認証トークンをヘッダーに付与
-  // BACKEND_ACCESS_TOKEN は secret_text_binding で注入されたグローバル変数
-  newRequest.headers.set("X-CF-Access-Token", BACKEND_ACCESS_TOKEN);
+  // ヘッダーをコピーして必要な修正を加える
+  const headers = new Headers(request.headers);
+  headers.set("Host", targetHostname);
+  headers.set("X-CF-Access-Token", BACKEND_ACCESS_TOKEN);
   
-  // 書き換えたリクエストを Cloud Run へ送信 (Fetch)
-  return fetch(newRequest);
+  // リクエストメソッドに応じて body の扱いを変える
+  // GET/HEAD/OPTIONS には body がないため、duplex も不要
+  const hasBody = !['GET', 'HEAD', 'OPTIONS'].includes(request.method);
+  
+  const init = {
+    method: request.method,
+    headers: headers
+  };
+  
+  // POST/PUT/PATCH 等、body があるメソッドのみストリーミング転送
+  if (hasBody) {
+    init.body = request.body;
+    init.duplex = 'half';
+  }
+  
+  return fetch(url.toString(), init);
 }
 EOT
 }
@@ -133,7 +139,7 @@ resource "cloudflare_workers_custom_domain" "api_proxy_dev" {
 resource "cloudflare_workers_custom_domain" "frontend_dev" {
   account_id = var.cloudflare_account_id
   zone_id    = var.cloudflare_zone_id
-  service    = "pose-est-frontend" # wrangler.jsonc の "name" と一致させる
+  service    = "pose-est-frontend-dev" # wrangler.jsonc の "name" と一致させる
   hostname   = "dev.kenken-pose-est.online"
 }
 
