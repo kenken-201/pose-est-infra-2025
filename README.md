@@ -19,7 +19,7 @@ Cloudflare (エッジ/ストレージ) と Google Cloud Platform (コンピュ�
 | レイヤー            | 技術                       | 用途                                               |
 | ------------------- | -------------------------- | -------------------------------------------------- |
 | **Edge / Frontend** | Cloudflare Workers & Pages | フロントエンド配信、API プロキシ、認証トークン注入 |
-| **Storage**         | Cloudflare R2 Storeage     | 動画ファイル保存（AWS S3 互換 API）                |
+| **Storage**         | Cloudflare R2 Storage      | 動画ファイル保存（AWS S3 互換 API）                |
 | **Backend Compute** | Google Cloud Run           | FastAPI による API サーバー、動画処理実行          |
 | **IaC**             | Terraform                  | インフラ構成管理 (HCL)                             |
 | **CI/CD**           | GitHub Actions             | 自動デプロイ、セキュリティスキャン、テスト         |
@@ -33,26 +33,26 @@ Cloudflare (エッジ/ストレージ) と Google Cloud Platform (コンピュ�
 ```mermaid
 flowchart TB
     subgraph User["👤 ユーザー"]
-        Browser["ブラウザ"]
+        Browser["🖥️ ブラウザ"]
     end
 
     subgraph Cloudflare["☁️ Cloudflare (エッジ層)"]
         direction TB
-        CDN["グローバル CDN"]
-        WAF["WAF / DDoS 防御"]
+        CDN["🌍 グローバル CDN"]
+        WAF["🛡️ WAF / DDoS 防御"]
 
-        subgraph Workers["Cloudflare Workers"]
-            FrontendWorker["Frontend Worker<br/>(React SSR)"]
-            APIProxy["API Proxy Worker<br/>(認証トークン注入)"]
+        subgraph Workers["⚡ Cloudflare Workers"]
+            FrontendWorker["⚛️ Frontend Worker<br/>(React SSR)"]
+            APIProxy["🔄 API Proxy Worker<br/>(認証トークン注入)"]
         end
 
-        R2["R2 Storage<br/>(動画ファイル)"]
+        R2["🗄️ R2 Storage<br/>(動画ファイル)"]
     end
 
-    subgraph GCP["🔷 Google Cloud Platform (コンピュート層)"]
+    subgraph GCP["🚀 Google Cloud Platform (コンピュート層)"]
         direction TB
-        CloudRun["Cloud Run<br/>(asia-northeast1)"]
-        SecretManager["Secret Manager"]
+        CloudRun["🏃 Cloud Run<br/>(asia-northeast1)"]
+        SecretManager["🔑 Secret Manager"]
     end
 
     Browser -->|HTTPS| CDN
@@ -60,11 +60,11 @@ flowchart TB
     WAF --> FrontendWorker
     WAF --> APIProxy
 
-    FrontendWorker -.->|静的アセット| CDN
-    APIProxy -->|認証済みリクエスト| CloudRun
+    FrontendWorker -.->|"静的アセット"| CDN
+    APIProxy -->|"認証済みリクエスト"| CloudRun
 
-    Browser -->|署名付きURL (PUT)| R2
-    CloudRun -->|署名URL発行| R2
+    Browser -->|"署名付きURL (PUT)"| R2
+    CloudRun -->|"署名URL発行"| R2
     CloudRun --> SecretManager
 ```
 
@@ -133,7 +133,7 @@ pose-est-infra/
 
 ## 🔒 技術的なこだわり (Designed for Reviewers)
 
-技術面接官やシニアエンジニア向けの、設計上の詳細なポイントです。
+設計上の詳細なポイントです。
 
 ### 1. セキュリティ設計 (Security by Design)
 
