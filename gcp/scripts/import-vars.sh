@@ -23,6 +23,16 @@ fi
 # 環境変数 -> Terraform 入力変数 マッピング
 # -----------------------------------------------------------------------------
 
+# GCP プロジェクト ID
+if [ -n "$GCP_PROJECT_ID" ]; then
+  export TF_VAR_project_id="$GCP_PROJECT_ID"
+fi
+
+# リージョン
+if [ -n "$GCP_REGION" ]; then
+  export TF_VAR_region="$GCP_REGION"
+fi
+
 # GCP 通知用メールアドレス (モニタリングアラート送信先)
 if [ -n "$GCP_NOTIFICATION_EMAIL" ]; then
   export TF_VAR_gcp_notification_email="$GCP_NOTIFICATION_EMAIL"
