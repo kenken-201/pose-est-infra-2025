@@ -3,9 +3,11 @@ name: Cloudflare Security Scan
 on:
   pull_request:
     branches: [main]
-    # 指定パス配下の変更がある場合のみ実行
     paths:
       - "pose-est-infra/cloudflare/**"
+    paths-ignore:
+      - "**.md"
+      - "**/docs/**"
 
 jobs:
   checkov:
