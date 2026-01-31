@@ -29,7 +29,7 @@ Cloudflare (エッジ/ストレージ) と Google Cloud Platform (コンピュ�
 ## システムアーキテクチャ
 
 ユーザー体験を最大化するため、エッジコンピューティングとサーバーレスコンピュートを適材適所で組み合わせています。  
-アーキテクチャ図の作成には https://app.eraser.io/ を用いました。
+アーキテクチャ図の作成には [Eraser.io](https://app.eraser.io/) を用いました。
 
 ![System Architecture](./architecture.png)
 
