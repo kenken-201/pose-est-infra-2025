@@ -18,6 +18,10 @@ on:
     branches: [main]
     paths:
       - "pose-est-infra/gcp/**"
+    paths-ignore:
+      - "**.md"
+      - "**/docs/**"
+
   workflow_dispatch:
     inputs:
       environment:

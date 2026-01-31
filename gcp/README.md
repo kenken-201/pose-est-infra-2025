@@ -1,63 +1,27 @@
 # GCP Infrastructure
 
-Infrastructure as Code (IaC) for Pose Estimation App Backend on Google Cloud Platform.
+Google Cloud Platform インフラストラクチャ (バックエンド API / Cloud Run) のための Terraform 設定です。
 
-## Directory Structure
+> 📖 **システム全体の概要は [pose-est-infra/README.md](../README.md) を参照してください。**
 
+## ドキュメント
+
+| ドキュメント                                                   | 説明                         |
+| -------------------------------------------------------------- | ---------------------------- |
+| [guidelines.md](./guidelines.md)                               | アーキテクチャ詳細・設計思想 |
+| [todo-list.md](./todo-list.md)                                 | 開発タスクの進捗状況         |
+| [docs/cloud-run-deployment.md](./docs/cloud-run-deployment.md) | Cloud Run デプロイ手順       |
+| [docs/troubleshooting-gcp.md](./docs/troubleshooting-gcp.md)   | トラブルシューティング       |
+| [docs/github-secrets.md](./docs/github-secrets.md)             | GitHub Secrets 設定          |
+| [docs/security-checklist.md](./docs/security-checklist.md)     | セキュリティチェックリスト   |
+
+## クイックスタート
+
+```bash
+# 認証情報の確認
+./scripts/verify-auth.sh
+
+# 開発環境への適用
+./scripts/plan-dev.sh
+./scripts/apply-dev.sh
 ```
-pose-est-infra/gcp/
-├── terraform/          # Terraform configurations
-│   ├── modules/        # Reusable Terraform modules
-│   ├── environments/   # Environment-specific configurations
-│   ├── backend.tf      # R2 Backend configuration
-│   └── versions.tf     # Provider versions
-├── docs/               # Documentation
-└── scripts/            # Helper scripts
-```
-
-## Prerequisites
-
-- Terraform >= 1.14.3
-- GCP Account with `kenken-pose-est` project
-- Cloudflare R2 credentials (for tfstate storage)
-
-## Setup & Configuration
-
-1. **Environment Variables**
-
-   Copy `.env.example` to `.env` and fill in the required values:
-
-   ```bash
-   cp .env.example .env
-   ```
-
-   Required variables:
-
-   - `CLOUDFLARE_ACCOUNT_ID`: Your Cloudflare Account ID
-   - `R2_ACCESS_KEY_ID`: R2 Acess Key ID (for backend)
-   - `R2_SECRET_ACCESS_KEY`: R2 Secret Access Key (for backend)
-   - `GCP_PROJECT_ID`: `kenken-pose-est`
-
-2. **Terraform Initialization**
-
-   Initialize Terraform with the R2 backend configuration using the provided script (or manually):
-
-   ```bash
-   # Using script (Recommended)
-   ./scripts/init-backend.sh
-
-   # Or manually
-   cd terraform
-   terraform init \
-     -backend-config="access_key=$R2_ACCESS_KEY_ID" \
-     -backend-config="secret_key=$R2_SECRET_ACCESS_KEY" \
-     -backend-config="endpoint=https://$CLOUDFLARE_ACCOUNT_ID.r2.cloudflarestorage.com"
-   ```
-
-## Getting Started
-
-See `docs/deployment-guide.md` (to be created) for details.
-
-## Terraform State
-
-The Terraform state is stored in Cloudflare R2 bucket `pose-est-terraform-state` with key `gcp/terraform.tfstate`.

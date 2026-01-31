@@ -6,7 +6,7 @@ Cloudflare (エッジ/ストレージ) と Google Cloud Platform (コンピュ�
 
 ---
 
-## 🚀 プロジェクトの目的と特徴
+## プロジェクトの目的と特徴
 
 ### なぜこの構成なのか？
 
@@ -26,51 +26,16 @@ Cloudflare (エッジ/ストレージ) と Google Cloud Platform (コンピュ�
 
 ---
 
-## 🏗️ システムアーキテクチャ
+## システムアーキテクチャ
 
-ユーザー体験を最大化するため、エッジコンピューティングとサーバーレスコンピュートを適材適所で組み合わせています。
+ユーザー体験を最大化するため、エッジコンピューティングとサーバーレスコンピュートを適材適所で組み合わせています。  
+アーキテクチャ図の作成には [Eraser.io](https://app.eraser.io/) を用いました。
 
-```mermaid
-flowchart TB
-    subgraph User["👤 ユーザー"]
-        Browser["🖥️ ブラウザ"]
-    end
-
-    subgraph Cloudflare["☁️ Cloudflare (エッジ層)"]
-        direction TB
-        CDN["🌍 グローバル CDN"]
-        WAF["🛡️ WAF / DDoS 防御"]
-
-        subgraph Workers["⚡ Cloudflare Workers"]
-            FrontendWorker["⚛️ Frontend Worker<br/>(React SSR)"]
-            APIProxy["🔄 API Proxy Worker<br/>(認証トークン注入)"]
-        end
-
-        R2["🗄️ R2 Storage<br/>(動画ファイル)"]
-    end
-
-    subgraph GCP["🚀 Google Cloud Platform (コンピュート層)"]
-        direction TB
-        CloudRun["🏃 Cloud Run<br/>(asia-northeast1)"]
-        SecretManager["🔑 Secret Manager"]
-    end
-
-    Browser -->|HTTPS| CDN
-    CDN --> WAF
-    WAF --> FrontendWorker
-    WAF --> APIProxy
-
-    FrontendWorker -.->|"静的アセット"| CDN
-    APIProxy -->|"認証済みリクエスト"| CloudRun
-
-    Browser -->|"署名付きURL (PUT)"| R2
-    CloudRun -->|"署名URL発行"| R2
-    CloudRun --> SecretManager
-```
+![System Architecture](./architecture.png)
 
 ---
 
-## 🏁 Getting Started (オンボーディング)
+## Getting Started (オンボーディング)
 
 開発を始めるためのステップです。
 
@@ -93,7 +58,7 @@ cd pose-est/pose-est-infra
 ./gcp/scripts/verify-auth.sh
 ```
 
-### 3. ディレクトリ構成を理解する
+### 3. ディレクトリ構成
 
 ```
 pose-est-infra/
@@ -131,7 +96,7 @@ pose-est-infra/
 
 ---
 
-## 🔒 技術的なこだわり (Designed for Reviewers)
+## 技術的なこだわり (Designed for Reviewers)
 
 設計上の詳細なポイントです。
 
@@ -157,7 +122,7 @@ pose-est-infra/
 
 ---
 
-## 🛠️ 運用スクリプト集
+## 運用スクリプト集
 
 開発効率化のため、以下のラッパースクリプトを用意しています。
 
@@ -170,11 +135,27 @@ pose-est-infra/
 
 ---
 
-## 📚 ドキュメントリンク
+## ドキュメントリンク
 
 各コンポーネントの詳細な設計ガイドはこちらを参照してください：
 
+### 設計・アーキテクチャ
+
 - [**Cloudflare 設計ガイド**](./cloudflare/guidelines.md): DNS, WAF, Workers, R2 の詳細設定
 - [**GCP 設計ガイド**](./gcp/guidelines.md): Cloud Run, IAM, Secret Manager の詳細設定
+
+### 運用・セットアップ
+
+| ドキュメント                                                      | 説明                                    |
+| ----------------------------------------------------------------- | --------------------------------------- |
+| [Cloudflare 認証セットアップ](./cloudflare/docs/setup-auth.md)    | API Token / R2 アクセスキーの発行手順   |
+| [Cloudflare アラート設定](./cloudflare/docs/alert_setup_guide.md) | 通知・監視の設定手順                    |
+| [GCP Cloud Run デプロイ](./gcp/docs/cloud-run-deployment.md)      | Terraform による Cloud Run デプロイ手順 |
+| [GCP GitHub Secrets](./gcp/docs/github-secrets.md)                | CI/CD 用シークレットの設定              |
+| [GCP トラブルシューティング](./gcp/docs/troubleshooting-gcp.md)   | デプロイ時の問題解決ガイド              |
+| [GCP セキュリティチェック](./gcp/docs/security-checklist.md)      | セキュリティ確認項目                    |
+
+### タスク管理
+
 - [**Cloudflare タスク一覧**](./cloudflare/todo-list.md)
 - [**GCP タスク一覧**](./gcp/todo-list.md)

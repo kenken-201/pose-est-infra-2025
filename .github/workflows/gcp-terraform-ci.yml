@@ -18,6 +18,9 @@ on:
     branches: [main]
     paths:
       - "pose-est-infra/gcp/**"
+    paths-ignore:
+      - "**.md"
+      - "**/docs/**"
 
 env:
   TF_WORKING_DIR: "pose-est-infra/gcp/terraform"

@@ -1,0 +1,51 @@
+title Pose Estimation App: Cloudflare + GCP Architecture
+
+// User Layer
+User Layer [icon: users] {
+  User Browser [icon: laptop]
+}
+
+// Cloudflare Edge Layer (orange-themed)
+Cloudflare Edge Layer [color: orange, icon: cloudflare] {
+  Global CDN [icon: globe]
+  WAF [icon: shield-check, label: "WAF / DDoS Protection"]
+
+  Cloudflare Workers [icon: cloudflare-workers] {
+    Frontend Worker [icon: react, label: "Frontend Worker - React SSR"]
+    API Proxy Worker [icon: proxy, label: "API Proxy Worker - Auth Token Injection"]
+  }
+
+  R2 Storage [icon: cloudflare-r2, label: "R2 Storage (Video Files)"]
+}
+
+// Google Cloud Platform Compute Layer (blue-themed)
+GCP Compute Layer [color: blue, icon: gcp-app-engine] {
+  Cloud Run [icon: gcp-cloud-run, label: "Cloud Run - FastAPI & MediaPipe"]
+  Secret Manager [icon: gcp-secret-manager, label: "Secret Manager"]
+}
+
+// Connections
+
+// 1. User Browser → Global CDN [HTTPS]
+User Browser > Global CDN: HTTPS
+
+// 2. Global CDN → WAF
+Global CDN > WAF
+
+// 3. WAF → Frontend Worker and API Proxy Worker
+
+// 4. Frontend Worker ←→ Global CDN [Static Assets, dashed]
+
+// 5. API Proxy Worker → Cloud Run [Authenticated Request with Token]
+API Proxy Worker > Cloud Run: Authenticated Request with Token
+
+// 6. User Browser → R2 Storage [Presigned URL (Direct PUT)]
+User Browser > R2 Storage: Presigned URL (Direct PUT)
+
+// 7. Cloud Run ←→ R2 Storage [Generate Signed URLs]
+
+// 8. Cloud Run → Secret Manager [Access Secrets]
+Cloud Run > Secret Manager: Access Secrets
+WAF > Cloudflare Workers
+Global CDN <--> Frontend Worker: Static Assets
+R2 Storage <--> Cloud Run: Generate Signed URLs
