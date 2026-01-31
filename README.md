@@ -28,45 +28,10 @@ Cloudflare (エッジ/ストレージ) と Google Cloud Platform (コンピュ�
 
 ## システムアーキテクチャ
 
-ユーザー体験を最大化するため、エッジコンピューティングとサーバーレスコンピュートを適材適所で組み合わせています。
+ユーザー体験を最大化するため、エッジコンピューティングとサーバーレスコンピュートを適材適所で組み合わせています。  
+アーキテクチャ図の作成には https://app.eraser.io/ を用いました。
 
-```mermaid
-flowchart TB
-    subgraph User["👤 ユーザー"]
-        Browser["🖥️ ブラウザ"]
-    end
-
-    subgraph Cloudflare["☁️ Cloudflare (エッジ層)"]
-        direction TB
-        CDN["🌍 グローバル CDN"]
-        WAF["🛡️ WAF / DDoS 防御"]
-
-        subgraph Workers["⚡ Cloudflare Workers"]
-            FrontendWorker["⚛️ Frontend Worker<br/>(React SSR)"]
-            APIProxy["🔄 API Proxy Worker<br/>(認証トークン注入)"]
-        end
-
-        R2["🗄️ R2 Storage<br/>(動画ファイル)"]
-    end
-
-    subgraph GCP["🚀 Google Cloud Platform (コンピュート層)"]
-        direction TB
-        CloudRun["🏃 Cloud Run<br/>(asia-northeast1)"]
-        SecretManager["🔑 Secret Manager"]
-    end
-
-    Browser -->|HTTPS| CDN
-    CDN --> WAF
-    WAF --> FrontendWorker
-    WAF --> APIProxy
-
-    FrontendWorker -.->|"静的アセット"| CDN
-    APIProxy -->|"認証済みリクエスト"| CloudRun
-
-    Browser -->|"署名付きURL (PUT)"| R2
-    CloudRun -->|"署名URL発行"| R2
-    CloudRun --> SecretManager
-```
+![System Architecture](./architecture.png)
 
 ---
 
@@ -93,7 +58,7 @@ cd pose-est/pose-est-infra
 ./gcp/scripts/verify-auth.sh
 ```
 
-### 3. ディレクトリ構成を理解する
+### 3. ディレクトリ構成
 
 ```
 pose-est-infra/
