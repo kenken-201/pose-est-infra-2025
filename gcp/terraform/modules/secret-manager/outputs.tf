@@ -21,10 +21,10 @@ output "r2_secret_access_key_name" {
 
 output "r2_secret_access_key_secret_id" {
   description = "R2 Secret Access Key の Secret ID"
-  value       = google_secret_manager_secret.r2_secret_access_key.id
+  value       = google_secret_manager_secret.r2_secret_access_key.secret_id
 }
 
 output "backend_access_token_secret_id" {
   description = "Backend Access Token の Secret ID"
-  value       = google_secret_manager_secret.backend_access_token.id
+  value       = google_secret_manager_secret.backend_access_token.secret_id
 }

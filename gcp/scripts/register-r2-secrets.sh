@@ -83,8 +83,9 @@ if command -v gh &> /dev/null; then
   read -r REGISTER_GH
   if [[ "$REGISTER_GH" =~ ^[Yy]$ ]]; then
     # リポジトリ確認などが必要だが、簡易的に register
-    echo -n "$ACCESS_KEY_ID" | gh secret set "R2_ACCESS_KEY_ID_${ENV^^}"
-    echo -n "$SECRET_ACCESS_KEY" | gh secret set "R2_SECRET_ACCESS_KEY_${ENV^^}"
+    ENV_UPPER=$(echo "$ENV" | tr '[:lower:]' '[:upper:]')
+    echo -n "$ACCESS_KEY_ID" | gh secret set "R2_ACCESS_KEY_ID_${ENV_UPPER}"
+    echo -n "$SECRET_ACCESS_KEY" | gh secret set "R2_SECRET_ACCESS_KEY_${ENV_UPPER}"
     echo -e "${GREEN}✅ Registered to GitHub Secrets.${NC}"
   else
     echo "Skipped GitHub Secrets registration."
